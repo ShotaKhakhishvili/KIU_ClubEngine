@@ -1,0 +1,43 @@
+# ---- JetBrains / CLion ----
+.idea/
+*.iml
+
+# ---- CMake build directories ----
+cmake-build-debug/
+cmake-build-release/
+cmake-build-*/
+build/
+out/
+
+# ---- OS junk ----
+.DS_Store
+Thumbs.db
+
+# ---- Compiled binaries ----
+*.o
+*.obj
+*.so
+*.dll
+*.dylib
+*.exe
+*.a
+*.lib
+
+# ---- CMake generated files ----
+CMakeFiles/
+CMakeCache.txt
+Makefile
+cmake_install.cmake
+install_manifest.txt
+
+# ---- Logs ----
+*.log
+
+# ---- Visual Studio (in case you generate VS project) ----
+*.vcxproj
+*.sln
+*.vcxproj.filters
+*.vcxproj.user
+
+# ---- Backup ----
+*~
