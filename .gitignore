@@ -13,15 +13,6 @@ out/
 .DS_Store
 Thumbs.db
 
-# ---- Compiled binaries ----
-*.o
-*.obj
-*.so
-*.dll
-*.dylib
-*.exe
-*.a
-*.lib
 
 # ---- CMake generated files ----
 CMakeFiles/
