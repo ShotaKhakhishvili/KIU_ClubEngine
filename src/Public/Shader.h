@@ -1,5 +1,7 @@
 #pragma once
 
+#define SHADER_PATH(name) (std::string(PROJECT_DIR) + "/src/Private/Shaders/" + name).c_str()
+
 #include <glad/glad.h>
 #include <string>
 #include<fstream>
@@ -18,6 +20,7 @@ class Shader
 
     void Activate() const;
     void Delete() const;
+    void compileErrors(unsigned int shader, std::string type);
 
     GLuint getID() const;
 };

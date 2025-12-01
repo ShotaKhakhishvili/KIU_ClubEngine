@@ -55,7 +55,11 @@ int main() {
 
     // Create Shaders -----------------------------------------------------------------------
 
-    Shader shader("Shaders/default.vert", "Shaders/default.frag");
+    Shader shader(
+        SHADER_PATH("default.vert"),
+        SHADER_PATH("default.frag")
+    );
+
     // --------------------------------------------------------------------------------------
 
     // Create Objects -----------------------------------------------------------------------

@@ -8,6 +8,9 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# Pass SOURCE DIRECTORY to the code
+add_definitions(-DPROJECT_DIR="${CMAKE_SOURCE_DIR}")
+
 # ==========================================================
 #  SOURCE FILES
 # ==========================================================
@@ -52,7 +55,6 @@ if (WIN32)
             PRIVATE glfw3 opengl32 user32 gdi32
     )
 
-    # Force console subsystem for MinGW (so main() runs instead of WinMain)
     if(MINGW)
         target_link_options(${PROJECT_NAME} PRIVATE "-Wl,-subsystem,console")
     endif()
@@ -75,16 +77,6 @@ elseif(UNIX)
             PRIVATE glfw3 OpenGL::GL ${X11_LIBRARIES} Threads::Threads dl m
     )
 endif()
-
-# ==========================================================
-#  SHADER COPYING (IMPORTANT!)
-# ==========================================================
-add_custom_command(
-        TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${CMAKE_SOURCE_DIR}/src/Private/Shaders
-        ${CMAKE_CURRENT_BINARY_DIR}/Shaders
-)
 
 # ==========================================================
 #  WARNINGS

@@ -11,7 +11,7 @@ std::string readFile(const char* filename)
         in.seekg(0, std::ios::beg);
         in.read(&contents[0], contents.size());
         in.close();
-        return(contents);
+        return contents;
     }
     throw(errno);
 }
@@ -24,23 +24,21 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath)
     const char* vertexSource = vertexCode.c_str();
     const char* fragmentSource = fragmentCode.c_str();
 
-    // Creating A Vertex Shader
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &vertexSource, NULL);
     glCompileShader(vertexShader);
+    compileErrors(vertexShader, "VERTEX");
 
-    // Creating A Fragment Shader
     GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
     glCompileShader(fragmentShader);
+    compileErrors(fragmentShader, "FRAGMENT");  // FIXED
 
-    // Creating A Shader Program
     ID = glCreateProgram();
-
     glAttachShader(ID, vertexShader);
     glAttachShader(ID, fragmentShader);
-
     glLinkProgram(ID);
+    compileErrors(ID, "PROGRAM");              // FIXED
 
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
@@ -59,4 +57,29 @@ void Shader::Delete() const
 GLuint Shader::getID() const
 {
     return ID;
+}
+
+void Shader::compileErrors(unsigned int shader, std::string type)
+{
+    GLint hasCompiled;
+    char infoLog[512];
+
+    if (type != "PROGRAM")
+    {
+        glGetShaderiv(shader, GL_COMPILE_STATUS, &hasCompiled);
+        if (hasCompiled == GL_FALSE)
+        {
+            glGetShaderInfoLog(shader, 512, NULL, infoLog);
+            std::cout << type << " SHADER ERROR:\n" << infoLog << std::endl;
+        }
+    }
+    else
+    {
+        glGetProgramiv(shader, GL_LINK_STATUS, &hasCompiled);
+        if (hasCompiled == GL_FALSE)
+        {
+            glGetProgramInfoLog(shader, 512, NULL, infoLog);
+            std::cout << "PROGRAM LINK ERROR:\n" << infoLog << std::endl;
+        }
+    }
 }
