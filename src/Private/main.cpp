@@ -2,18 +2,21 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 
+#include "Path.h"
 #include "Shader.h"
 #include "VAO.h"
 #include "EBO.h"
+#include "Texture.h"
+#include "stb/stb_image.h"
 
 int width = 800, height = 600;
 
 GLfloat vertices[] = { // Put Square Vertices
     //----Coords-----//    //----Colors-----//
-    -0.5f,  0.5f, 0.0f,     1.0f, 0.0f, 0.0f,
-    -0.5f, -0.5f, 0.0f,     0.0f, 0.0f, 1.0f,
-     0.5f, -0.5f, 0.0f,     0.0f, 1.0f, 0.0f,
-     0.5f,  0.5f, 0.0f,     0.0f, 1.0f, 0.0f
+    -0.5f,  0.5f, 0.0f,     1.0f, 0.0f, 0.0f,   0.0f, 1.0f,     // UpperLeft
+    -0.5f, -0.5f, 0.0f,     0.0f, 0.0f, 1.0f,   0.0f, 0.0f,     // LowerLeft
+     0.5f, -0.5f, 0.0f,     0.0f, 1.0f, 0.0f,   1.0f, 0.0f,     // LowerRight
+     0.5f,  0.5f, 0.0f,     0.0f, 1.0f, 0.0f,   1.0f, 1.0f      // UpperRight
 };
 
 GLuint indices[] = { // Put Square Indices
@@ -56,8 +59,8 @@ int main() {
     // Create Shaders -----------------------------------------------------------------------
 
     Shader shader(
-        SHADER_PATH("default.vert"),
-        SHADER_PATH("default.frag")
+        (Path::Shader("default.vert").c_str()),
+        (Path::Shader("default.frag").c_str())
     );
 
     // --------------------------------------------------------------------------------------
@@ -70,39 +73,28 @@ int main() {
     VBO vbo(vertices, sizeof(vertices));
     EBO ebo(indices, sizeof(indices));
 
-    vao.LinkAttrib(vbo, 0, 3, GL_FLOAT, 6 * sizeof(float), (void*)0);
-    vao.LinkAttrib(vbo, 1, 3, GL_FLOAT, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    vao.LinkAttrib(vbo, 0, 3, GL_FLOAT, 8 * sizeof(float), (void*)0);
+    vao.LinkAttrib(vbo, 1, 3, GL_FLOAT, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    vao.LinkAttrib(vbo, 2, 2, GL_FLOAT, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 
     vao.Unbind();
     vbo.Unbind();
     ebo.Unbind();
 
     // --------------------------------------------------------------------------------------
-
-    // Uniform ID
-    GLuint id_of_offset = glGetUniformLocation(shader.getID(), "offset");
-    float offsetY = 0.0f;
-    // --------------------------------------------------------------------------------------
     glViewport(0, 0, width, height);
     glClearColor(0.1f, 0.1f, 0.15f, 1.0f);
+
+    Texture texture = Texture("1.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
         glClear(GL_COLOR_BUFFER_BIT);
         // Draw Triangle ------------------------------------
         shader.Activate();
-        glUniform3f(id_of_offset, 0.0f, offsetY, 0.0f);
+        glBindTexture(GL_TEXTURE_2D, texture.getID());
         vao.Bind();
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        // --------------------------------------------------
-        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
-        {
-             offsetY += 0.01f;
-        }
-        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
-        {
-            offsetY -= 0.01f;
-        }
 
         glfwSwapBuffers(window);
     }

@@ -1,7 +1,5 @@
 #pragma once
 
-#define SHADER_PATH(name) (std::string(PROJECT_DIR) + "/src/Private/Shaders/" + name).c_str()
-
 #include <glad/glad.h>
 #include <string>
 #include<fstream>
