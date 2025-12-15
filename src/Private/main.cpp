@@ -94,6 +94,9 @@ int main() {
 
     texture.TexUnit(shader, "tex0", 0);
 
+    float rotation = 0.0f;
+    double prevTime = glfwGetTime();
+
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
         glClear(GL_COLOR_BUFFER_BIT);
@@ -105,9 +108,16 @@ int main() {
         glm::mat4 view = glm::mat4(1.0f);
         glm::mat4 proj = glm::mat4(1.0f);
 
-        //model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0, 0, 1));
+        model = glm::rotate(model, glm::radians(rotation), glm::vec3(1, 1, 1));
         view = glm::translate(view, glm::vec3(0.0f, 0.0f, -2.0f));
         proj = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 100.0f);
+
+        double currentTime = glfwGetTime();
+        if (currentTime - prevTime >= 1 / 60)
+        {
+            rotation += 0.5f;
+            prevTime = currentTime;
+        }
 
         int modelLoc = glGetUniformLocation(shader.getID(), "model");
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
@@ -128,6 +138,7 @@ int main() {
     vao.Delete();
     ebo.Delete();
     vbo.Delete();
+    texture.Delete();
 
     glfwDestroyWindow(window);
     glfwTerminate();
