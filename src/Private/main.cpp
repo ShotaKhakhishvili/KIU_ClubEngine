@@ -61,7 +61,7 @@ int main() {
     std::vector<Vertex> vertices;
     std::vector<GLuint> indices;
 
-    ReadFromObjIntoVectors(Path::Model("Cube.txt"), vertices, indices);
+    ReadFromObjIntoVectors(Path::Model("Sword.txt"), vertices, indices);
 
     VAO vao;
     vao.Bind();

@@ -23,7 +23,6 @@ class Camera
     // Extras for now
     static constexpr float normalSpeed = 0.01f, highSpeed = 0.05f;
     float speed = 0.01f, sensitivity = 100.0f;
-
     bool firstClick = true;
 
     public:
