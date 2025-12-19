@@ -7,9 +7,11 @@ std::string Path::Resources(){ return ProjectRoot() + "/Resources";}
 // typed dirs
 std::string Path::Shaders(){ return Resources() + "/Shaders";}
 std::string Path::Textures(){ return Resources() + "/Textures";}
+std::string Path::Models(){ return Resources() + "/Models";}
 
 // helpers
 std::string Path::Asset(const std::string& relative){ return Resources() + "/" + relative;}
 std::string Path::Shader(const std::string& relative){ return Shaders() + "/" + relative;}
 std::string Path::Texture(const std::string& relative){ return Textures() + "/" + relative;}
+std::string Path::Model(const std::string& relative){ return Models() + "/" + relative;}
 

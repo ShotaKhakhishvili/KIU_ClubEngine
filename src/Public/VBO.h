@@ -1,12 +1,14 @@
 #pragma once
 
 #include <glad/glad.h>
+#include "FuncLib.h"
+#include <vector>
 
 class VBO
 {
     GLuint ID;
 public:
-    VBO(GLfloat* vertices, GLsizeiptr size);
+    VBO(std::vector<Vertex>& vertices);
 
     void Bind() const;
     static void Unbind();

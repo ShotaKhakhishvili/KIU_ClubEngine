@@ -6,28 +6,17 @@
 #include <glm\gtc\type_ptr.hpp>
 
 #include <iostream>
+#include <vector>
 
 #include "Path.h"
 #include "Shader.h"
 #include "VAO.h"
 #include "EBO.h"
 #include "Texture.h"
-#include "stb/stb_image.h"
+#include "Camera.h"
+#include "FuncLib.h"
 
 int width = 800, height = 600;
-
-GLfloat vertices[] = { // Put Square Vertices
-    //----Coords-----//    //----Colors-----//
-    -0.5f,  0.5f, 0.0f,     1.0f, 0.0f, 0.0f,   0.0f, 1.0f,     // UpperLeft
-    -0.5f, -0.5f, 0.0f,     0.0f, 0.0f, 1.0f,   0.0f, 0.0f,     // LowerLeft
-     0.5f, -0.5f, 0.0f,     0.0f, 1.0f, 0.0f,   1.0f, 0.0f,     // LowerRight
-     0.5f,  0.5f, 0.0f,     0.0f, 1.0f, 0.0f,   1.0f, 1.0f      // UpperRight
-};
-
-GLuint indices[] = { // Put Square Indices
-    0, 1, 2,
-    0, 2, 3
-};
 
 GLFWwindow* CreateWindow() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -58,77 +47,64 @@ int main() {
     }
 
     glfwMakeContextCurrent(window); // Actually display the window
-
     gladLoadGL(); // Load Functions
 
-    // Create Shaders -----------------------------------------------------------------------
+    // ----------------------------------------------- Object Setup ------------------------------------------
 
-    Shader shader(
-        (Path::Shader("default.vert").c_str()),
-        (Path::Shader("default.frag").c_str())
-    );
+    // Shader
+    std::string vp = Path::Shader("default.vert");
+    std::string fp = Path::Shader("default.frag");
+    Shader shader(vp.c_str(), fp.c_str());
 
-    // --------------------------------------------------------------------------------------
+    // Geometry
 
-    // Create Objects -----------------------------------------------------------------------
+    std::vector<Vertex> vertices;
+    std::vector<GLuint> indices;
+
+    ReadFromObjIntoVectors(Path::Model("Cube.txt"), vertices, indices);
 
     VAO vao;
     vao.Bind();
 
-    VBO vbo(vertices, sizeof(vertices));
-    EBO ebo(indices, sizeof(indices));
+    VBO vbo(vertices);
+    EBO ebo(indices);
 
-    vao.LinkAttrib(vbo, 0, 3, GL_FLOAT, 8 * sizeof(float), (void*)0);
-    vao.LinkAttrib(vbo, 1, 3, GL_FLOAT, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-    vao.LinkAttrib(vbo, 2, 2, GL_FLOAT, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    vao.LinkAttrib(vbo, 0, 3, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, coord));
+    vao.LinkAttrib(vbo, 1, 3, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+    vao.LinkAttrib(vbo, 2, 3, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, color));
+    vao.LinkAttrib(vbo, 3, 2, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, texUV));
 
-    vao.Unbind();
-    vbo.Unbind();
-    ebo.Unbind();
+    VAO::Unbind();
+    VBO::Unbind();
+    EBO::Unbind();
 
-    // --------------------------------------------------------------------------------------
-    glViewport(0, 0, width, height);
-    glClearColor(0.1f, 0.1f, 0.15f, 1.0f);
+    // Texture
 
     Texture texture = Texture("1.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
-
     texture.TexUnit(shader, "tex0", 0);
 
-    float rotation = 0.0f;
-    double prevTime = glfwGetTime();
+    // -------------------------------General Settings----------------------------------------
+
+    glViewport(0, 0, width, height);
+    glClearColor(0.1f, 0.1f, 0.15f, 1.0f);
+    glEnable(GL_DEPTH_TEST);
+
+    // -----------------------------------Camera--------------------------------------------------
+
+    Camera camera(width, height, glm::vec3(0.0f, 0.0f, 2.0f));
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
-        glClear(GL_COLOR_BUFFER_BIT);
-        // Draw Triangle ------------------------------------
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         shader.Activate();
 
-        // setup for 3D
-        glm::mat4 model = glm::mat4(1.0f);
-        glm::mat4 view = glm::mat4(1.0f);
-        glm::mat4 proj = glm::mat4(1.0f);
+        camera.UpdateMatrix(45.0f, 0.1f, 100.0f);
+        camera.ApplyMatrix(shader, "camMat");
+        camera.ProccessInputs(window);
 
-        model = glm::rotate(model, glm::radians(rotation), glm::vec3(1, 1, 1));
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -2.0f));
-        proj = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 100.0f);
-
-        double currentTime = glfwGetTime();
-        if (currentTime - prevTime >= 1 / 60)
-        {
-            rotation += 0.5f;
-            prevTime = currentTime;
-        }
-
-        int modelLoc = glGetUniformLocation(shader.getID(), "model");
-        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-        int viewLoc = glGetUniformLocation(shader.getID(), "view");
-        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-        int projLoc = glGetUniformLocation(shader.getID(), "proj");
-        glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));
-
-        glBindTexture(GL_TEXTURE_2D, texture.getID());
+        texture.Bind();
         vao.Bind();
-        glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(int), GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 
         glfwSwapBuffers(window);
     }

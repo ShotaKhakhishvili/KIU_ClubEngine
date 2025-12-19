@@ -21,6 +21,9 @@ add_executable(${PROJECT_NAME}
         ${CLUBENGINE_SOURCES}
         src/Public/Texture.h
         src/Private/Texture.cpp
+        src/Public/Camera.h
+        src/Private/Camera.cpp
+        src/Public/FuncLib.h
 )
 
 # ==========================================================

@@ -11,9 +11,11 @@ public:
     // Typed subdirectories
     static std::string Shaders();
     static std::string Textures();
+    static std::string Models();
 
     // Generic helpers
     static std::string Asset(const std::string& relative);
     static std::string Shader(const std::string& relative);
     static std::string Texture(const std::string& relative);
+    static std::string Model(const std::string& relative);
 };
