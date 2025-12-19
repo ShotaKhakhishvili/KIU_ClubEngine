@@ -24,6 +24,9 @@ add_executable(${PROJECT_NAME}
         src/Public/Camera.h
         src/Private/Camera.cpp
         src/Public/FuncLib.h
+        src/Public/Object.h
+        src/Private/Object.cpp
+        src/Private/Object.cpp
 )
 
 # ==========================================================

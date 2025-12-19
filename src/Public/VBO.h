@@ -9,6 +9,7 @@ class VBO
     GLuint ID;
 public:
     VBO(std::vector<Vertex>& vertices);
+    VBO(){}
 
     void Bind() const;
     static void Unbind();

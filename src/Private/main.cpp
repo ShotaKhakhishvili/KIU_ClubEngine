@@ -15,6 +15,7 @@
 #include "Texture.h"
 #include "Camera.h"
 #include "FuncLib.h"
+#include "Object.h"
 
 int width = 800, height = 600;
 
@@ -49,39 +50,6 @@ int main() {
     glfwMakeContextCurrent(window); // Actually display the window
     gladLoadGL(); // Load Functions
 
-    // ----------------------------------------------- Object Setup ------------------------------------------
-
-    // Shader
-    std::string vp = Path::Shader("default.vert");
-    std::string fp = Path::Shader("default.frag");
-    Shader shader(vp.c_str(), fp.c_str());
-
-    // Geometry
-
-    std::vector<Vertex> vertices;
-    std::vector<GLuint> indices;
-
-    ReadFromObjIntoVectors(Path::Model("Sword.txt"), vertices, indices);
-
-    VAO vao;
-    vao.Bind();
-
-    VBO vbo(vertices);
-    EBO ebo(indices);
-
-    vao.LinkAttrib(vbo, 0, 3, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, coord));
-    vao.LinkAttrib(vbo, 1, 3, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, normal));
-    vao.LinkAttrib(vbo, 2, 3, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, color));
-    vao.LinkAttrib(vbo, 3, 2, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, texUV));
-
-    VAO::Unbind();
-    VBO::Unbind();
-    EBO::Unbind();
-
-    // Texture
-
-    Texture texture = Texture("1.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
-    texture.TexUnit(shader, "tex0", 0);
 
     // -------------------------------General Settings----------------------------------------
 
@@ -91,30 +59,30 @@ int main() {
 
     // -----------------------------------Camera--------------------------------------------------
 
-    Camera camera(width, height, glm::vec3(0.0f, 0.0f, 2.0f));
+    Object sword = Object("Sword.txt", "1.png");
+    Object cube = Object("Cube.txt", "1.png");
+
+    std::vector<Object> objects;
+
+    for (int i = 0; i < 100; i++)
+    {
+        objects.push_back(Object("Sphere.txt", "1.png"));
+        objects[i].SetPosition(glm::vec3(i * 2, 0, 0));
+    }
+
+    Camera camera(width, height, glm::vec3(0.0f, 0.0f, 1.0f));
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        shader.Activate();
 
-        camera.UpdateMatrix(45.0f, 0.1f, 100.0f);
-        camera.ApplyMatrix(shader, "camMat");
+        sword.Draw(camera, window);
+        cube.Draw(camera, window);
+
         camera.ProccessInputs(window);
-
-        texture.Bind();
-        vao.Bind();
-        glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 
         glfwSwapBuffers(window);
     }
-
-    shader.Delete();
-
-    vao.Delete();
-    ebo.Delete();
-    vbo.Delete();
-    texture.Delete();
 
     glfwDestroyWindow(window);
     glfwTerminate();

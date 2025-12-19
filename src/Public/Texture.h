@@ -11,6 +11,7 @@ class Texture
 
     public:
     Texture(const char* imagePath, GLenum texType, GLenum slot, GLenum format, GLenum pixelType);
+    Texture(){}
 
     void TexUnit(Shader& shader, const char* uniform, GLuint unit) const;
     void Bind() const;
