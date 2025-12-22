@@ -8,7 +8,6 @@
 #include "EBO.h"
 #include "Camera.h"
 
-
 class Object
 {
     Shader shader;
@@ -25,7 +24,7 @@ class Object
     glm::vec3 rotation{0.0f};
     glm::vec3 scale{1.0f};
 
-    bool matValuesChanged = false;
+    bool matValuesChanged = true;
 
     public:
     Object(const char* modelPath, const char* texturePath, const char* fragShaderPath);
@@ -39,5 +38,5 @@ class Object
     void SetLightSource(glm::vec3 position, glm::vec4 color);
 
     Shader& GetShader();
-    void Draw(Camera& camera, GLFWwindow* window);
+    void Draw(Camera& camera);
 };

@@ -28,7 +28,7 @@ Object::Object(const char* modelPath, const char* texturePath, const char* fragS
     texture.TexUnit(shader, "tex0", 0);
 }
 
-void Object::Draw(Camera& camera, GLFWwindow* window)
+void Object::Draw(Camera& camera)
 {
     if (matValuesChanged)
         RefreshModelMatrix();
@@ -76,6 +76,8 @@ void Object::RefreshModelMatrix()
 
     GLint modelLoc = glGetUniformLocation(shader.getID(), "model");
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+    matValuesChanged = false;
 }
 
 void Object::SetLightSource(glm::vec3 position, glm::vec4 color)

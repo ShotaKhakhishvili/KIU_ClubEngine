@@ -27,6 +27,8 @@ add_executable(${PROJECT_NAME}
         src/Public/Object.h
         src/Private/Object.cpp
         src/Private/Object.cpp
+        src/Public/InstancedObject.h
+        src/Private/InstancedObject.cpp
 )
 
 # ==========================================================

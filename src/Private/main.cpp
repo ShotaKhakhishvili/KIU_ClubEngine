@@ -16,6 +16,7 @@
 #include "Camera.h"
 #include "FuncLib.h"
 #include "Object.h"
+#include "InstancedObject.h"
 
 int width = 800, height = 600;
 
@@ -63,23 +64,18 @@ int main() {
 
     // -----------------------------------Spawning Objects-------------------------------------
 
-    glm::vec4 lightCol = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-    glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 1.0f);
+    glm::vec4 lightCol = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+    glm::vec3 lightPos = glm::vec3(100.0f, 100.0f, 100.0f);
 
-    Object lightSource = Object("Cube.txt", "1.png", "light.frag");
-    lightSource.SetPosition(lightPos);
+    InstancedObject* instObj = new InstancedObject("Cube.txt", "1.png", "default.frag");
 
-    // Update light's color
-    GLint lightColPos = glGetUniformLocation(lightSource.GetShader().getID(), "lightCol");
-    glUniform4f(lightColPos, lightCol.x, lightCol.y, lightCol.z, lightCol.w);
-
-    std::vector<Object> objects;
-
-    for (int i = 0; i < 100; i++)
-    {
-        objects.push_back(Object("Cube.txt", "1.png", "default.frag"));
-        objects[i].SetPosition(glm::vec3(i, 0, 0));
-        objects[i].SetLightSource(lightPos, lightCol);
+    for (int i = 0; i < 50; i++) {
+        for (int j = 0; j < 50; j++) {
+            for (int k = 0; k < 50; k++) {
+                instObj->AddInstance(glm::vec3(i, k, j));
+                instObj->SetLightSource(lightPos, lightCol);
+            }
+        }
     }
 
     while (!glfwWindowShouldClose(window)) {
@@ -87,9 +83,7 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         camera.ProccessInputs(window);
 
-        for (int i = 0; i < objects.size(); i++)
-            objects[i].Draw(camera, window);
-        lightSource.Draw(camera, window);
+        instObj->Draw(camera);
 
         glfwSwapBuffers(window);
     }
