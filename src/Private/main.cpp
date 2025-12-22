@@ -67,12 +67,13 @@ int main() {
     glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 1.0f);
 
     Object lightSource = Object("Cube.txt", "1.png", "light.frag");
+    lightSource.SetPosition(lightPos);
+
+    // Update light's color
     GLint lightColPos = glGetUniformLocation(lightSource.GetShader().getID(), "lightCol");
     glUniform4f(lightColPos, lightCol.x, lightCol.y, lightCol.z, lightCol.w);
 
     std::vector<Object> objects;
-
-    lightSource.SetPosition(lightPos);
 
     for (int i = 0; i < 100; i++)
     {
