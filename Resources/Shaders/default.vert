@@ -8,11 +8,18 @@ layout (location = 3) in vec2 aTex;
 out vec3 color;
 out vec2 texCoord;
 
+out vec3 pos;
+out vec3 normal;
+
+uniform mat4 model;
 uniform mat4 camMat;
 
 void main()
 {
-   gl_Position = camMat * vec4(aPos, 1.0);
+   pos = vec3(model * vec4(aPos, 1.0f));
+
+   gl_Position = camMat * vec4(pos, 1.0);
    color = aColor;
    texCoord = aTex;
+   normal = aNormal;
 };

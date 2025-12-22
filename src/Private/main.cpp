@@ -59,27 +59,36 @@ int main() {
 
     // -----------------------------------Camera--------------------------------------------------
 
-    Object sword = Object("Sword.txt", "1.png");
-    Object cube = Object("Cube.txt", "1.png");
+    Camera camera(width, height, glm::vec3(0.0f, 0.0f, 1.0f));
+
+    // -----------------------------------Spawning Objects-------------------------------------
+
+    glm::vec4 lightCol = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+    glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 1.0f);
+
+    Object lightSource = Object("Cube.txt", "1.png", "light.frag");
+    GLint lightColPos = glGetUniformLocation(lightSource.GetShader().getID(), "lightCol");
+    glUniform4f(lightColPos, lightCol.x, lightCol.y, lightCol.z, lightCol.w);
 
     std::vector<Object> objects;
 
+    lightSource.SetPosition(lightPos);
+
     for (int i = 0; i < 100; i++)
     {
-        objects.push_back(Object("Sphere.txt", "1.png"));
-        objects[i].SetPosition(glm::vec3(i * 2, 0, 0));
+        objects.push_back(Object("Cube.txt", "1.png", "default.frag"));
+        objects[i].SetPosition(glm::vec3(i, 0, 0));
+        objects[i].SetLightSource(lightPos, lightCol);
     }
-
-    Camera camera(width, height, glm::vec3(0.0f, 0.0f, 1.0f));
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        sword.Draw(camera, window);
-        cube.Draw(camera, window);
-
         camera.ProccessInputs(window);
+
+        for (int i = 0; i < objects.size(); i++)
+            objects[i].Draw(camera, window);
+        lightSource.Draw(camera, window);
 
         glfwSwapBuffers(window);
     }
