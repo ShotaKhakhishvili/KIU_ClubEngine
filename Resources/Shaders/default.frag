@@ -14,10 +14,9 @@ void main()
 {
    float ambient = 0.1;
 
-   vec3 unitNormal = normalize(normal);
    vec3 lightDir = normalize(lightPos - pos);
 
-   float diffuse = max(dot(unitNormal, lightDir), 0.0);
+   float diffuse = max(dot(normal, lightDir), 0.0);
 
    vec4 texColor = texture(tex0, texCoord);
    vec3 litColor = diffuse * lightCol.rgb * texColor.rgb + ambient * texColor.rgb;

@@ -65,18 +65,14 @@ int main() {
     // -----------------------------------Spawning Objects-------------------------------------
 
     glm::vec4 lightCol = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-    glm::vec3 lightPos = glm::vec3(100.0f, 100.0f, 100.0f);
+    glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 0.0f);
 
     InstancedObject* instObj = new InstancedObject("Cube.txt", "1.png", "default.frag");
 
-    for (int i = 0; i < 50; i++) {
-        for (int j = 0; j < 50; j++) {
-            for (int k = 0; k < 50; k++) {
-                instObj->AddInstance(glm::vec3(i, k, j));
-                instObj->SetLightSource(lightPos, lightCol);
-            }
-        }
-    }
+    instObj->AddInstance(glm::vec3(0,-2,0));
+    instObj->SetScale(0,glm::vec3(100,100,3));
+    instObj->SetRotation(0,glm::vec3(90,0,0));
+    instObj->SetLightSource(lightPos, lightCol);
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();

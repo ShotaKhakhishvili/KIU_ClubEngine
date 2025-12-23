@@ -21,5 +21,5 @@ void main()
    gl_Position = camMat * vec4(pos, 1.0);
    color = aColor;
    texCoord = aTex;
-   normal = aNormal;
+   normal = normalize(transpose(inverse(mat3(model))) * aNormal); // put normals in world-space
 };

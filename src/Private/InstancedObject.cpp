@@ -29,15 +29,15 @@ InstancedObject::InstancedObject(const char* modelPath, const char* texturePath,
 
 void InstancedObject::SetPosition(signed int objIndex, glm::vec3 position) {
     objInsts[objIndex].position = position;
-    objInsts[objIndex].matValuesChanged = false;
+    objInsts[objIndex].matValuesChanged = true;
 }
 void InstancedObject::SetRotation(signed int objIndex, glm::vec3 rotation) {
     objInsts[objIndex].rotation = rotation;
-    objInsts[objIndex].matValuesChanged = false;
+    objInsts[objIndex].matValuesChanged = true;
 }
 void InstancedObject::SetScale(signed int objIndex, glm::vec3 scale) {
     objInsts[objIndex].scale = scale;
-    objInsts[objIndex].matValuesChanged = false;
+    objInsts[objIndex].matValuesChanged = true;
 }
 
 void InstancedObject::SetLightSource(glm::vec3 position, glm::vec4 color) {
