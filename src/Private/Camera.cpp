@@ -1,5 +1,7 @@
 #include"Camera.h"
 
+Camera* Camera::camera = nullptr;
+
 Camera::Camera(int width, int height, glm::vec3 position)
 {
 	Camera::width = width;
@@ -93,4 +95,9 @@ void Camera::ProccessInputs(GLFWwindow* window)
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 		firstClick = true;
 	}
+}
+
+void Camera::Init(int width, int height, glm::vec3 position)
+{
+	camera = new Camera(width, height, position);
 }

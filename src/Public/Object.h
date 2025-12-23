@@ -1,4 +1,4 @@
-#pragma one
+#pragma once
 
 #include "Shader.h"
 #include "Texture.h"
@@ -7,8 +7,9 @@
 #include "VAO.h"
 #include "EBO.h"
 #include "Camera.h"
+#include "Actor.h"
 
-class Object
+class Object : public Actor
 {
     Shader shader;
     Texture texture;
@@ -38,5 +39,5 @@ class Object
     void SetLightSource(glm::vec3 position, glm::vec4 color);
 
     Shader& GetShader();
-    void Draw(Camera& camera);
+    void Draw() override;
 };

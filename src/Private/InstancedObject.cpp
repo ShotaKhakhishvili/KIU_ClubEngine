@@ -52,11 +52,11 @@ void InstancedObject::SetLightSource(glm::vec3 position, glm::vec4 color) {
 Shader& InstancedObject::GetShader() {
     return shader;
 }
-void InstancedObject::Draw(Camera& camera) {
+void InstancedObject::Draw() {
     shader.Activate();
 
-    camera.UpdateMatrix(45.0f, 0.1f, 100.0f);
-    camera.ApplyMatrix(shader, "camMat");
+    Camera::camera->UpdateMatrix(45.0f, 0.1f, 100.0f);
+    Camera::camera->ApplyMatrix(shader, "camMat");
 
     texture.Bind();
     vao.Bind();

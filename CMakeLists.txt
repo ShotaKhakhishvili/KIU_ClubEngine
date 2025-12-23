@@ -24,6 +24,9 @@ add_executable(${PROJECT_NAME}
         ${ALL_SOURCES}
         Game/src/Public/Game.h
         Game/src/Private/Game.cpp
+        src/Public/Actor.h
+        src/Public/World.h
+        src/Private/World.cpp
 )
 
 # ==========================================================

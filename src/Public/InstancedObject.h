@@ -7,6 +7,7 @@
 #include "VAO.h"
 #include "EBO.h"
 #include "Camera.h"
+#include "Actor.h"
 
 struct ObjInst {
     glm::vec3 position{0.0f};
@@ -17,7 +18,7 @@ struct ObjInst {
     bool matValuesChanged = true;
 };
 
-class InstancedObject {
+class InstancedObject : public Actor {
 
     Shader shader;
     Texture texture;
@@ -44,7 +45,7 @@ class InstancedObject {
     void SetLightSource(glm::vec3 position, glm::vec4 color);
 
     Shader& GetShader();
-    void Draw(Camera& camera);
+    void Draw() override;
 
     void AddInstance(glm::vec3 position);
 };

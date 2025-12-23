@@ -19,8 +19,9 @@
 #include "FuncLib.h"
 #include "Object.h"
 #include "InstancedObject.h"
+#include "World.h"
 
-namespace ClubEngine
+namespace Game
 {
     void Init();
 }

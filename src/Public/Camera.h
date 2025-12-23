@@ -25,10 +25,15 @@ class Camera
     float speed = 0.01f, sensitivity = 100.0f;
     bool firstClick = true;
 
-    public:
     Camera(int width, int height, glm::vec3 position);
+
+    public:
 
     void UpdateMatrix(float FOVdeg, float newPlane, float farPlane);
     void ApplyMatrix(Shader& shader, const char* uniform) const;
     void ProccessInputs(GLFWwindow* window);
+
+    static void Init(int width, int height, glm::vec3 position);
+
+    static Camera* camera;
 };

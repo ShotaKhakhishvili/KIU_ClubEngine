@@ -28,14 +28,14 @@ Object::Object(const char* modelPath, const char* texturePath, const char* fragS
     texture.TexUnit(shader, "tex0", 0);
 }
 
-void Object::Draw(Camera& camera)
+void Object::Draw()
 {
     if (matValuesChanged)
         RefreshModelMatrix();
     shader.Activate();
 
-    camera.UpdateMatrix(45.0f, 0.1f, 100.0f);
-    camera.ApplyMatrix(shader, "camMat");
+    Camera::camera->UpdateMatrix(45.0f, 0.1f, 100.0f);
+    Camera::camera->ApplyMatrix(shader, "camMat");
 
     texture.Bind();
     vao.Bind();
