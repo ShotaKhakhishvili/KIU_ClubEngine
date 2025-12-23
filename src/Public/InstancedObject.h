@@ -42,10 +42,8 @@ class InstancedObject : public Actor {
 
     void RefreshModelMatrix(ObjInst& instRef);
 
-    void SetLightSource(glm::vec3 position, glm::vec4 color);
-
-    Shader& GetShader();
     void Draw() override;
+    Shader* GetShader() override;
 
     void AddInstance(glm::vec3 position);
 };

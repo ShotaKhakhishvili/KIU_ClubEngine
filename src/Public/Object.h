@@ -36,8 +36,6 @@ class Object : public Actor
 
     void RefreshModelMatrix();
 
-    void SetLightSource(glm::vec3 position, glm::vec4 color);
-
-    Shader& GetShader();
+    Shader* GetShader() override;
     void Draw() override;
 };

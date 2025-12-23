@@ -40,17 +40,9 @@ void InstancedObject::SetScale(signed int objIndex, glm::vec3 scale) {
     objInsts[objIndex].matValuesChanged = true;
 }
 
-void InstancedObject::SetLightSource(glm::vec3 position, glm::vec4 color) {
-    shader.Activate();
 
-    GLint positionLoc = glGetUniformLocation(shader.getID(), "lightPos");
-    glUniform3f(positionLoc, position.x, position.y, position.z);
-    GLint colorLoc = glGetUniformLocation(shader.getID(), "lightCol");
-    glUniform4f(colorLoc, color.r, color.g, color.b, color.a);
-}
-
-Shader& InstancedObject::GetShader() {
-    return shader;
+Shader* InstancedObject::GetShader() {
+    return &shader;
 }
 void InstancedObject::Draw() {
     shader.Activate();
@@ -63,7 +55,7 @@ void InstancedObject::Draw() {
 
     GLint modelMatrixLoc = glGetUniformLocation(shader.getID(), "model");
 
-    for (int i = 0; i < objInsts.size(); i++) {
+    for (unsigned int i = 0; i < objInsts.size(); i++) {
         if (objInsts[i].matValuesChanged) {
             RefreshModelMatrix(objInsts[i]);
             objInsts[i].matValuesChanged = false;

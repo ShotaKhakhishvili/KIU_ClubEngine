@@ -80,17 +80,8 @@ void Object::RefreshModelMatrix()
     matValuesChanged = false;
 }
 
-void Object::SetLightSource(glm::vec3 position, glm::vec4 color)
-{
-    shader.Activate();
 
-    GLint positionLoc = glGetUniformLocation(shader.getID(), "lightPos");
-    glUniform3f(positionLoc, position.x, position.y, position.z);
-    GLint colorLoc = glGetUniformLocation(shader.getID(), "lightCol");
-    glUniform4f(colorLoc, color.r, color.g, color.b, color.a);
-}
-
-Shader& Object::GetShader()
+Shader* Object::GetShader()
 {
-    return shader;
+    return &shader;
 }

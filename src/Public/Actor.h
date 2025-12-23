@@ -11,4 +11,6 @@ public:
     virtual void OnActorBegin(){}
     virtual void OnActorEnd(){}
     virtual void Update(){}
+
+    virtual Shader* GetShader(){return nullptr;}
 };

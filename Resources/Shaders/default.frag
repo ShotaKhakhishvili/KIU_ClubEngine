@@ -7,19 +7,56 @@ in vec3 pos;
 in vec3 normal;
 
 uniform sampler2D tex0;
-uniform vec4 lightCol;
-uniform vec3 lightPos;
+
+#define MAX_LIGHTS 32
+
+struct Light
+{
+   vec3 position;
+   vec3 color;
+   float intensity;
+   float radius;
+};
+
+uniform int lightCount;
+uniform Light lights[MAX_LIGHTS];
 
 void main()
 {
-   float ambient = 0.1;
+   vec3 N = normalize(normal);
+   vec3 fragPos = pos;
+   vec3 albedo = texture(tex0, texCoord).rgb;
 
-   vec3 lightDir = normalize(lightPos - pos);
+   vec3 result = albedo * 0.1;
 
-   float diffuse = max(dot(normal, lightDir), 0.0);
+   for (int i = 0; i < lightCount; i++)
+   {
+      vec3 toLight = lights[i].position - fragPos;
+      float dist = length(toLight);
 
-   vec4 texColor = texture(tex0, texCoord);
-   vec3 litColor = diffuse * lightCol.rgb * texColor.rgb + ambient * texColor.rgb;
+      if (dist > lights[i].radius)
+      continue;
 
-   FragColor = vec4(litColor, texColor.a);
+      vec3 L = normalize(toLight);
+      float diff = max(dot(N, L), 0.0);
+
+      float attenuation = 1.0 / max(dist * dist, 0.001);
+
+      float fade = 1.0 - smoothstep(
+         lights[i].radius * 0.8,
+         lights[i].radius,
+         dist
+      );
+
+      vec3 lightContribution =
+      diff *
+      lights[i].color *
+      lights[i].intensity *
+      attenuation *
+      fade;
+
+      result += lightContribution * albedo;
+   }
+
+   FragColor = vec4(result, 1.0);
 }
