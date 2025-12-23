@@ -9,32 +9,26 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # ==========================================================
-#  SOURCE FILES
+#  SOURCE FILES (ENGINE + GAME = ONE CODEBASE)
 # ==========================================================
-file(GLOB_RECURSE CLUBENGINE_SOURCES
-        "${CMAKE_SOURCE_DIR}/src/Private/*.cpp"
-        "${CMAKE_SOURCE_DIR}/src/Private/*.c"
-        "${CMAKE_SOURCE_DIR}/src/Public/*.h"
+file(GLOB_RECURSE ALL_SOURCES
+        "${CMAKE_SOURCE_DIR}/src/**/*.cpp"
+        "${CMAKE_SOURCE_DIR}/src/**/*.c"
+        "${CMAKE_SOURCE_DIR}/src/**/*.h"
+        "${CMAKE_SOURCE_DIR}/Game/src/**/*.cpp"
+        "${CMAKE_SOURCE_DIR}/Game/src/**/*.c"
+        "${CMAKE_SOURCE_DIR}/Game/src/**/*.h"
 )
 
 add_executable(${PROJECT_NAME}
-        ${CLUBENGINE_SOURCES}
-        src/Public/Texture.h
-        src/Private/Texture.cpp
-        src/Public/Camera.h
-        src/Private/Camera.cpp
-        src/Public/FuncLib.h
-        src/Public/Object.h
-        src/Private/Object.cpp
-        src/Private/Object.cpp
-        src/Public/InstancedObject.h
-        src/Private/InstancedObject.cpp
+        ${ALL_SOURCES}
+        Game/src/Public/Game.h
+        Game/src/Private/Game.cpp
 )
 
 # ==========================================================
 #  COMPILE DEFINITIONS
 # ==========================================================
-# Used by Path::ProjectRoot()
 target_compile_definitions(${PROJECT_NAME}
         PRIVATE
         PROJECT_DIR="${CMAKE_SOURCE_DIR}"
@@ -44,10 +38,12 @@ target_compile_definitions(${PROJECT_NAME}
 # ==========================================================
 #  INCLUDE DIRECTORIES
 # ==========================================================
-# Only headers that should be included by engine code
 target_include_directories(${PROJECT_NAME}
         PRIVATE
         ${CMAKE_SOURCE_DIR}/src/Public
+        ${CMAKE_SOURCE_DIR}/src/Private
+        ${CMAKE_SOURCE_DIR}/Game/src/Public
+        ${CMAKE_SOURCE_DIR}/Game/src/Private
         ${CMAKE_SOURCE_DIR}/Libraries/include
 )
 

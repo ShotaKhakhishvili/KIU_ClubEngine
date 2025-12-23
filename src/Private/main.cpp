@@ -1,22 +1,4 @@
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
-#include <glm\glm.hpp>
-#include <glm\gtx\matrix_transform_2d.hpp>
-#include <glm\gtc\type_ptr.hpp>
-
-#include <iostream>
-#include <vector>
-
-#include "Path.h"
-#include "Shader.h"
-#include "VAO.h"
-#include "EBO.h"
-#include "Texture.h"
-#include "Camera.h"
-#include "FuncLib.h"
-#include "Object.h"
-#include "InstancedObject.h"
+#include "ClubEngine.h"
 
 int width = 800, height = 600;
 
@@ -73,6 +55,8 @@ int main() {
     instObj->SetScale(0,glm::vec3(100,100,3));
     instObj->SetRotation(0,glm::vec3(90,0,0));
     instObj->SetLightSource(lightPos, lightCol);
+
+    ClubEngine::Init();
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
