@@ -20,7 +20,7 @@ class Sublevel {
     public:
 
     Sublevel(std::vector<Placeholderinfo> infos, Player* player, glm::vec3 position);
-    glm::vec3 position;
-    double size;
+    glm::vec3 position{};
+    double size{};
     ~Sublevel();
 };
