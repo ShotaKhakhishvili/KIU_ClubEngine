@@ -9,6 +9,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # ==========================================================
+#  LIBRARIES
+# ==========================================================
+add_subdirectory(Libraries/freetype-2.14.1)
+
+
+# ==========================================================
 #  SOURCE FILES (ENGINE + GAME = ONE CODEBASE)
 # ==========================================================
 file(GLOB_RECURSE ALL_SOURCES
@@ -31,7 +37,17 @@ add_executable(${PROJECT_NAME}
         src/Private/AnimObject.cpp
         "Game/src/Public/MyObject.h"
         Game/src/Private/MyObject.cpp
+        src/Public/Font.h
+        src/Private/Font.cpp
+        src/Public/TextRenderer.h
+        src/Private/TextRenderer.cpp
 )
+
+target_link_libraries(${PROJECT_NAME}
+        PRIVATE
+        freetype
+)
+
 
 # ==========================================================
 #  COMPILE DEFINITIONS

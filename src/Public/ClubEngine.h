@@ -20,6 +20,8 @@
 #include "Object.h"
 #include "InstancedObject.h"
 #include "World.h"
+#include "Font.h"
+#include "TextRenderer.h""
 
 namespace Game
 {

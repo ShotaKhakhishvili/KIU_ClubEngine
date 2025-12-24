@@ -1,6 +1,6 @@
 #include "ClubEngine.h"
 
-int width = 800, height = 600;
+int width = 1600, height = 900;
 
 GLFWwindow* CreateWindow() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -29,7 +29,11 @@ int main() {
     std::cout << "Successfully created" << std::endl;
 
     glfwMakeContextCurrent(window); // Actually display the window
-    gladLoadGL(); // Load Functions
+    if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)))
+    {
+        std::cout << "Failed to initialize GLAD\n";
+        return -1;
+    }
 
 
     // -------------------------------General Settings----------------------------------------
@@ -37,10 +41,21 @@ int main() {
     glViewport(0, 0, width, height);
     glClearColor(0.1f, 0.1f, 0.15f, 1.0f);
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 
     // -----------------------------------Camera--------------------------------------------------
 
     Camera::Init(width, height, glm::vec3(0.0f, 0.0f, 1.0f));
+
+    // ------------------------------------Text--------------------------------------------------
+
+    Font* mainFont = new Font();
+    mainFont->Load(Path::Font("RobotoMono-Regular.ttf"), 48);
+    auto* textRenderer = new TextRenderer();
+    textRenderer->Init(width, height);
+
 
     // -----------------------------------Initialization-------------------------------------
 
@@ -55,6 +70,14 @@ int main() {
 
         World::Update();
         World::Draw();
+        textRenderer->Draw(
+            *mainFont,
+            "Score: N/A",
+            10.0f,
+            static_cast<float>(height) - 40.0f,
+            1.0f,
+            {1.0f, 1.0f, 1.0f}
+        );
 
         glfwSwapBuffers(window);
     }
