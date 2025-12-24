@@ -13,7 +13,7 @@ void PlayerDetector::Update(double dTime) {
     Object::Update(dTime);
 
     float dist = std::abs(player->GetPosition().x - GetPosition().x);
-    if (dist < 0.25)
+    if (dist < 0.25 && player->GetPosition().z == GetPosition().z)
         OnPlayerInteraction();
 }
 

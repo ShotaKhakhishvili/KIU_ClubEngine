@@ -3,6 +3,8 @@
 #include <memory>     // std::unique_ptr
 #include <algorithm> // std::remove_if
 #include <random>
+#include "World.h"
+#include "SABook.h"
 
 GameLogic::GameLogic(Player* player) {
     this->player =player;
@@ -28,7 +30,7 @@ void GameLogic::Update(double dTime)
 
 
     while (furthestSubLevel < player->GetPosition().x + forwardCullDistance) {
-        auto* newLevel = new Sublevel(GetRandomSubLevel(), player, glm::vec3(furthestSubLevel, 0, 0));
+        auto* newLevel = new Sublevel(Sublevel::subLevels[0], player, glm::vec3(furthestSubLevel, 0, 0));
         furthestSubLevel += newLevel->size + 1;
         subLevels.push_back(newLevel);
     }

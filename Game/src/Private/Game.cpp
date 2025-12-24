@@ -22,7 +22,5 @@ void Game::Init()
     World::AddLight({4, 2,1}, {1,1,1}, 5,5);
 
     auto* player = World::CreateActor<Player>();
-
-    auto* sa = World::CreateActor<SABook>(player, glm::vec3(3, 1, 0));
-    auto* bar = World::CreateActor<Barrier>(player, glm::vec3(10, 1, 0));
+    auto* gameLogic = World::CreateActor<GameLogic>(player);
 }

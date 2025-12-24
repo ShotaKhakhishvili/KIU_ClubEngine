@@ -9,7 +9,10 @@ class GameLogic : public Actor{
     std::vector<Sublevel*> subLevels;
     double furthestSubLevel = 0.0f;
     double cullDistance = -5.0f;
-    double forwardCullDistance = 10.0f;
+    double forwardCullDistance = 20.0f;
+
+    double lastTime = 0.0f;
+    double spawned = 0.0f;
 
     public:
         explicit GameLogic(Player* player);
