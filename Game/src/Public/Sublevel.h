@@ -15,10 +15,9 @@ struct Placeholderinfo {
 class Sublevel {
 
     std::vector<Placeholder*> Placeholders;
-    static std::vector<std::vector<Placeholderinfo>> subLevels;
 
     public:
-
+    static std::vector<std::vector<Placeholderinfo>> subLevels;
     Sublevel(std::vector<Placeholderinfo> infos, Player* player, glm::vec3 position);
     glm::vec3 position{};
     double size{};
