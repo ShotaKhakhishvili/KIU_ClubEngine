@@ -63,7 +63,7 @@ int main() {
         glfwPollEvents();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        Camera::camera->ProccessInputs(window);
+        //Camera::camera->ProccessInputs(window);
 
         World::Update();
         World::Draw();

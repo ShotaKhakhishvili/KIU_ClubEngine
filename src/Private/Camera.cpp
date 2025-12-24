@@ -2,6 +2,19 @@
 
 Camera* Camera::camera = nullptr;
 
+glm::vec3 DirectionFromEuler(glm::vec3 rotationDeg)
+{
+	float pitch = glm::radians(rotationDeg.x);
+	float yaw   = glm::radians(rotationDeg.y);
+
+	glm::vec3 dir;
+	dir.x = cos(pitch) * cos(yaw);
+	dir.y = sin(pitch);
+	dir.z = cos(pitch) * sin(yaw);
+
+	return dir / glm::length(dir);
+}
+
 Camera::Camera(int width, int height, glm::vec3 position)
 {
 	Camera::width = width;
@@ -24,6 +37,14 @@ void Camera::ApplyMatrix(Shader& shader, const char* uniform) const
 {
 	GLint camMatLoc = glGetUniformLocation(shader.getID(), uniform);
 	glUniformMatrix4fv(camMatLoc, 1, GL_FALSE, glm::value_ptr(camMat));
+}
+
+void Camera::SetPosition(glm::vec3 position) {
+	camera->Position = position;
+}
+void Camera::SetRotation(glm::vec3 rotationDeg)
+{
+	camera->Orientation = DirectionFromEuler(rotationDeg);
 }
 
 void Camera::ProccessInputs(GLFWwindow* window)
