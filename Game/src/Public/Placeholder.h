@@ -1,4 +1,6 @@
 #pragma once
+#include "Object.h"
+#include "Player.h"
 
 enum class ObjectType {
     SABook,
