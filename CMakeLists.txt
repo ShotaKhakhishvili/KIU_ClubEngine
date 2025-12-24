@@ -43,7 +43,6 @@ add_executable(${PROJECT_NAME}
         src/Private/TextRenderer.cpp
         Game/src/Public/SABook.h
         Game/src/Private/SABook.cpp
-        Game/src/Public/Barrier.cpp
         Game/src/Public/Barrier.h
 )
 
