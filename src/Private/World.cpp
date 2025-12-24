@@ -5,6 +5,8 @@ namespace World
 {
     std::vector<Actor*> actors;
     std::vector<Light> lights;
+    std::vector<Actor*> toDelete;
+
     double worldTime = 0;
     constexpr int MAX_LIGHTS = 32;
 
@@ -52,35 +54,61 @@ namespace World
     void DestroyActor(Actor* actor)
     {
         if (!actor) return;
+        if (actor->pendingKill) return;
 
+        actor->pendingKill = true;
         actor->OnActorEnd();
+        toDelete.push_back(actor);
+    }
 
-        auto it = std::find(actors.begin(), actors.end(), actor);
-        if (it != actors.end())
-            actors.erase(it);
+    void FlushDestroyActors()
+    {
+        for (Actor* actor : toDelete)
+        {
+            auto it = std::find(actors.begin(), actors.end(), actor);
+            if (it != actors.end())
+                actors.erase(it);
 
-        delete actor;
+            delete actor;
+        }
+
+        toDelete.clear();
     }
 
     void Update()
     {
         double currentTime = glfwGetTime();
-        for (unsigned int i = 0; i < actors.size(); i++)
+
+        const size_t count = actors.size();
+        for (size_t i = 0; i < count; i++)
         {
-            actors[i]->Update(currentTime - worldTime);
+            if (!actors[i]->pendingKill)
+                actors[i]->Update(currentTime - worldTime);
         }
+
         worldTime  = currentTime;
+
+        FlushDestroyActors();
     }
 
     void Draw()
     {
-        for (unsigned int i = 0; i < actors.size(); i++)
+        const size_t count = actors.size();
+        for (size_t i = 0; i < count; i++)
         {
-            if (!actors[i]->IsWidget)
-                UploadLights(*actors[i]->GetShader());
-            actors[i]->Draw();
+            Actor* actor = actors[i];
+            if (actor->pendingKill)
+                continue;
+            if (!actor->IsWidget)
+            {
+                Shader* shader = actor->GetShader();
+                if (shader)
+                    UploadLights(*shader);
+            }
+            actor->Draw();
         }
     }
+
     unsigned int AddLight(glm::vec3 position, glm::vec3 color, float intensity, float radius)
     {
         lights.push_back(Light(position, color, intensity, radius));

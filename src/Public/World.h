@@ -16,6 +16,8 @@ namespace World
     extern std::vector<Light> lights;
     extern double worldTime;
 
+    extern std::vector<Actor*> toDelete;
+
     template<typename T, typename... Args>
     T* CreateActor(Args&&... args)
     {
@@ -30,6 +32,7 @@ namespace World
     void UpdateLight(Shader& shader);
 
     void DestroyActor(Actor* actor);
+    void FlushDestroyActors();
     void Update();
     void Draw();
 

@@ -6,6 +6,8 @@ class Actor
 {
 public:
     bool IsWidget = false;
+    bool pendingKill = false;
+
     virtual ~Actor() = default;
     virtual void Draw(){}
 

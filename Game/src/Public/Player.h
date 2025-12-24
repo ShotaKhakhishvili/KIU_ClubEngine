@@ -2,6 +2,9 @@
 #include "Actor.h"
 #include "AnimObject.h"
 #include "Object.h"
+#include "TextRenderer.h"
+
+class PlayerDetector;
 
 enum class PlayerInteraction {
     SABook = 0,
@@ -18,10 +21,15 @@ enum class PlayerState {
 class Player : public AnimObject
 {
     PlayerState state;
+    TextRenderer* scoreText = nullptr;
+
+    unsigned int score = 0;
 
     public:
     Player();
+    ~Player();
 
     void Update(double dTime) override;
     void PlayerInteracted(PlayerInteraction playerInteraction);
+    void RefreshText();
 };
