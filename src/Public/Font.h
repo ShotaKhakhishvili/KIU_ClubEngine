@@ -17,6 +17,9 @@ public:
     bool Load(const std::string& path, unsigned int pixelSize);
     const Glyph& Get(char c) const;
 
+    Font() = default;
+    Font(const std::string& path, unsigned int pixelSize);
+
 private:
     std::map<char, Glyph> glyphs;
 };

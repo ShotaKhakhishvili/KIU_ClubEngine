@@ -2,6 +2,10 @@
 
 #include "MyObject.h"
 
+extern int WINDOW_WIDTH;
+extern int WINDOW_HEIGHT;
+extern Font* FONT_MAIN;
+
 void Game::Init()
 {
     auto* instObj = World::CreateActor<InstancedObject>("Cube.txt", "1.png", "default.frag");
@@ -15,4 +19,6 @@ void Game::Init()
     World::AddLight({4, 0,1}, {1,1,1}, 5,5);
 
     auto* myobj = World::CreateActor<MyObject>();
+
+    auto* textRenderer = World::CreateActor<TextRenderer>();
 }

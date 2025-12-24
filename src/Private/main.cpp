@@ -1,6 +1,7 @@
 #include "ClubEngine.h"
 
-int width = 1600, height = 900;
+int WINDOW_WIDTH = 1600, WINDOW_HEIGHT = 900;
+Font* FONT_MAIN  = nullptr;
 
 GLFWwindow* CreateWindow() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -10,7 +11,7 @@ GLFWwindow* CreateWindow() {
     glfwWindowHint(GLFW_SAMPLES, 1);
 
     // Actually create the window and return it
-    return glfwCreateWindow(width, height, "OpenGL_Proj1 Window", nullptr, nullptr);
+    return glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "OpenGL_Proj1 Window", nullptr, nullptr);
 }
 
 int main() {
@@ -38,7 +39,7 @@ int main() {
 
     // -------------------------------General Settings----------------------------------------
 
-    glViewport(0, 0, width, height);
+    glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
     glClearColor(0.1f, 0.1f, 0.15f, 1.0f);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
@@ -47,15 +48,11 @@ int main() {
 
     // -----------------------------------Camera--------------------------------------------------
 
-    Camera::Init(width, height, glm::vec3(0.0f, 0.0f, 1.0f));
+    Camera::Init(WINDOW_WIDTH, WINDOW_HEIGHT, glm::vec3(0.0f, 0.0f, 1.0f));
 
-    // ------------------------------------Text--------------------------------------------------
+    // ----------------------------------TextRenderer----------------------------------------------
 
-    Font* mainFont = new Font();
-    mainFont->Load(Path::Font("RobotoMono-Regular.ttf"), 48);
-    auto* textRenderer = new TextRenderer();
-    textRenderer->Init(width, height);
-
+    FONT_MAIN = new Font(Path::Font("RobotoMono-Regular.ttf"), 48);
 
     // -----------------------------------Initialization-------------------------------------
 
@@ -70,14 +67,6 @@ int main() {
 
         World::Update();
         World::Draw();
-        textRenderer->Draw(
-            *mainFont,
-            "Score: N/A",
-            10.0f,
-            static_cast<float>(height) - 40.0f,
-            1.0f,
-            {1.0f, 1.0f, 1.0f}
-        );
 
         glfwSwapBuffers(window);
     }

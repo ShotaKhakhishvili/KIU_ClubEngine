@@ -76,7 +76,8 @@ namespace World
     {
         for (unsigned int i = 0; i < actors.size(); i++)
         {
-            UploadLights(*actors[i]->GetShader());
+            if (!actors[i]->IsWidget)
+                UploadLights(*actors[i]->GetShader());
             actors[i]->Draw();
         }
     }

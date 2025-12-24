@@ -73,3 +73,10 @@ const Glyph& Font::Get(char c) const
     return it->second;
 }
 
+Font::Font(const std::string& path, unsigned int pixelSize)
+{
+    if (!Load(path, pixelSize))
+    {
+        std::cout << "Font constructor failed to load: " << path << std::endl;
+    }
+}

@@ -5,6 +5,7 @@
 class Actor
 {
 public:
+    bool IsWidget = false;
     virtual ~Actor() = default;
     virtual void Draw(){}
 

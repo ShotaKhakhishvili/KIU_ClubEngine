@@ -4,6 +4,37 @@
 #include "Path.h"
 #include <iostream>
 
+extern int WINDOW_WIDTH;
+extern int WINDOW_HEIGHT;
+extern Font* FONT_MAIN;
+
+TextRenderer::TextRenderer(const glm::vec2& position, float size, const glm::vec3& color, Font* font, const std::string& text, unsigned int width, unsigned int height)
+{
+    this->position = position;
+    this->size = size;
+    this->color = color;
+    this->font = font;
+    this->text = text;
+    this->IsWidget = true;
+
+    Init(width, height);
+}
+
+TextRenderer::TextRenderer(unsigned int width, unsigned int height)
+    : TextRenderer(glm::vec2(0, height - 36), 1,
+                   glm::vec3(1,1,1),
+                   FONT_MAIN,
+                   "Text Renderer",
+                   width, height)
+{
+}
+
+TextRenderer::TextRenderer()
+    : TextRenderer(WINDOW_WIDTH, WINDOW_HEIGHT)
+{
+}
+
+
 void TextRenderer::Init(int screenWidth, int screenHeight)
 {
     shader = new Shader(
@@ -102,6 +133,8 @@ TextRenderer::~TextRenderer()
     {
         delete shader;
         shader = nullptr;
+        delete font;
+        font = nullptr;
     }
 
     if (VBO)
@@ -109,4 +142,18 @@ TextRenderer::~TextRenderer()
 
     if (VAO)
         glDeleteVertexArrays(1, &VAO);
+}
+
+void TextRenderer::SetPosition(const glm::vec2& position){this->position = position;}
+void TextRenderer::SetSize(float size){this->size = size;}
+void TextRenderer::SetColor(const glm::vec3& color){this->color = color;}
+void TextRenderer::SetText(const std::string& text){this->text = text;}
+void TextRenderer::SetFont(Font* font)
+{
+    this->font = font;
+}
+
+void TextRenderer::Draw()
+{
+    this->Draw(*font, text, position.x, position.y, size, color);
 }

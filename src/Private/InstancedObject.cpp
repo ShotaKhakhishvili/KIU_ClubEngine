@@ -16,7 +16,7 @@ InstancedObject::InstancedObject(const char* modelPath, const char* texturePath,
     ebo = new EBO(indices);
 
     vao->LinkAttrib(*vbo, 0, 3, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, coord));
-    vao ->LinkAttrib(*vbo, 1, 3, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+    vao->LinkAttrib(*vbo, 1, 3, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, normal));
     vao->LinkAttrib(*vbo, 2, 3, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, color));
     vao->LinkAttrib(*vbo, 3, 2, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, texUV));
 
@@ -40,7 +40,6 @@ void InstancedObject::SetScale(unsigned int objIndex, glm::vec3 scale) {
     objInsts[objIndex].scale = scale;
     objInsts[objIndex].matValuesChanged = true;
 }
-
 
 Shader* InstancedObject::GetShader() {
     return shader;

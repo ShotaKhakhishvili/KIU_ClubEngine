@@ -30,6 +30,5 @@ AnimObject(
 void MyObject::Update(double dTime)
 {
     AnimObject::Update(dTime);
-    std::cout << GetPosition().x << " " << GetPosition().y << " " << GetPosition().z << std::endl;
     //SetPosition(GetPosition() + glm::vec3(dTime, 0, 0));
 }
