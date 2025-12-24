@@ -42,10 +42,19 @@ void Texture::Unbind() const
 {
     glBindTexture(type, 0);
 }
-void Texture::Delete() const
+void Texture::Delete()
 {
-    glDeleteTextures(1, &ID);
+    if (ID != 0)
+    {
+        glDeleteTextures(1, &ID);
+        ID = 0;
+    }
 }
+Texture::~Texture()
+{
+    Delete();
+}
+
 
 GLuint Texture::getID() const{return ID;}
 GLenum Texture::getType() const{return type;}

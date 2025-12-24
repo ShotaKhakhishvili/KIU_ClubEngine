@@ -9,17 +9,25 @@
 #include "Camera.h"
 #include "Actor.h"
 
-class Object : public Actor
+struct ModelData
 {
-    Shader* shader;
-    Texture* texture;
-
     std::vector<Vertex> vertices;
     std::vector<GLuint> indices;
 
     VAO* vao;
     VBO* vbo;
     EBO* ebo;
+};
+
+class AnimObject : public Actor
+{
+    Shader* shader;
+    Texture* texture;
+
+    std::vector<ModelData> models;
+    unsigned int frame = 0;
+    float timePassed = 0;
+    float frameChangeTime = 0.05;
 
     glm::vec3 position{0.0f};
     glm::vec3 rotation{0.0f};
@@ -27,9 +35,9 @@ class Object : public Actor
 
     bool matValuesChanged = true;
 
-    public:
-    Object(const char* modelPath, const char* texturePath, const char* fragShaderPath);
-    ~Object();
+public:
+    AnimObject(std::vector<const char*> modelPath, const char* texturePath, const char* fragShaderPath);
+    ~AnimObject();
 
     void SetPosition(glm::vec3 position);
     void SetRotation(glm::vec3 rotation);
@@ -43,4 +51,5 @@ class Object : public Actor
 
     Shader* GetShader() override;
     void Draw() override;
+    void Update(double dTime) override;
 };

@@ -99,5 +99,7 @@ void Camera::ProccessInputs(GLFWwindow* window)
 
 void Camera::Init(int width, int height, glm::vec3 position)
 {
+	if (camera != nullptr)
+		delete camera;
 	camera = new Camera(width, height, position);
 }

@@ -17,9 +17,14 @@ class Shader
     Shader(const char* vertexPath, const char* fragmentPath);
     Shader(){}
 
+    ~Shader();
+
     void Activate() const;
-    void Delete() const;
+    void Delete();
     void compileErrors(unsigned int shader, std::string type);
+
+    Shader(const Shader&) = delete;
+    Shader& operator=(const Shader&) = delete;
 
     GLuint getID() const;
 };

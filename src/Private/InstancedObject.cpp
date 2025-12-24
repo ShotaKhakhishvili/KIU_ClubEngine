@@ -5,55 +5,56 @@ InstancedObject::InstancedObject(const char* modelPath, const char* texturePath,
     // Shader
     std::string vp = Path::Shader("default.vert");
     std::string fp = Path::Shader(fragShaderPath);
-    shader = Shader(vp.c_str(), fp.c_str());
+    shader = new Shader(vp.c_str(), fp.c_str());
 
     ReadFromObjIntoVectors(Path::Model(modelPath), vertices, indices);
 
-    vao.Bind();
+    vao = new VAO();
+    vao->Bind();
 
-    vbo = VBO(vertices);
-    ebo = EBO(indices);
+    vbo = new VBO(vertices);
+    ebo = new EBO(indices);
 
-    vao.LinkAttrib(vbo, 0, 3, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, coord));
-    vao.LinkAttrib(vbo, 1, 3, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, normal));
-    vao.LinkAttrib(vbo, 2, 3, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, color));
-    vao.LinkAttrib(vbo, 3, 2, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, texUV));
+    vao->LinkAttrib(*vbo, 0, 3, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, coord));
+    vao ->LinkAttrib(*vbo, 1, 3, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+    vao->LinkAttrib(*vbo, 2, 3, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, color));
+    vao->LinkAttrib(*vbo, 3, 2, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, texUV));
 
     VAO::Unbind();
     VBO::Unbind();
     EBO::Unbind();
 
-    texture = Texture(texturePath, GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
-    texture.TexUnit(shader, "tex0", 0);
+    texture = new Texture(texturePath, GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+    texture->TexUnit(*shader, "tex0", 0);
 }
 
-void InstancedObject::SetPosition(signed int objIndex, glm::vec3 position) {
+void InstancedObject::SetPosition(unsigned int objIndex, glm::vec3 position) {
     objInsts[objIndex].position = position;
     objInsts[objIndex].matValuesChanged = true;
 }
-void InstancedObject::SetRotation(signed int objIndex, glm::vec3 rotation) {
+void InstancedObject::SetRotation(unsigned int objIndex, glm::vec3 rotation) {
     objInsts[objIndex].rotation = rotation;
     objInsts[objIndex].matValuesChanged = true;
 }
-void InstancedObject::SetScale(signed int objIndex, glm::vec3 scale) {
+void InstancedObject::SetScale(unsigned int objIndex, glm::vec3 scale) {
     objInsts[objIndex].scale = scale;
     objInsts[objIndex].matValuesChanged = true;
 }
 
 
 Shader* InstancedObject::GetShader() {
-    return &shader;
+    return shader;
 }
 void InstancedObject::Draw() {
-    shader.Activate();
+    shader->Activate();
 
     Camera::camera->UpdateMatrix(45.0f, 0.1f, 100.0f);
-    Camera::camera->ApplyMatrix(shader, "camMat");
+    Camera::camera->ApplyMatrix(*shader, "camMat");
 
-    texture.Bind();
-    vao.Bind();
+    texture->Bind();
+    vao->Bind();
 
-    GLint modelMatrixLoc = glGetUniformLocation(shader.getID(), "model");
+    GLint modelMatrixLoc = glGetUniformLocation(shader->getID(), "model");
 
     for (unsigned int i = 0; i < objInsts.size(); i++) {
         if (objInsts[i].matValuesChanged) {
@@ -67,7 +68,7 @@ void InstancedObject::Draw() {
 
 void InstancedObject::RefreshModelMatrix(ObjInst& obj_inst)
 {
-    shader.Activate();
+    shader->Activate();
 
     glm::mat4 model = glm::mat4(1.0f);
 
@@ -89,4 +90,13 @@ void InstancedObject::RefreshModelMatrix(ObjInst& obj_inst)
 
 void InstancedObject::AddInstance(glm::vec3 position){
     objInsts.push_back(ObjInst(position));
+}
+
+InstancedObject::~InstancedObject()
+{
+    delete vao;
+    delete ebo;
+    delete vbo;
+    delete shader;
+    delete texture;
 }

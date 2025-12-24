@@ -14,6 +14,7 @@ namespace World
 {
     extern std::vector<Actor*> actors;
     extern std::vector<Light> lights;
+    extern double worldTime;
 
     template<typename T, typename... Args>
     T* CreateActor(Args&&... args)

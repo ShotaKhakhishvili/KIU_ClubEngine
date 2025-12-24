@@ -5,6 +5,7 @@ namespace World
 {
     std::vector<Actor*> actors;
     std::vector<Light> lights;
+    double worldTime = 0;
     constexpr int MAX_LIGHTS = 32;
 
     void UploadLights(Shader& shader)
@@ -63,10 +64,12 @@ namespace World
 
     void Update()
     {
+        double currentTime = glfwGetTime();
         for (unsigned int i = 0; i < actors.size(); i++)
         {
-            actors[i]->Update();
+            actors[i]->Update(currentTime - worldTime);
         }
+        worldTime  = currentTime;
     }
 
     void Draw()

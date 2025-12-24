@@ -18,12 +18,21 @@ void VBO::Unbind()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void VBO::Delete() const
+void VBO::Delete()
 {
-    glDeleteBuffers(1, &ID);
+    if (ID != 0)
+    {
+        glDeleteBuffers(1, &ID);
+        ID = 0;
+    }
 }
 
 GLuint VBO::GetID() const
 {
     return ID;
+}
+
+VBO::~VBO()
+{
+    Delete();
 }

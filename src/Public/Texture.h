@@ -12,11 +12,15 @@ class Texture
     public:
     Texture(const char* imagePath, GLenum texType, GLenum slot, GLenum format, GLenum pixelType);
     Texture(){}
+    ~Texture();
 
     void TexUnit(Shader& shader, const char* uniform, GLuint unit) const;
     void Bind() const;
     void Unbind() const;
-    void Delete() const;
+    void Delete();
+
+    Texture(const Texture&) = delete;
+    Texture& operator=(const Texture&) = delete;
 
     GLuint getID() const;
     GLenum getType() const;

@@ -49,9 +49,13 @@ void Shader::Activate() const
     glUseProgram(ID);
 }
 
-void Shader::Delete() const
+void Shader::Delete()
 {
-    glDeleteProgram(ID);
+    if (ID != 0)
+    {
+        glDeleteProgram(ID);
+        ID = 0;
+    }
 }
 
 GLuint Shader::getID() const
@@ -82,4 +86,9 @@ void Shader::compileErrors(unsigned int shader, std::string type)
             std::cout << "PROGRAM LINK ERROR:\n" << infoLog << std::endl;
         }
     }
+}
+
+Shader::~Shader()
+{
+    Delete();
 }

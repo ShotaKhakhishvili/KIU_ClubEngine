@@ -24,12 +24,21 @@ void VAO::Unbind()
     glBindVertexArray(0);
 }
 
-void VAO::Delete() const
+void VAO::Delete()
 {
-    glDeleteVertexArrays(1, &ID);
+    if (ID != 0)
+    {
+        glDeleteVertexArrays(1, &ID);
+        ID = 0;
+    }
 }
 
 GLuint VAO::getID() const
 {
     return ID;
+}
+
+VAO::~VAO()
+{
+    Delete();
 }

@@ -6,39 +6,40 @@ Object::Object(const char* modelPath, const char* texturePath, const char* fragS
     // Shader
     std::string vp = Path::Shader("default.vert");
     std::string fp = Path::Shader(fragShaderPath);
-    shader = Shader(vp.c_str(), fp.c_str());
+    shader = new Shader(vp.c_str(), fp.c_str());
 
     ReadFromObjIntoVectors(Path::Model(modelPath), vertices, indices);
 
-    vao.Bind();
+    vao = new VAO();
+    vao->Bind();
 
-    vbo = VBO(vertices);
-    ebo = EBO(indices);
+    vbo = new VBO(vertices);
+    ebo = new EBO(indices);
 
-    vao.LinkAttrib(vbo, 0, 3, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, coord));
-    vao.LinkAttrib(vbo, 1, 3, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, normal));
-    vao.LinkAttrib(vbo, 2, 3, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, color));
-    vao.LinkAttrib(vbo, 3, 2, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, texUV));
+    vao->LinkAttrib(*vbo, 0, 3, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, coord));
+    vao->LinkAttrib(*vbo, 1, 3, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+    vao->LinkAttrib(*vbo, 2, 3, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, color));
+    vao->LinkAttrib(*vbo, 3, 2, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, texUV));
 
     VAO::Unbind();
     VBO::Unbind();
     EBO::Unbind();
 
-    texture = Texture(texturePath, GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
-    texture.TexUnit(shader, "tex0", 0);
+    texture = new Texture(texturePath, GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+    texture->TexUnit(*shader, "tex0", 0);
 }
 
 void Object::Draw()
 {
     if (matValuesChanged)
         RefreshModelMatrix();
-    shader.Activate();
+    shader->Activate();
 
     Camera::camera->UpdateMatrix(45.0f, 0.1f, 100.0f);
-    Camera::camera->ApplyMatrix(shader, "camMat");
+    Camera::camera->ApplyMatrix(*shader, "camMat");
 
-    texture.Bind();
-    vao.Bind();
+    texture->Bind();
+    vao->Bind();
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 }
 
@@ -59,7 +60,7 @@ void Object::SetScale(glm::vec3 scale)
 }
 void Object::RefreshModelMatrix()
 {
-    shader.Activate();
+    shader->Activate();
 
     glm::mat4 model = glm::mat4(1.0f);
 
@@ -74,14 +75,22 @@ void Object::RefreshModelMatrix()
     // Scale
     model = glm::scale(model, scale);
 
-    GLint modelLoc = glGetUniformLocation(shader.getID(), "model");
+    GLint modelLoc = glGetUniformLocation(shader->getID(), "model");
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
     matValuesChanged = false;
 }
 
+Object::~Object()
+{
+    delete vao;
+    delete ebo;
+    delete vbo;
+    delete shader;
+    delete texture;
+}
 
 Shader* Object::GetShader()
 {
-    return &shader;
+    return shader;
 }

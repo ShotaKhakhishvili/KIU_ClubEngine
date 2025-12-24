@@ -27,6 +27,10 @@ add_executable(${PROJECT_NAME}
         src/Public/Actor.h
         src/Public/World.h
         src/Private/World.cpp
+        src/Public/AnimObject.h
+        src/Private/AnimObject.cpp
+        "Game/src/Public/MyObject.h"
+        Game/src/Private/MyObject.cpp
 )
 
 # ==========================================================

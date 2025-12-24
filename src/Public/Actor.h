@@ -8,9 +8,9 @@ public:
     virtual ~Actor() = default;
     virtual void Draw(){}
 
-    virtual void OnActorBegin(){}
-    virtual void OnActorEnd(){}
-    virtual void Update(){}
+    virtual void OnActorBegin(){};
+    virtual void OnActorEnd(){};
+    virtual void Update(double dTime){}
 
     virtual Shader* GetShader(){return nullptr;}
 };

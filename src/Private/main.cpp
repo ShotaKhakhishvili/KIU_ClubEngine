@@ -42,13 +42,15 @@ int main() {
 
     Camera::Init(width, height, glm::vec3(0.0f, 0.0f, 1.0f));
 
-    // -----------------------------------Initialize Game-------------------------------------
+    // -----------------------------------Initialization-------------------------------------
 
+    World::worldTime = glfwGetTime();
     Game::Init();
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
         Camera::camera->ProccessInputs(window);
 
         World::Update();

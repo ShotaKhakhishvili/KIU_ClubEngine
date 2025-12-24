@@ -11,10 +11,14 @@ class EBO
 public:
     EBO(std::vector<GLuint>& indices);
     EBO(){}
+    ~EBO();
 
     void Bind() const;
     static void Unbind();
-    void Delete() const;
+    void Delete();
+
+    EBO(const EBO&) = delete;
+    EBO& operator=(const EBO&) = delete;
 
     GLuint getID() const;
 };

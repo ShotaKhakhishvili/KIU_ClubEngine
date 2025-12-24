@@ -20,25 +20,30 @@ struct ObjInst {
 
 class InstancedObject : public Actor {
 
-    Shader shader;
-    Texture texture;
+    Shader* shader;
+    Texture* texture;
 
     std::vector<Vertex> vertices;
     std::vector<GLuint> indices;
 
-    VAO vao;
-    VBO vbo;
-    EBO ebo;
+    VAO* vao;
+    VBO* vbo;
+    EBO* ebo;
 
     std::vector<ObjInst> objInsts;
 
     public:
 
     InstancedObject(const char* modelPath, const char* texturePath, const char* fragShaderPath);
+    ~InstancedObject();
 
-    void SetPosition(signed int objIndex, glm::vec3 position);
-    void SetRotation(signed int objIndex, glm::vec3 rotation);
-    void SetScale(signed int objIndex, glm::vec3 scale);
+    void SetPosition(unsigned int objIndex, glm::vec3 position);
+    void SetRotation(unsigned int objIndex, glm::vec3 rotation);
+    void SetScale(unsigned int objIndex, glm::vec3 scale);
+
+    glm::vec3 GetPosition(unsigned int objIndex){return objInsts[objIndex].position;}
+    glm::vec3 GetRotation(unsigned int objIndex){return objInsts[objIndex].rotation;}
+    glm::vec3 GetScale(unsigned int objIndex){return objInsts[objIndex].scale;}
 
     void RefreshModelMatrix(ObjInst& instRef);
 

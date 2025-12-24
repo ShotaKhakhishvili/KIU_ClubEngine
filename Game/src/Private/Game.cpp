@@ -1,5 +1,7 @@
 #include "Game.h"
 
+#include "MyObject.h"
+
 void Game::Init()
 {
     auto* instObj = World::CreateActor<InstancedObject>("Cube.txt", "1.png", "default.frag");
@@ -11,4 +13,6 @@ void Game::Init()
     World::AddLight({-4,0,1}, {1,1,1}, 5,4);
     World::AddLight({0,0,1}, {1,1,1}, 10,4);
     World::AddLight({4, 0,1}, {1,1,1}, 5,5);
+
+    auto* myobj = World::CreateActor<MyObject>();
 }
