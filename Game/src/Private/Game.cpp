@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "SABook.h"
 #include "Barrier.h"
+#include "GameLogic.h"
 
 extern int WINDOW_WIDTH;
 extern int WINDOW_HEIGHT;

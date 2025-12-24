@@ -51,6 +51,7 @@ add_executable(${PROJECT_NAME}
         Game/src/Public/GameLogic.h
         Game/src/Private/Sublevel.cpp
         Game/src/Public/Sublevel.h
+        Game/src/Private/GameLogic.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}
