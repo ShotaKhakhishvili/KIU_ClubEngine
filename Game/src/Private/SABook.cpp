@@ -7,6 +7,7 @@ void SABook::Update(double dTime) {
     SetPosition(GetPosition() - glm::vec3(0, glm::sin(moveProgress * movementSpeed) * 0.25, 0));
     moveProgress += dTime;
     SetPosition(GetPosition() + glm::vec3(0, glm::sin(moveProgress * movementSpeed) * 0.25, 0));
+
     SetRotation(GetRotation() + glm::vec3(0, rotationSpeed * dTime,0 ));
 }
 

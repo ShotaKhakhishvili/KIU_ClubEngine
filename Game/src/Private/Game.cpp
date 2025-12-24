@@ -21,4 +21,5 @@ void Game::Init()
 
     auto* player = World::CreateActor<Player>();
 
+    auto* sa = World::CreateActor<SABook>(player, glm::vec3(0, 2, 0));
 }

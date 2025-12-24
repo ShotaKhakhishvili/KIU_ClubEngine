@@ -1,7 +1,7 @@
 #include "AnimObject.h"
 #include "Path.h"
 
-AnimObject::AnimObject(std::vector<const char*> modelPaths, const char* texturePath, const char* fragShaderPath)
+AnimObject::AnimObject(const char* modelsPrefix, unsigned int modelCount, const char* texturePath, const char* fragShaderPath)
 {
     // Shader
     std::string vp = Path::Shader("default.vert");
@@ -11,9 +11,9 @@ AnimObject::AnimObject(std::vector<const char*> modelPaths, const char* textureP
     std::vector<Vertex> vertices;
     std::vector<GLuint> indices;
 
-    for (signed int i = 0; i < modelPaths.size(); ++i)
+    for (signed int i = 0; i < modelCount; ++i)
     {
-        ReadFromObjIntoVectors(Path::Model(modelPaths[i]), vertices, indices);
+        ReadFromObjIntoVectors(Path::Model(modelsPrefix + std::to_string(i+1) + ".txt"), vertices, indices);
 
         VAO* vao = new VAO();
         vao->Bind();

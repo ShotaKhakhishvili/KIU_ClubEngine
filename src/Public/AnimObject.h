@@ -36,7 +36,7 @@ class AnimObject : public Actor
     bool matValuesChanged = true;
 
 public:
-    AnimObject(std::vector<const char*> modelPath, const char* texturePath, const char* fragShaderPath);
+    AnimObject(const char* modelsPrefix, unsigned int modelCount, const char* texturePath, const char* fragShaderPath);
     ~AnimObject();
 
     void SetPosition(glm::vec3 position);
