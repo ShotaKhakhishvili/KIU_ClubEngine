@@ -34,6 +34,8 @@ class Camera
     void ProccessInputs(GLFWwindow* window);
 
     static void Init(int width, int height, glm::vec3 position);
+    static void SetPosition(glm::vec3 position);
+    static void SetRotation(glm::vec3 rotation);
 
     static Camera* camera;
 };

@@ -27,6 +27,9 @@ void Player::Update(double dTime)
     AnimObject::Update(dTime);
 
     SetPosition(GetPosition() + glm::vec3(dTime * 4, 0, 0));
+
+    Camera::SetPosition(GetPosition() + glm::vec3(-4, 3, 0));
+    Camera::SetRotation(GetRotation() + glm::vec3(-20, -90, 0));
 }
 
 Player::~Player() {

@@ -23,4 +23,6 @@ void Game::Init()
 
     auto* sa = World::CreateActor<SABook>(player, glm::vec3(0, -1.5, 0));
 
+    Camera::SetPosition({0,0,0});
+    Camera::SetRotation({0,0,90});
 }

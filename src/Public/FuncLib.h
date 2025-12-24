@@ -13,6 +13,9 @@
 #include "glad/glad.h"
 #include "glm/vec2.hpp"
 #include "glm/vec3.hpp"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp> // lookAt, perspective
+#include <glm/gtc/quaternion.hpp>
 
 struct Vertex
 {
@@ -286,3 +289,4 @@ inline void ReadFromObjIntoVectors(
                   << " indices=" << indices.size() << "\n";
     }
 }
+
