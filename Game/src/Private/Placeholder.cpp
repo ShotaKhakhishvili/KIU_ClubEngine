@@ -8,19 +8,19 @@ Placeholder::Placeholder(ObjectType a, ObjectType b, ObjectType c, glm::vec3 pos
     if (a == ObjectType::SABook) {
         LeftObject = World::CreateActor<SABook>(player, position + glm::vec3(0, 0, -1));
     } else if (a == ObjectType::Barrier) {
-        // LeftObject = World::CreateActor<Barrier>(player, position + glm::vec3(0, 0, 0));
+        LeftObject = World::CreateActor<Barrier>(player, position + glm::vec3(0, 0, -1));
     }
 
     if (b == ObjectType::SABook) {
         MiddleObject = World::CreateActor<SABook>(player, position + glm::vec3(0, 0, 0));
     } else if (b == ObjectType::Barrier) {
-        // MiddleObject = World::CreateActor<Barrier>(player, position + glm::vec3(0, 0, 0));
+        MiddleObject = World::CreateActor<Barrier>(player, position + glm::vec3(0, 0, 0));
     }
 
     if (c == ObjectType::SABook) {
         RightObject = World::CreateActor<SABook>(player, position + glm::vec3(0, 0, 1));
     } else if (c == ObjectType::Barrier) {
-        // RightObject = World::CreateActor<Barrier>(player, position + glm::vec3(0, 0, 0));
+        RightObject = World::CreateActor<Barrier>(player, position + glm::vec3(0, 0, 1));
     }
 }
 
