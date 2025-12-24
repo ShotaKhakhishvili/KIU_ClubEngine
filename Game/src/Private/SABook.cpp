@@ -11,7 +11,7 @@ void SABook::Update(double dTime) {
     SetRotation(GetRotation() + glm::vec3(0, rotationSpeed * dTime,0 ));
 }
 
-SABook::SABook(Player* player, glm::vec3 pos) : PlayerDetector("SA_Book.txt", "bookText.png", "default.frag", player)
+SABook::SABook(Player* player, glm::vec3 pos) : PlayerDetector("SA_Book.txt", "bookText.png", "default.frag", player, PlayerInteraction::SABook)
 {
     SetPosition(pos);
 }

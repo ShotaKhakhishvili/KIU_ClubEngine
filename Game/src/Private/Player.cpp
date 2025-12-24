@@ -1,7 +1,7 @@
 #include "Player.h"
 
 Player::Player() :
-AnimObject("my_animation.000",62,"WolfTexture.png", "default.frag")
+AnimObject("run_frame0",16,"WolfTexture.png", "default.frag")
 {
     SetPosition({-5,-1.5,-0.5});
     SetScale({0.1,0.1,0.1});

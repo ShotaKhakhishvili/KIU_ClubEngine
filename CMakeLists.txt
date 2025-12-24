@@ -46,6 +46,7 @@ add_executable(${PROJECT_NAME}
         Game/src/Public/Barrier.h
         Game/src/Public/PlayerDetector.h
         Game/src/Private/PlayerDetector.cpp
+        Game/src/Private/Barrier.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}
