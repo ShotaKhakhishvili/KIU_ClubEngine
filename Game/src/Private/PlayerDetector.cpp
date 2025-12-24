@@ -12,12 +12,14 @@ PlayerDetector::PlayerDetector(const char *model, const char *texture, const cha
 void PlayerDetector::Update(double dTime) {
     Object::Update(dTime);
 
-    float dist = glm::length(glm::vec3(player->GetPosition() - GetPosition()));
-    if (dist < 0.5)
+    float dist = std::abs(player->GetPosition().x - GetPosition().x);
+    if (dist < 0.25)
         OnPlayerInteraction();
 }
 
 void PlayerDetector::OnPlayerInteraction() {
     player->PlayerInteracted(interactionType);
-    World::DestroyActor(this);
+
+    if (interactionType == PlayerInteraction::SABook)
+        World::DestroyActor(this);
 }

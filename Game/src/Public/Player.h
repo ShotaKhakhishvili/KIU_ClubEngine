@@ -20,7 +20,7 @@ enum class PlayerState {
 
 class Player : public AnimObject
 {
-    PlayerState state;
+    PlayerState state = PlayerState::Normal;
     TextRenderer* scoreText = nullptr;
 
     unsigned int score = 0;

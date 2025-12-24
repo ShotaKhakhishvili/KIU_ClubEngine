@@ -4,7 +4,7 @@
 Player::Player()
     : AnimObject("run_frame0",16,"WolfTexture.png", "default.frag")
 {
-    SetPosition({-5,-1.5,0});
+    SetPosition({-5,0,0});
     SetScale({0.1,0.1,0.1});
     SetRotation({0,90,0});
 
@@ -24,10 +24,10 @@ void Player::PlayerInteracted(PlayerInteraction playerInteraction) {
 
 void Player::Update(double dTime)
 {
-    AnimObject::Update(dTime);
-
-    SetPosition(GetPosition() + glm::vec3(dTime * 4, 0, 0));
-
+    if (state != PlayerState::GameOver) {
+        AnimObject::Update(dTime);
+        SetPosition(GetPosition() + glm::vec3(dTime * 4, 0, 0));
+    }
     Camera::SetPosition(GetPosition() + glm::vec3(-4, 3, 0));
     Camera::SetRotation(GetRotation() + glm::vec3(-20, -90, 0));
 }
