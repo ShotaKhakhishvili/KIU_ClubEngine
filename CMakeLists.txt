@@ -35,8 +35,8 @@ add_executable(${PROJECT_NAME}
         src/Private/World.cpp
         src/Public/AnimObject.h
         src/Private/AnimObject.cpp
-        "Game/src/Public/MyObject.h"
-        Game/src/Private/MyObject.cpp
+        "Game/src/Public/Player.h"
+        Game/src/Private/Player.cpp
         src/Public/Font.h
         src/Private/Font.cpp
         src/Public/TextRenderer.h
@@ -44,6 +44,8 @@ add_executable(${PROJECT_NAME}
         Game/src/Public/SABook.h
         Game/src/Private/SABook.cpp
         Game/src/Public/Barrier.h
+        Game/src/Public/PlayerDetector.h
+        Game/src/Private/PlayerDetector.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}

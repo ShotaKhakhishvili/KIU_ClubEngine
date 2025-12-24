@@ -1,6 +1,6 @@
 #include "Game.h"
 
-#include "MyObject.h"
+#include "Player.h"
 #include "SABook.h"
 
 extern int WINDOW_WIDTH;
@@ -19,9 +19,6 @@ void Game::Init()
     World::AddLight({0,0,1}, {1,1,1}, 10,4);
     World::AddLight({4, 0,1}, {1,1,1}, 5,5);
 
-    auto* myobj = World::CreateActor<MyObject>();
+    auto* player = World::CreateActor<Player>();
 
-    auto* mySABOOK = World::CreateActor<SABook>();
-
-    auto* textRenderer = World::CreateActor<TextRenderer>();
 }

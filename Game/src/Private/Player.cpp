@@ -1,6 +1,6 @@
-#include "MyObject.h"
+#include "Player.h"
 
-MyObject::MyObject() :
+Player::Player() :
 AnimObject(
     {
         "run_frame01.txt",
@@ -27,10 +27,18 @@ AnimObject(
     SetRotation({0,90,0});
 }
 
-void MyObject::Update(double dTime)
+void Player::PlayerInteracted(PlayerInteraction playerInteraction) {
+    if (playerInteraction == PlayerInteraction::Barrier) {
+        state = PlayerState::GameOver;
+
+        std::cout << "Player Interacted Barrier" << std::endl;
+    }
+}
+
+void Player::Update(double dTime)
 {
     AnimObject::Update(dTime);
 
-    SetPosition(GetPosition() + glm::vec3(dTime, 0, 0));
-    std::cout << GetPosition().x << " " << GetPosition().y << " " << GetPosition().z;
+    if (state != PlayerState::GameOver) {}
+    SetPosition(GetPosition() + glm::vec3(dTime * 4, 0, 0));
 }
