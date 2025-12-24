@@ -41,6 +41,10 @@ add_executable(${PROJECT_NAME}
         src/Private/Font.cpp
         src/Public/TextRenderer.h
         src/Private/TextRenderer.cpp
+        Game/src/Public/SABook.h
+        Game/src/Private/SABook.cpp
+        Game/src/Public/Barrier.cpp
+        Game/src/Public/Barrier.h
 )
 
 target_link_libraries(${PROJECT_NAME}
