@@ -3,7 +3,7 @@
 #include <algorithm>
 
 Player::Player(GLFWwindow* win)
-    : AnimObject({"run_frame0", "my_animation.000"},{16, 62},"WolfTexture.png", "default.frag")
+    : AnimObject({"run_frame0", "my_animation.000", "roll_frame0"},{16, 62, 28},"WolfTexture.png", "default.frag")
 {
     SetPosition({-5,0,0});
     SetScale({0.1,0.1,0.1});
@@ -54,19 +54,18 @@ void Player::RefreshText() {
 
 void Player::HandleInput(double dTime) {
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-        if (GetAnimIndex() != 1 && noSpaceLastTime) {
+        if (GetAnimIndex() != 1 && noUpLastTime) {
             PlayAnimationOnce(1, 10, 12, 0, 2.0f);
             std::cout << "space" << std::endl;
         }
-        noSpaceLastTime = false;
+        noUpLastTime = false;
     }
     else
-        noSpaceLastTime = true;
+        noUpLastTime = true;
 
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
         if (noLeftLastTime) {
             zGoal = std::max(-2.0, zGoal - 2);
-            std::cout << "left: " << zGoal << std::endl;
         }
         noLeftLastTime = false;
     }
@@ -76,12 +75,20 @@ void Player::HandleInput(double dTime) {
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
         if (noRightLastTime) {
             zGoal = std::min(2.0, zGoal + 2);
-            std::cout << "right: " << zGoal << std::endl;
         }
         noRightLastTime = false;
     }
     else
         noRightLastTime = true;
+
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+        if (noDownLastTime) {
+            PlayAnimationOnce(2, 0, 0, 0, 1.5f);
+        }
+        noDownLastTime = false;
+    }
+    else
+        noDownLastTime = true;
 }
 
 double Player::DInterpTo(double current, double goal, double interpSpeed, double dTime)
