@@ -4,30 +4,63 @@
 namespace World
 {
     std::vector<Actor*> actors;
-    std::vector<Light> lights;
     std::vector<Actor*> toDelete;
 
-    double worldTime = 0;
+    std::unordered_map<LightID, Light> lights;
+
+    double worldTime = 0.0;
+
     constexpr int MAX_LIGHTS = 32;
+    static LightID nextLightID = 1; // 0 reserved as "invalid"
+
+    // ---------------- LIGHT MANAGEMENT ----------------
+
+    LightID AddLight(
+        const glm::vec3& position,
+        const glm::vec3& color,
+        float intensity,
+        float radius
+    )
+    {
+        LightID id = nextLightID++;
+        lights.emplace(id, Light{ position, color, intensity, radius });
+        return id;
+    }
+
+    void RemoveLight(LightID id)
+    {
+        lights.erase(id);
+    }
+
+    bool HasLight(LightID id)
+    {
+        return lights.find(id) != lights.end();
+    }
+
+    Light* GetLight(LightID id)
+    {
+        auto it = lights.find(id);
+        return (it != lights.end()) ? &it->second : nullptr;
+    }
+
+    // ---------------- SHADER UPLOAD ----------------
 
     void UploadLights(Shader& shader)
     {
         shader.Activate();
 
-        int count = static_cast<int>(World::lights.size());
-        if (count > MAX_LIGHTS)
-            count = MAX_LIGHTS;
-
+        int count = 0;
         glUniform1i(
             glGetUniformLocation(shader.getID(), "lightCount"),
-            count
+            std::min((int)lights.size(), MAX_LIGHTS)
         );
 
-        for (int i = 0; i < count; i++)
+        for (const auto& [id, l] : lights)
         {
-            const Light& l = World::lights[i];
+            if (count >= MAX_LIGHTS)
+                break;
 
-            std::string base = "lights[" + std::to_string(i) + "]";
+            std::string base = "lights[" + std::to_string(count) + "]";
 
             glUniform3fv(
                 glGetUniformLocation(shader.getID(), (base + ".position").c_str()),
@@ -48,13 +81,17 @@ namespace World
                 glGetUniformLocation(shader.getID(), (base + ".radius").c_str()),
                 l.radius
             );
+
+            count++;
         }
     }
 
+    // ---------------- ACTOR LIFETIME ----------------
+
     void DestroyActor(Actor* actor)
     {
-        if (!actor) return;
-        if (actor->pendingKill) return;
+        if (!actor || actor->pendingKill)
+            return;
 
         actor->pendingKill = true;
         actor->OnActorEnd();
@@ -71,47 +108,39 @@ namespace World
 
             delete actor;
         }
-
         toDelete.clear();
     }
 
     void Update()
     {
         double currentTime = glfwGetTime();
+        double delta = currentTime - worldTime;
 
-        const size_t count = actors.size();
-        for (size_t i = 0; i < count; i++)
+        for (Actor* actor : actors)
         {
-            if (!actors[i]->pendingKill)
-                actors[i]->Update(currentTime - worldTime);
+            if (!actor->pendingKill)
+                actor->Update(delta);
         }
 
-        worldTime  = currentTime;
-
+        worldTime = currentTime;
         FlushDestroyActors();
     }
 
     void Draw()
     {
-        const size_t count = actors.size();
-        for (size_t i = 0; i < count; i++)
+        for (Actor* actor : actors)
         {
-            Actor* actor = actors[i];
             if (actor->pendingKill)
                 continue;
+
             if (!actor->IsWidget)
             {
                 Shader* shader = actor->GetShader();
                 if (shader)
                     UploadLights(*shader);
             }
+
             actor->Draw();
         }
-    }
-
-    unsigned int AddLight(glm::vec3 position, glm::vec3 color, float intensity, float radius)
-    {
-        lights.push_back(Light(position, color, intensity, radius));
-        return lights.size() - 1;
     }
 }

@@ -58,6 +58,8 @@ add_executable(${PROJECT_NAME}
         Game/src/Private/BarrierShuttle.cpp
         Game/src/Public/BarrierBoard.h
         Game/src/Private/BarrierBoard.cpp
+        Game/src/Public/BarrierShuttleLit.h
+        Game/src/Private/BarrierShuttleLit.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}

@@ -56,5 +56,5 @@ public:
     Shader* GetShader() override;
 
     virtual unsigned int AddInstance(glm::vec3 position);
-    void RemoveInstance(unsigned int index);
+    virtual void RemoveInstance(unsigned int index);
 };
