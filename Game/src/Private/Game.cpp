@@ -8,6 +8,7 @@
 extern int WINDOW_WIDTH;
 extern int WINDOW_HEIGHT;
 extern Font* FONT_MAIN;
+extern GLFWwindow* GAME_WINDOW;
 
 void Game::Init()
 {
@@ -21,6 +22,6 @@ void Game::Init()
     World::AddLight({0,2,1}, {1,1,1}, 10,4);
     World::AddLight({4, 2,1}, {1,1,1}, 5,5);
 
-    auto* player = World::CreateActor<Player>();
+    auto* player = World::CreateActor<Player>(GAME_WINDOW);
     auto* gameLogic = World::CreateActor<GameLogic>(player);
 }

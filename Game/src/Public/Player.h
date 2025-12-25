@@ -22,14 +22,23 @@ class Player : public AnimObject
 {
     PlayerState state = PlayerState::Normal;
     TextRenderer* scoreText = nullptr;
+    GLFWwindow* window = nullptr;
+
+    float moveSpeed = 10.0f;
 
     unsigned int score = 0;
+    bool noSpaceLastTime = true;
+    bool noLeftLastTime = true;
+    bool noRightLastTime = true;
+    double zGoal = 0;
 
     public:
-    Player();
+    Player(GLFWwindow* window);
     ~Player();
 
     void Update(double dTime) override;
     void PlayerInteracted(PlayerInteraction playerInteraction);
     void RefreshText();
+    void HandleInput(double dTime);
+    double DInterpTo(double current, double goal, double interpSpeed, double dTime);
 };

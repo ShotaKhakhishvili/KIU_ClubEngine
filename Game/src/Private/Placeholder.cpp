@@ -11,11 +11,11 @@ Placeholder::Placeholder(ObjectType a, ObjectType b, ObjectType c, glm::vec3 pos
     InstancedObject* cObj = GetInstObjFromObjType(c);
 
     if (aObj != nullptr)
-        LeftObject = {aObj, aObj->AddInstance(position - glm::vec3(0, 0, 1))};
+        LeftObject = {aObj, aObj->AddInstance(position - glm::vec3(0, 0, 2))};
     if (bObj != nullptr)
         MiddleObject = {bObj, bObj->AddInstance(position)};
     if (cObj != nullptr)
-        RightObject = {cObj, cObj->AddInstance(position + glm::vec3(0, 0, 1))};
+        RightObject = {cObj, cObj->AddInstance(position + glm::vec3(0, 0, 2))};
 }
 
 Placeholder::~Placeholder() {

@@ -1,7 +1,7 @@
 #include "AnimObject.h"
 #include "Path.h"
 
-AnimObject::AnimObject(const char* modelsPrefix, unsigned int modelCount, const char* texturePath, const char* fragShaderPath)
+AnimObject::AnimObject(const std::vector<const char*>& modelsPrefix, const std::vector<unsigned int>& modelCount, const char* texturePath, const char* fragShaderPath)
 {
     // Shader
     std::string vp = Path::Shader("default.vert");
@@ -11,26 +11,32 @@ AnimObject::AnimObject(const char* modelsPrefix, unsigned int modelCount, const 
     std::vector<Vertex> vertices;
     std::vector<GLuint> indices;
 
-    for (signed int i = 0; i < modelCount; ++i)
-    {
-        ReadFromObjIntoVectors(Path::Model(modelsPrefix + std::to_string(i+1) + ".txt"), vertices, indices);
+    animations.resize(modelsPrefix.size());
 
-        VAO* vao = new VAO();
-        vao->Bind();
+    for (unsigned int j = 0; j < modelsPrefix.size(); j++) {
+        for (signed int i = 0; i < modelCount[j]; ++i)
+        {
+            std::string modelPath = std::string(modelsPrefix[j]) + std::to_string(i + 1) + ".txt";
+            ReadFromObjIntoVectors(Path::Model(modelPath), vertices, indices);
 
-        VBO* vbo = new VBO(vertices);
-        EBO* ebo = new EBO(indices);
 
-        vao->LinkAttrib(*vbo, 0, 3, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, coord));
-        vao->LinkAttrib(*vbo, 1, 3, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, normal));
-        vao->LinkAttrib(*vbo, 2, 3, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, color));
-        vao->LinkAttrib(*vbo, 3, 2, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, texUV));
+            VAO* vao = new VAO();
+            vao->Bind();
 
-        VAO::Unbind();
-        VBO::Unbind();
-        EBO::Unbind();
+            VBO* vbo = new VBO(vertices);
+            EBO* ebo = new EBO(indices);
 
-        models.push_back(ModelData(vertices, indices, vao, vbo, ebo));
+            vao->LinkAttrib(*vbo, 0, 3, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, coord));
+            vao->LinkAttrib(*vbo, 1, 3, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+            vao->LinkAttrib(*vbo, 2, 3, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, color));
+            vao->LinkAttrib(*vbo, 3, 2, GL_FLOAT, sizeof(Vertex), (void*)offsetof(Vertex, texUV));
+
+            VAO::Unbind();
+            VBO::Unbind();
+            EBO::Unbind();
+
+            animations[j].push_back(ModelData(vertices, indices, vao, vbo, ebo));
+        }
     }
 
     texture = new Texture(texturePath, GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
@@ -47,8 +53,8 @@ void AnimObject::Draw()
     Camera::camera->ApplyMatrix(*shader, "camMat");
 
     texture->Bind();
-    models[frame].vao->Bind();
-    glDrawElements(GL_TRIANGLES, models[frame].indices.size(), GL_UNSIGNED_INT, 0);
+    animations[animationIndex][frame].vao->Bind();
+    glDrawElements(GL_TRIANGLES, animations[animationIndex][frame].indices.size(), GL_UNSIGNED_INT, 0);
 }
 
 void AnimObject::SetPosition(glm::vec3 newPos)
@@ -103,16 +109,29 @@ AnimObject::~AnimObject()
 
 void AnimObject::Update(double dTime)
 {
-    if (models.empty() || frameChangeTime <= 0)
+    if (animations.empty() || animations.size() <= animationIndex || frameChangeTime <= 0)
         return;
 
-    timePassed += static_cast<float>(dTime);
+    timePassed += static_cast<float>(dTime) * animSpeed;
 
     const int deltaFrames = static_cast<int>(timePassed / frameChangeTime);
 
     if (deltaFrames > 0)
     {
         timePassed -= static_cast<float>(deltaFrames) * frameChangeTime;
-        frame = (frame + deltaFrames) % static_cast<int>(models.size());
+        if (frame + deltaFrames >= static_cast<int>(animations[animationIndex].size()) - ignoredLastFrames) {
+            animationIndex = nextAnimationIndex;
+            ignoredLastFrames = 0;
+            animSpeed = 1.0f;
+        }
+        frame = (frame + deltaFrames) % static_cast<int>(animations[animationIndex].size());
     }
+}
+
+void AnimObject::PlayAnimationOnce(unsigned int animationIndex, unsigned int frame, unsigned int ignoredLastFrames, unsigned int nextAnimationIndex, float animSpeed) {
+    this->animationIndex = animationIndex;
+    this->frame = frame;
+    this->nextAnimationIndex = nextAnimationIndex;
+    this->ignoredLastFrames = ignoredLastFrames;
+    this->animSpeed = animSpeed;
 }

@@ -49,7 +49,7 @@ void GameLogic::Update(double dTime)
             glm::vec3(furthestSubLevel, 0, 0)
         );
 
-        furthestSubLevel += newLevel->size + 1;
+        furthestSubLevel += newLevel->size + distBetweenLevels;
         subLevels.push_back(newLevel);
     }
 }

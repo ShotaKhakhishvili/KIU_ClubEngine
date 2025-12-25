@@ -2,6 +2,7 @@
 
 int WINDOW_WIDTH = 1600, WINDOW_HEIGHT = 900;
 Font* FONT_MAIN  = nullptr;
+GLFWwindow* GAME_WINDOW = nullptr;
 
 GLFWwindow* CreateWindow() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -17,10 +18,10 @@ GLFWwindow* CreateWindow() {
 int main() {
     glfwInit();
 
-    GLFWwindow* window = CreateWindow();
+    GAME_WINDOW = CreateWindow();
 
     // Check if the window was created successfully
-    if (window == NULL)
+    if (GAME_WINDOW == NULL)
     {
         // Terminate if it failed to create the window
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -29,7 +30,7 @@ int main() {
     }
     std::cout << "Successfully created" << std::endl;
 
-    glfwMakeContextCurrent(window); // Actually display the window
+    glfwMakeContextCurrent(GAME_WINDOW); // Actually display the window
     if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)))
     {
         std::cout << "Failed to initialize GLAD\n";
@@ -59,7 +60,7 @@ int main() {
     World::worldTime = glfwGetTime();
     Game::Init();
 
-    while (!glfwWindowShouldClose(window)) {
+    while (!glfwWindowShouldClose(GAME_WINDOW)) {
         glfwPollEvents();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -68,9 +69,9 @@ int main() {
         World::Update();
         World::Draw();
 
-        glfwSwapBuffers(window);
+        glfwSwapBuffers(GAME_WINDOW);
     }
 
-    glfwDestroyWindow(window);
+    glfwDestroyWindow(GAME_WINDOW);
     glfwTerminate();
 }
