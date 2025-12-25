@@ -27,17 +27,18 @@ void Player::PlayerInteracted(PlayerInteraction playerInteraction) {
 
 void Player::Update(double dTime)
 {
-    if (state != PlayerState::GameOver || 1) {
+    if (state != PlayerState::GameOver) {
         AnimObject::Update(dTime);
         SetPosition(GetPosition() + glm::vec3(dTime * moveSpeed, 0, 0));
+
+        HandleInput(dTime);
+        SetPosition({GetPosition().x, GetPosition().y, DInterpTo(GetPosition().z, zGoal, 5.0, dTime)});
     }
     Camera::SetPosition(GetPosition() + glm::vec3(-4, 3, 0));
     Camera::SetRotation(GetRotation() + glm::vec3(-20, -90, 0));
     //Camera::SetPosition(GetPosition() + glm::vec3(-80, 60, 0));
     //Camera::SetRotation(GetRotation() + glm::vec3(-30, -90, 0));
 
-    HandleInput(dTime);
-    SetPosition({GetPosition().x, GetPosition().y, DInterpTo(GetPosition().z, zGoal, 5.0, dTime)});
 }
 
 Player::~Player() {
@@ -46,7 +47,6 @@ Player::~Player() {
         scoreText = nullptr;
     }
 }
-
 
 void Player::RefreshText() {
     scoreText->SetText("Score:" + std::to_string(score));

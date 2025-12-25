@@ -47,7 +47,8 @@ public:
     glm::vec3 GetRotation(unsigned int objIndex);
     glm::vec3 GetScale(unsigned int objIndex);
 
-    unsigned int Size(){return objInsts.size();}
+    unsigned int Size() const {return objInsts.size();}
+    unsigned int GetLastIndex() const {return currIndex;}
 
     void RefreshModelMatrix(ObjInst& instRef);
 

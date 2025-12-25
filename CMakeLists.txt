@@ -52,6 +52,12 @@ add_executable(${PROJECT_NAME}
         Game/src/Private/Sublevel.cpp
         Game/src/Public/Sublevel.h
         Game/src/Private/GameLogic.cpp
+        Game/src/Public/BarrierA.h
+        Game/src/Private/BarrierA.cpp
+        Game/src/Public/BarrierShuttle.h
+        Game/src/Private/BarrierShuttle.cpp
+        Game/src/Public/BarrierBoard.h
+        Game/src/Private/BarrierBoard.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}

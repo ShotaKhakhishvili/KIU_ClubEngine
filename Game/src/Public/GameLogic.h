@@ -3,7 +3,6 @@
 #include "Barrier.h"
 #include "Player.h"
 #include "Sublevel.h"
-#include "InstancedObject.h"
 #include "SABook.h"
 
 
@@ -21,6 +20,8 @@ class GameLogic : public Actor{
     public:
         static SABook* book;
         static Barrier* barrier;
+        static Barrier* shuttle;
+        static Barrier* board;
 
         explicit GameLogic(Player* player);
         ~GameLogic();

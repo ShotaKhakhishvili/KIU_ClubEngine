@@ -20,7 +20,6 @@ enum class PlayerState {
 
 class Player : public AnimObject
 {
-    PlayerState state = PlayerState::Normal;
     TextRenderer* scoreText = nullptr;
     GLFWwindow* window = nullptr;
 
@@ -36,6 +35,11 @@ class Player : public AnimObject
     bool noDownLastTime = true;
 
     public:
+
+    static constexpr float colX = 0.275, colY = 1.5, colZ = 0.5;
+
+    PlayerState state = PlayerState::Normal;
+
     Player(GLFWwindow* window);
     ~Player();
 

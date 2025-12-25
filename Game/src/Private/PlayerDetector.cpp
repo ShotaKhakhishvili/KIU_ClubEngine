@@ -17,8 +17,7 @@ void PlayerDetector::Update(double dTime)
 
     for (auto& [id, inst] : objInsts)
     {
-        float dist = glm::length(player->GetPosition() + glm::vec3(0, 0.5, 0) - inst.position);
-        if (dist < 0.75f)
+        if (DetectPlayer(inst.position))
             toRemove.push_back(id);
     }
 
@@ -32,4 +31,9 @@ void PlayerDetector::OnPlayerInteraction(unsigned int idx) {
 
     if (interactionType == PlayerInteraction::SABook)
         RemoveInstance(idx);
+}
+
+bool PlayerDetector::DetectPlayer(glm::vec3 instPosition) {
+    float dist = glm::length(player->GetPosition() + glm::vec3(0, 0.5, 0) - instPosition);
+    return dist < 0.8f;
 }

@@ -5,15 +5,22 @@
 #include <random>
 #include "World.h"
 #include "SABook.h"
+#include "BarrierA.h"
+#include "BarrierShuttle.h"
+#include "BarrierBoard.h"
 
 SABook* GameLogic::book = nullptr;
 Barrier* GameLogic::barrier = nullptr;
+Barrier* GameLogic::shuttle = nullptr;
+Barrier* GameLogic::board = nullptr;
 
 GameLogic::GameLogic(Player* player) {
     this->player =player;
 
     book = World::CreateActor<SABook>(player);
-    barrier = World::CreateActor<Barrier>(player);
+    barrier = World::CreateActor<BarrierBoard>(player);
+    shuttle = World::CreateActor<BarrierShuttle>(player);
+    board = World::CreateActor<BarrierBoard>(player);
 }
 
 void GameLogic::Update(double dTime)
@@ -78,4 +85,6 @@ GameLogic::~GameLogic()
 
     book = nullptr;
     barrier = nullptr;
+    shuttle = nullptr;
+    board = nullptr;
 }
