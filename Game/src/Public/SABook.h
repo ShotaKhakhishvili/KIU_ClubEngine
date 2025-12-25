@@ -8,7 +8,10 @@ class SABook : public PlayerDetector{
 
     double moveProgress = 0;
 
+    std::unordered_map<unsigned int, double> baseYs;
+
     public:
         SABook(Player* player);
         void Update(double dTime) override;
+        unsigned int AddInstance(glm::vec3 position) override;
 };
