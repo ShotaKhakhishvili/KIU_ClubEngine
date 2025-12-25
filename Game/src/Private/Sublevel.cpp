@@ -2,7 +2,23 @@
 
 std::vector<std::vector<Placeholderinfo>> Sublevel::subLevels{
     {
-            {{ObjectType::Shuttle, 0, 1}, {ObjectType::Empty, 0, 1}, {ObjectType::BarrierBoard, 0, 1}, {0,0,0}, 10},
+            {{ObjectType::Shuttle, 6, 4}, {ObjectType::Empty, 0, 1}, {ObjectType::Empty, 0, 1}, {0,0,0}, 10},
+            {{ObjectType::Empty, 0, 1}, {ObjectType::Empty, 0, 1}, {ObjectType::Shuttle, 0, 1}, {6,0,0}},
+            {{ObjectType::Empty, 0, 1}, {ObjectType::SABookSequence, 2, 4}, {ObjectType::Empty, 0, 1}, {18,0,0}},
+            {{ObjectType::Empty, 0, 1}, {ObjectType::SABookSequence, 4, 2}, {ObjectType::Empty, 0, 1}, {25,0,1}},
+            {{ObjectType::Empty, 0, 1}, {ObjectType::Empty, 0, 1}, {ObjectType::SABookSequence, 2, 2}, {26,0,0}},
+            {{ObjectType::Empty, 0, 1}, {ObjectType::SABook, 0, 1}, {ObjectType::Empty, 0, 1}, {30,0,0}},
+        },
+    {
+            {{ObjectType::Empty, 0, 1}, {ObjectType::Empty, 0, 1}, {ObjectType::Shuttle, 6, 4}, {0,0,0}, 10},
+            {{ObjectType::Empty, 0, 1}, {ObjectType::SABookSequence, 2, 3}, {ObjectType::Empty, 0, 1}, {5,0,0}},
+            {{ObjectType::Empty, 0, 1}, {ObjectType::Shuttle, 0, 1}, {ObjectType::Empty, 0, 1}, {15,0,0}},
+            {{ObjectType::SABookSequence, 12, 2}, {ObjectType::Empty, 0, 1}, {ObjectType::Empty, 0, 1}, {11,0,1}},
+            {{ObjectType::SABookSequence, 2, 5}, {ObjectType::Empty, 0, 1}, {ObjectType::Empty, 0, 1}, {13,0,0}},
+            {{ObjectType::Empty, 0, 1}, {ObjectType::SABookSequence, 2, 2}, {ObjectType::Empty, 0, 1}, {25,0,0}},
+        },
+    {
+            {{ObjectType::BarrierA, 0, 1}, {ObjectType::Empty, 0, 1}, {ObjectType::BarrierBoard, 0, 1}, {0,0,0}, 10},
             {{ObjectType::Empty, 0, 1}, {ObjectType::SABookSequence, 1, 5}, {ObjectType::Empty, 0, 1}, {-3,0,0}},
             {{ObjectType::Empty, 0, 1}, {ObjectType::BarrierBoard, 0, 1}, {ObjectType::BarrierA, 0, 1}, {10,0,0}},
             {{ObjectType::SABookSequence, 1, 5}, {ObjectType::Empty, 0, 1}, {ObjectType::Empty, 0, 1}, {7,0,0}},
