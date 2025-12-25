@@ -15,9 +15,9 @@ Placeholder::Placeholder(ObjectWrapper a, ObjectWrapper b, ObjectWrapper c, glm:
         for (int i = 0; i < a.ObjectCount; i++) {
             LeftObject.second.push_back(aObj->AddInstance(position + glm::vec3(a.ObjectDistance*i, 0, -2)));
         }
-        MiddleObject.first = bObj;
     }
     if (bObj != nullptr) {
+        MiddleObject.first = bObj;
         for (int i = 0; i < b.ObjectCount; i++) {
             MiddleObject.second.push_back(bObj->AddInstance(position + glm::vec3(b.ObjectDistance*i, 0, 0)));
         }
@@ -50,6 +50,8 @@ InstancedObject* Placeholder::GetInstObjFromObjType(ObjectType objType)
         return GameLogic::barrierA;
     if (objType == ObjectType::BarrierBoard)
         return GameLogic::barrierBoard;
+    if (objType == ObjectType::ShuttleLit)
+        return GameLogic::shuttleLit;
     if (objType == ObjectType::Shuttle)
         return GameLogic::shuttle;
     return nullptr;

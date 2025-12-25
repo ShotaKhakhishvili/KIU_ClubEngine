@@ -57,4 +57,10 @@ public:
 
     virtual unsigned int AddInstance(glm::vec3 position);
     virtual void RemoveInstance(unsigned int index);
+
+    virtual void ClearInstances();
+    bool HasInstance(unsigned int id) const
+    {
+        return objInsts.find(id) != objInsts.end();
+    }
 };

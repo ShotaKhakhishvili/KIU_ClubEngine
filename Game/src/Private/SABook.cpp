@@ -29,3 +29,16 @@ unsigned int SABook::AddInstance(glm::vec3 position)
     baseYs.emplace(id, position.y);
     return id;
 }
+
+void SABook::RemoveInstance(unsigned int id)
+{
+    baseYs.erase(id);
+    PlayerDetector::RemoveInstance(id);
+}
+
+void SABook::ClearInstances()
+{
+    baseYs.clear();
+    PlayerDetector::ClearInstances();
+}
+

@@ -14,4 +14,8 @@ class SABook : public PlayerDetector{
         SABook(Player* player);
         void Update(double dTime) override;
         unsigned int AddInstance(glm::vec3 position) override;
+        void RemoveInstance(unsigned int id) override;
+        void ClearInstances() override;
+        ~SABook() override {baseYs.clear();}
+
 };

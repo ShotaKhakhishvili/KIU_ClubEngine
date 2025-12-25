@@ -16,10 +16,8 @@ void Game::Init()
     floor->SetRotation(glm::vec3(0,0,0));
     floor->SetPosition({0,0,0});
 
-    World::AddLight({-4,2,1}, {1,1,1}, 5,4);
-    World::AddLight({0,2,1}, {1,1,1}, 10,4);
-    World::AddLight({4, 2,1}, {1,1,1}, 5,5);
-
     auto* player = World::CreateActor<Player>(GAME_WINDOW);
     auto* gameLogic = World::CreateActor<GameLogic>(player);
+
+    player->SetGameLogic(gameLogic);
 }

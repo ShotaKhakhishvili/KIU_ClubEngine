@@ -1,34 +1,48 @@
 #pragma once
+
+#include <vector>
+#include <random>
+#include <stdexcept>
+
 #include "Actor.h"
-#include "Barrier.h"
-#include "Player.h"
-#include "Sublevel.h"
-#include "SABook.h"
 
+class Player;
+class Sublevel;
+class SABook;
+class Barrier;
+struct Placeholderinfo;
 
-class GameLogic : public Actor{
-    Player* player;
-    std::vector<Sublevel*> subLevels;
-    double furthestSubLevel = 30.0f;
-    double cullDistance = -25.0f;
-    double forwardCullDistance = 100.0f;
-    double distBetweenLevels = 10.0f;
+class GameLogic : public Actor
+{
+public:
+    static SABook*  book;
+    static Barrier* barrierA;
+    static Barrier* barrierBoard;
+    static Barrier* shuttle;
+    static Barrier* shuttleLit;
+    static Barrier* board;
 
-    double lastTime = 0.0f;
-    double spawned = 0.0f;
+    GameLogic(Player* player);
+    ~GameLogic() override;
 
-    public:
-        static SABook* book;
-        static Barrier* barrierA;
-        static Barrier* barrierBoard;
-        static Barrier* shuttle;
-        static Barrier* shuttleLit;
-        static Barrier* board;
+    void Update(double dTime) override;
 
-        explicit GameLogic(Player* player);
-        ~GameLogic();
+    void OnRestart();
 
-        void Update(double deltaTime) override;
-        static const std::vector<Placeholderinfo>& GetRandomSubLevel();
+private:
     void MakeNewSubLevel(unsigned int levelIdx);
+    const std::vector<Placeholderinfo>& GetRandomSubLevel();
+
+private:
+    Player* player = nullptr;
+
+    std::vector<Sublevel*> subLevels;
+
+    double furthestSubLevel      = 30.0;
+    double cullDistance          = -100.0;
+    double forwardCullDistance   = 100.0;
+    double distBetweenLevels     = 1.0;
+
+    double spawned               = 0.0;
+    double lastTime              = 0.0;
 };

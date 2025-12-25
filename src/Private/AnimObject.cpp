@@ -139,4 +139,14 @@ void AnimObject::PlayAnimationOnce(unsigned int animationIndex, unsigned int fra
     this->nextAnimationIndex = nextAnimationIndex;
     this->ignoredLastFrames = ignoredLastFrames;
     this->animSpeed = animSpeed;
+    paused = false;
+}
+
+void AnimObject::PlayAnimationLoop(unsigned int animationIndex, unsigned int firstFrame, unsigned int ignoredLastFrames, float animSpeed) {
+    this->animationIndex = animationIndex;
+    this->nextAnimationIndex = animationIndex;
+    this->frame = firstFrame;
+    this->ignoredLastFrames = ignoredLastFrames;
+    this->animSpeed = animSpeed;
+    paused = false;
 }

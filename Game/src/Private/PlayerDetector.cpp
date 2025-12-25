@@ -26,12 +26,17 @@ void PlayerDetector::Update(double dTime)
 }
 
 
-void PlayerDetector::OnPlayerInteraction(unsigned int idx) {
+void PlayerDetector::OnPlayerInteraction(unsigned int idx)
+{
+    if (!player || player->state == PlayerState::GameOver)
+        return;
+
     player->PlayerInteracted(interactionType);
 
     if (interactionType == PlayerInteraction::SABook)
         RemoveInstance(idx);
 }
+
 
 bool PlayerDetector::DetectPlayer(glm::vec3 instPosition) {
     float dist = glm::length(player->GetPosition() + glm::vec3(0, 0.5, 0) - instPosition);

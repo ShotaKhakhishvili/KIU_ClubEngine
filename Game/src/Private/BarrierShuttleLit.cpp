@@ -25,20 +25,20 @@ unsigned int BarrierShuttleLit::AddInstance(glm::vec3 position)
     unsigned int instanceID = BarrierShuttle::AddInstance(position);
 
     // Light parameters
-    const glm::vec3 color     = { 1.0f, 0.0f, 0.0f };
+    const glm::vec3 color     = { 1.0f, 1.0f, 0.9f };
     const float     intensity = 1.0f;
-    const float     radius    = 3.0f;
+    const float     radius    = 1.5f;
 
     // Create lights
     World::LightID leftLight = World::AddLight(
-        position + glm::vec3(-2.5f, 1.0f,  0.5f),
+        position + glm::vec3(-2.35f, 1.0f,  0.75f),
         color,
         intensity,
         radius
     );
 
     World::LightID rightLight = World::AddLight(
-        position + glm::vec3(-2.5f, 1.0f, -0.5f),
+        position + glm::vec3(-2.35f, 1.0f, -0.75f),
         color,
         intensity,
         radius
@@ -66,4 +66,15 @@ void BarrierShuttleLit::RemoveInstance(unsigned int id)
 
     // Remove base instance
     BarrierShuttle::RemoveInstance(id);
+}
+
+void BarrierShuttleLit::ClearInstances()
+{
+    for (auto& [id, lights] : lightIndices)
+    {
+        World::RemoveLight(lights.first);
+        World::RemoveLight(lights.second);
+    }
+    lightIndices.clear();
+    BarrierShuttle::ClearInstances();
 }

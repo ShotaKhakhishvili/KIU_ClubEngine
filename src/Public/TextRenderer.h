@@ -11,6 +11,7 @@ class TextRenderer : public Actor
     unsigned int VBO = 0;
 
     Shader* shader = nullptr;
+    bool ownsFont = false;
 
     Font* font = nullptr;
     glm::vec2 position;

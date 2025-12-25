@@ -1,34 +1,73 @@
 #include "GameLogic.h"
-#include <vector>     // std::vector
-#include <memory>     // std::unique_ptr
-#include <algorithm> // std::remove_if
+
+#include <algorithm>
 #include <random>
+#include <vector>
+
 #include "World.h"
+#include "Player.h"
+#include "Sublevel.h"
+
 #include "SABook.h"
 #include "BarrierA.h"
 #include "BarrierShuttle.h"
 #include "BarrierShuttleLit.h"
 #include "BarrierBoard.h"
 
-SABook* GameLogic::book = nullptr;
-Barrier* GameLogic::barrierA = nullptr;
+// ===== static pools =====
+SABook*  GameLogic::book         = nullptr;
+Barrier* GameLogic::barrierA     = nullptr;
 Barrier* GameLogic::barrierBoard = nullptr;
-Barrier* GameLogic::shuttle = nullptr;
-Barrier* GameLogic::shuttleLit = nullptr;
-Barrier* GameLogic::board = nullptr;
+Barrier* GameLogic::shuttle      = nullptr;
+Barrier* GameLogic::shuttleLit   = nullptr;
+Barrier* GameLogic::board        = nullptr;
 
-GameLogic::GameLogic(Player* player) {
-    this->player =player;
+GameLogic::GameLogic(Player* player)
+{
+    this->player = player;
 
-    book = World::CreateActor<SABook>(player);
-    barrierA = World::CreateActor<BarrierA>(player);
+    // Pools are created ONCE and then reused across levels/restarts.
+    book         = World::CreateActor<SABook>(player);
+    barrierA     = World::CreateActor<BarrierA>(player);
     barrierBoard = World::CreateActor<BarrierBoard>(player);
-    shuttle = World::CreateActor<BarrierShuttle>(player);
-    shuttleLit = World::CreateActor<BarrierShuttleLit>(player);
-    board = World::CreateActor<BarrierBoard>(player);
+    shuttle      = World::CreateActor<BarrierShuttle>(player);
+    shuttleLit   = World::CreateActor<BarrierShuttleLit>(player);
+    board        = World::CreateActor<BarrierBoard>(player);
 
+    // First startup spawn
     MakeNewSubLevel(0);
     MakeNewSubLevel(1);
+
+    // Fill ahead on first start too (optional, but makes it consistent)
+    while (furthestSubLevel < player->GetPosition().x + forwardCullDistance)
+    {
+        if (Sublevel::subLevels.empty())
+            break;
+
+        auto* newLevel = new Sublevel(
+            GetRandomSubLevel(),
+            glm::vec3(furthestSubLevel, 0, 0)
+        );
+
+        furthestSubLevel += newLevel->size + distBetweenLevels;
+        subLevels.push_back(newLevel);
+    }
+}
+
+GameLogic::~GameLogic()
+{
+    for (Sublevel* s : subLevels)
+        delete s;
+
+    subLevels.clear();
+
+    // Pools are owned by World; don't delete them here.
+    book = nullptr;
+    barrierA = nullptr;
+    barrierBoard = nullptr;
+    shuttle = nullptr;
+    shuttleLit = nullptr;
+    board = nullptr;
 }
 
 void GameLogic::Update(double dTime)
@@ -41,6 +80,8 @@ void GameLogic::Update(double dTime)
             subLevels.end(),
             [&](Sublevel* s)
             {
+                if (!s) return true;
+
                 if ((s->position.x - player->GetPosition().x) < cullDistance)
                 {
                     toDelete.push_back(s);
@@ -69,7 +110,6 @@ void GameLogic::Update(double dTime)
     }
 }
 
-
 const std::vector<Placeholderinfo>& GameLogic::GetRandomSubLevel()
 {
     static std::mt19937 rng{ std::random_device{}() };
@@ -77,31 +117,21 @@ const std::vector<Placeholderinfo>& GameLogic::GetRandomSubLevel()
     if (Sublevel::subLevels.empty())
         throw std::runtime_error("No sublevel templates available");
 
-    std::uniform_int_distribution<std::size_t> dist(
-        1, Sublevel::subLevels.size() - 1
-    );
+    // NOTE: Your code used 1..size-1 (skipping template 0). Keeping that behavior.
+    if (Sublevel::subLevels.size() == 1)
+        return Sublevel::subLevels[0];
 
+    std::uniform_int_distribution<std::size_t> dist(1, Sublevel::subLevels.size() - 1);
     return Sublevel::subLevels[dist(rng)];
 }
 
-GameLogic::~GameLogic()
+void GameLogic::MakeNewSubLevel(unsigned int levelIdx)
 {
-    for (Sublevel* s : subLevels)
-        delete s;
-
-    subLevels.clear();
-
-    book = nullptr;
-    barrierA = nullptr;
-    barrierBoard = nullptr;
-    shuttle = nullptr;
-    shuttleLit = nullptr;
-    board = nullptr;
-}
-
-void GameLogic::MakeNewSubLevel(unsigned int levelIdx) {
     if (Sublevel::subLevels.empty())
         return;
+
+    if (levelIdx >= Sublevel::subLevels.size())
+        levelIdx = 0;
 
     auto* newLevel = new Sublevel(
         Sublevel::subLevels[levelIdx],
@@ -111,3 +141,28 @@ void GameLogic::MakeNewSubLevel(unsigned int levelIdx) {
     furthestSubLevel += newLevel->size + distBetweenLevels;
     subLevels.push_back(newLevel);
 }
+
+void GameLogic::OnRestart()
+{
+    for (Sublevel* s : subLevels)
+        delete s;
+
+    subLevels.clear();
+
+    if (book)         book->ClearInstances();
+    if (barrierA)     barrierA->ClearInstances();
+    if (barrierBoard) barrierBoard->ClearInstances();
+    if (shuttle)      shuttle->ClearInstances();
+    if (shuttleLit)   shuttleLit->ClearInstances();
+    if (board)        board->ClearInstances();
+
+    furthestSubLevel = player->GetPosition().x;
+
+    spawned = 0.0;
+    lastTime = 0.0;
+
+    MakeNewSubLevel(0);
+    MakeNewSubLevel(1);
+}
+
+

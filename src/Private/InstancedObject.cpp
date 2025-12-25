@@ -137,5 +137,15 @@ InstancedObject::~InstancedObject()
 
 void InstancedObject::RemoveInstance(unsigned int index)
 {
-    objInsts.erase(index);
+    auto it = objInsts.find(index);
+    if (it == objInsts.end())
+        return;
+
+    objInsts.erase(it);
+}
+
+
+void InstancedObject::ClearInstances()
+{
+    objInsts.clear();
 }

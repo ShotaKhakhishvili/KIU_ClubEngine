@@ -21,4 +21,5 @@ public:
 
     unsigned int AddInstance(glm::vec3 position) override;
     void RemoveInstance(unsigned int id) override;
+    void ClearInstances() override;
 };

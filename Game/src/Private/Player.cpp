@@ -1,28 +1,56 @@
 #include "Player.h"
 #include "World.h"
+#include "GameLogic.h"
+
 #include <algorithm>
 
 extern int WINDOW_HEIGHT;
+extern int WINDOW_WIDTH;
 
 Player::Player(GLFWwindow* win)
-    : AnimObject({"run_frame0", "my_animation.000", "roll_frame0", "fall_frame.0"},{16, 62, 28, 50},"WolfTexture.png", "default.frag")
+    : AnimObject(
+        { "run_frame0", "my_animation.000", "roll_frame0", "fall_frame.0" },
+        { 16, 62, 28, 50 },
+        "WolfTexture.png",
+        "default.frag"
+      )
 {
-    SetPosition({-5,0,0});
-    SetScale({0.1,0.1,0.1});
-    SetRotation({0,90,0});
-
     window = win;
 
+    SetPosition({ -5, 0, 0 });
+    SetScale({ 0.1f, 0.1f, 0.1f });
+    SetRotation({ 0, 90, 0 });
+
     scoreText = World::CreateActor<TextRenderer>();
-    scoreText->SetPosition({20, WINDOW_HEIGHT - 56});
+    scoreText->SetPosition({ 20, WINDOW_HEIGHT - 56 });
     RefreshText();
 }
 
-void Player::PlayerInteracted(PlayerInteraction playerInteraction) {
-    if (playerInteraction == PlayerInteraction::Barrier) {
+Player::~Player()
+{
+    if (scoreText)
+        World::DestroyActor(scoreText);
+
+    if (gameOverText)
+        World::DestroyActor(gameOverText);
+
+    if (resetText)
+        World::DestroyActor(resetText);
+}
+
+void Player::SetGameLogic(GameLogic* logic)
+{
+    gameLogic = logic;
+}
+
+void Player::PlayerInteracted(PlayerInteraction interaction)
+{
+    if (interaction == PlayerInteraction::Barrier)
+    {
         state = PlayerState::GameOver;
     }
-    else if (playerInteraction == PlayerInteraction::SABook) {
+    else if (interaction == PlayerInteraction::SABook)
+    {
         score++;
         RefreshText();
     }
@@ -31,161 +59,224 @@ void Player::PlayerInteracted(PlayerInteraction playerInteraction) {
 void Player::Update(double dTime)
 {
     AnimObject::Update(dTime);
-    if (state != PlayerState::GameOver) {
+
+    if (restarting)
+        return;
+
+    if (state != PlayerState::GameOver)
+    {
         SetPosition(GetPosition() + glm::vec3(dTime * moveSpeed, 0, 0));
 
         HandleInput(dTime);
         UpdateJump(dTime);
 
-        SetPosition({GetPosition().x, GetPosition().y, DInterpTo(GetPosition().z, zGoal, 5.0, dTime)});
+        SetPosition({
+            GetPosition().x,
+            GetPosition().y,
+            DInterpTo(GetPosition().z, zGoal, 5.0, dTime)
+        });
 
         RefreshState();
         HandleState();
     }
-    else if (alive) {
-        alive = false;
-        PlayAnimationOnce(3, 0, 0, 1000, 1.0f);
+    else
+    {
+        HandleRestartInput();
     }
 
-    if (state == PlayerState::GameOver) {
-        Camera::SetPosition(VInterpTo(Camera::GetPosition(), GetPosition() + glm::vec3(0, 10, 0), 0.4, dTime));
-        glm::vec3 targetDir = Camera::DirectionFromEuler(glm::vec3(-90,0,0));
+    if (state == PlayerState::GameOver)
+    {
+        if (alive)
+        {
+            alive = false;
+            PlayAnimationOnce(3, 0, 0, 1000, 1.0f);
+            DisplayGameOverTexts();
+        }
 
-        Camera::SetOrientation(
-            glm::normalize(
-                VInterpTo(Camera::GetOrientation(), targetDir, 1.0, dTime)
-            )
-        );
+
+            Camera::SetPosition(
+            VInterpTo(Camera::GetPosition(),
+                 GetPosition() + glm::vec3(0, 10, 0),
+                 0.4, dTime));
+
+            glm::vec3 targetDir =
+                Camera::DirectionFromEuler(glm::vec3(-90, 0, 0));
+
+            Camera::SetOrientation(glm::normalize(
+                VInterpTo(Camera::GetOrientation(), targetDir, 1.0, dTime)));
+
     }
-    else {
-        Camera::SetPosition(VInterpTo(Camera::GetPosition(), GetPosition() + glm::vec3(-4, 3, 0), 10, dTime));
-        Camera::SetRotation(GetRotation() + glm::vec3(-20, -90, 0));
+    else
+    {
+            Camera::SetPosition(
+                VInterpTo(Camera::GetPosition(),
+                          GetPosition() + glm::vec3(-4, 3, 0),
+                          10.0, dTime));
+
+            Camera::SetRotation(GetRotation() + glm::vec3(-20, -90, 0));
+
     }
-
-    //Camera::SetPosition(GetPosition() + glm::vec3(-80, 60, 0));
-    //Camera::SetRotation(GetRotation() + glm::vec3(-30, -90, 0));
-
 }
 
-Player::~Player() {
-    if (scoreText) {
-        World::DestroyActor(scoreText);
-        scoreText = nullptr;
-    }
-}
-
-void Player::RefreshText() {
-    scoreText->SetText("GPA: 0." + std::to_string(score));
-}
-
-void Player::HandleInput(double dTime) {
-    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS){
-        if (state != PlayerState::Jumping && noUpLastTime){
+void Player::HandleInput(double)
+{
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+    {
+        if (state != PlayerState::Jumping && noUpLastTime)
+        {
             state = PlayerState::Jumping;
             jumpTime = 0.0f;
             jumpBaseY = GetPosition().y;
-
             PlayAnimationOnce(1, 10, 12, 0, 2.0f);
         }
         noUpLastTime = false;
     }
-    else
-        noUpLastTime = true;
+    else noUpLastTime = true;
 
-
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        if (noLeftLastTime) {
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    {
+        if (noLeftLastTime)
             zGoal = std::max(-2.0, zGoal - 2);
-        }
         noLeftLastTime = false;
     }
-    else
-        noLeftLastTime = true;
+    else noLeftLastTime = true;
 
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        if (noRightLastTime) {
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    {
+        if (noRightLastTime)
             zGoal = std::min(2.0, zGoal + 2);
-        }
         noRightLastTime = false;
     }
-    else
-        noRightLastTime = true;
+    else noRightLastTime = true;
 
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-        if (noDownLastTime) {
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+    {
+        if (noDownLastTime)
             PlayAnimationOnce(2, 0, 0, 0, 1.5f);
-        }
         noDownLastTime = false;
     }
-    else
-        noDownLastTime = true;
+    else noDownLastTime = true;
+
+    if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)
+    {
+        if (!alive && noEnterLastTime)
+            OnRestart();
+        noEnterLastTime = false;
+    }
+    else noEnterLastTime = true;
 }
 
-double Player::DInterpTo(double current, double goal, double interpSpeed, double dTime)
+void Player::OnRestart()
 {
-    if (interpSpeed <= 0.0)
-        return goal;
+    restarting = true;
+    SetPosition({ -5, 0, 0 });
+    zGoal = 0.0;
 
-    const double delta = goal - current;
+    if (gameLogic)
+        gameLogic->OnRestart();
 
-    if (std::abs(delta) < 1e-6)
-        return goal;
+    state = PlayerState::Normal;
+    alive = true;
 
-    const double interpStep = std::clamp(interpSpeed * dTime, 0.0, 1.0);
+    score = 0;
 
-    return current + delta * interpStep;
+    jumpTime = 0.0f;
+    jumpBaseY = 0.0f;
+
+    noUpLastTime = true;
+    noLeftLastTime = true;
+    noRightLastTime = true;
+    noDownLastTime = true;
+    noEnterLastTime = true;
+
+    SetCollisionToNormal();
+
+    SetRotation({ 0, 90, 0 });
+
+    PlayAnimationLoop(0, 0, 0, 1.0f);
+
+    Camera::SetPosition(GetPosition() + glm::vec3(-4, 3, 0));
+    Camera::SetRotation(GetRotation() + glm::vec3(-20, -90, 0));
+
+    scoreText->SetPosition({ 20, WINDOW_HEIGHT - 56 });
+    RefreshText();
+
+    if (gameOverText)
+        World::DestroyActor(gameOverText), gameOverText = nullptr;
+
+    if (resetText)
+        World::DestroyActor(resetText), resetText = nullptr;
+
+    restarting = false;
 }
 
-glm::vec3 Player::VInterpTo(
-    glm::vec3 current,
-    glm::vec3 goal,
-    double interpSpeed,
-    double dTime)
+void Player::DisplayGameOverTexts()
 {
-    if (interpSpeed <= 0.0)
-        return goal;
+    constexpr float GAME_OVER_SIZE = 2.5f;
+    constexpr float RESTART_SIZE   = 1.2f;
 
-    const glm::vec3 delta = goal - current;
+    auto estimateWidth = [](const std::string& s, float size)
+    {
+        return s.length() * 24.0f * size;
+    };
 
-    // Close enough → snap
-    if (glm::length2(delta) < 1e-12)
-        return goal;
+    float cx = WINDOW_WIDTH * 0.5f;
+    float cy = WINDOW_HEIGHT * 0.5f;
 
-    const double interpStep = std::clamp(interpSpeed * dTime, 0.0, 1.0);
+    gameOverText = World::CreateActor<TextRenderer>();
+    gameOverText->SetText("Game Over");
+    gameOverText->SetSize(GAME_OVER_SIZE);
+    gameOverText->SetColor({ 1.0f, 0.2f, 0.2f });
 
-    return current + delta * static_cast<float>(interpStep);
+    gameOverText->SetPosition({
+        cx - estimateWidth("Game Over", GAME_OVER_SIZE) * 0.5f,
+        cy + 30.0f
+    });
+
+    resetText = World::CreateActor<TextRenderer>();
+    resetText->SetText("Press Enter To Restart");
+    resetText->SetSize(RESTART_SIZE);
+    resetText->SetColor({ 1.0f, 1.0f, 1.0f });
+
+    resetText->SetPosition({
+        cx - estimateWidth("Press Enter To Restart", RESTART_SIZE) * 0.5f,
+        cy - 30.0f
+    });
 }
 
-
-void Player::SetCollisionToNormal() {
-    colCoordX = colCoordY = colCoordZ = 0;
-    colY = 1.5;
-}
-void Player::SetCollisionToRoll() {
-    colCoordX = colCoordY = colCoordZ = 0;
-    colY = 0.2;
+void Player::RefreshText()
+{
+    scoreText->SetText("GPA: 0." + std::to_string(score));
 }
 
 void Player::RefreshState()
 {
-    if (state == PlayerState::GameOver)
+    if (state == PlayerState::GameOver || state == PlayerState::Jumping)
         return;
-    if (state == PlayerState::Jumping)
-        return;
-    if (GetAnimIndex() == 2)
-        state = PlayerState::Rolling;
-    else
-        state = PlayerState::Normal;
+
+    state = (GetAnimIndex() == 2)
+        ? PlayerState::Rolling
+        : PlayerState::Normal;
 }
 
-
-void Player::HandleState() {
-    if (state == PlayerState::Normal) {
-        SetCollisionToNormal();
-    }
-    else if (state == PlayerState::Rolling) {
+void Player::HandleState()
+{
+    if (state == PlayerState::Rolling)
         SetCollisionToRoll();
-    }
+    else
+        SetCollisionToNormal();
+}
+
+void Player::SetCollisionToNormal()
+{
+    colCoordX = colCoordY = colCoordZ = 0.0f;
+    colY = 1.5f;
+}
+
+void Player::SetCollisionToRoll()
+{
+    colCoordX = colCoordY = colCoordZ = 0.0f;
+    colY = 0.2f;
 }
 
 void Player::UpdateJump(double dTime)
@@ -194,24 +285,59 @@ void Player::UpdateJump(double dTime)
         return;
 
     jumpTime += static_cast<float>(dTime);
+    float t = std::clamp(jumpTime / jumpDuration, 0.0f, 1.0f);
 
-    float t = jumpTime / jumpDuration;
-    t = std::clamp(t, 0.0f, 1.0f);
-
-    // Sine jump arc: 0 → peak → 0
-    float jumpOffset = std::sin(t * glm::pi<float>()) * jumpHeight;
+    float offset = std::sin(t * glm::pi<float>()) * jumpHeight;
 
     glm::vec3 pos = GetPosition();
-    pos.y = jumpBaseY + jumpOffset;
+    pos.y = jumpBaseY + offset;
     SetPosition(pos);
 
     if (t >= 1.0f)
     {
-        // Landing
         pos.y = jumpBaseY;
         SetPosition(pos);
         state = PlayerState::Normal;
     }
 }
 
+double Player::DInterpTo(double current, double goal, double speed, double dt)
+{
+    if (speed <= 0.0)
+        return goal;
 
+    double delta = goal - current;
+    if (std::abs(delta) < 1e-6)
+        return goal;
+
+    double step = std::clamp(speed * dt, 0.0, 1.0);
+    return current + delta * step;
+}
+
+glm::vec3 Player::VInterpTo(glm::vec3 current, glm::vec3 goal, double speed, double dt)
+{
+    if (speed <= 0.0)
+        return goal;
+
+    glm::vec3 delta = goal - current;
+    if (glm::length2(delta) < 1e-12)
+        return goal;
+
+    double step = std::clamp(speed * dt, 0.0, 1.0);
+    return current + delta * static_cast<float>(step);
+}
+
+void Player::HandleRestartInput()
+{
+    if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)
+    {
+        if (noEnterLastTime)
+            OnRestart();
+
+        noEnterLastTime = false;
+    }
+    else
+    {
+        noEnterLastTime = true;
+    }
+}

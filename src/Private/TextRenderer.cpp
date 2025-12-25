@@ -133,9 +133,13 @@ TextRenderer::~TextRenderer()
     {
         delete shader;
         shader = nullptr;
-        delete font;
-        font = nullptr;
     }
+
+    if (ownsFont && font)
+    {
+        delete font;
+    }
+    font = nullptr;
 
     if (VBO)
         glDeleteBuffers(1, &VBO);

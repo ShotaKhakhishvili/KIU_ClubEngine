@@ -57,6 +57,7 @@ public:
     void RefreshModelMatrix();
 
     void PlayAnimationOnce(unsigned int animationIndex, unsigned int frame, unsigned int ignoredLastFrames, unsigned int nextAnimationIndex, float animSpeed);
+    void PlayAnimationLoop(unsigned int animationIndex, unsigned int firstFrame, unsigned int ignoredLastFrames, float animSpeed);
 
     unsigned int GetAnimIndex(){return animationIndex;}
 

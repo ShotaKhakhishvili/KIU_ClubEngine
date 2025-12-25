@@ -7,6 +7,7 @@ enum class ObjectType {
     BarrierA,
     BarrierBoard,
     Shuttle,
+    ShuttleLit,
     SABookSequence,
     Empty
 };
