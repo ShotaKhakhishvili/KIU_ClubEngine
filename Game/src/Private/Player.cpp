@@ -151,7 +151,7 @@ void Player::HandleInput(double)
 
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
     {
-        if (noDownLastTime)
+        if (noDownLastTime && GetAnimIndex() != 2)
             PlayAnimationOnce(2, 0, 0, 0, 1.5f);
         noDownLastTime = false;
     }
