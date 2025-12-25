@@ -27,10 +27,13 @@ class Player : public AnimObject
     float moveSpeed = 10.0f;
 
     unsigned int score = 0;
-    bool noSpaceLastTime = true;
+    double zGoal = 0;
+
+
+    bool noUpLastTime = true;
     bool noLeftLastTime = true;
     bool noRightLastTime = true;
-    double zGoal = 0;
+    bool noDownLastTime = true;
 
     public:
     Player(GLFWwindow* window);
