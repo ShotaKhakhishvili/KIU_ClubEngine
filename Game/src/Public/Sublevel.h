@@ -10,6 +10,7 @@ struct Placeholderinfo {
     ObjectWrapper b;
     ObjectWrapper c;
     glm::vec3 position;
+    double size;
 };
 
 class Sublevel {

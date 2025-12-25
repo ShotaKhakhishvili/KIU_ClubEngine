@@ -46,8 +46,12 @@ InstancedObject* Placeholder::GetInstObjFromObjType(ObjectType objType)
 {
     if (objType == ObjectType::SABook || objType == ObjectType::SABookSequence)
         return GameLogic::book;
-    if (objType == ObjectType::Barrier)
-        return GameLogic::barrier;
+    if (objType == ObjectType::BarrierA)
+        return GameLogic::barrierA;
+    if (objType == ObjectType::BarrierBoard)
+        return GameLogic::barrierBoard;
+    if (objType == ObjectType::Shuttle)
+        return GameLogic::shuttle;
     return nullptr;
 }
 

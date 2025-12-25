@@ -10,7 +10,8 @@
 #include "BarrierBoard.h"
 
 SABook* GameLogic::book = nullptr;
-Barrier* GameLogic::barrier = nullptr;
+Barrier* GameLogic::barrierA = nullptr;
+Barrier* GameLogic::barrierBoard = nullptr;
 Barrier* GameLogic::shuttle = nullptr;
 Barrier* GameLogic::board = nullptr;
 
@@ -18,7 +19,8 @@ GameLogic::GameLogic(Player* player) {
     this->player =player;
 
     book = World::CreateActor<SABook>(player);
-    barrier = World::CreateActor<BarrierBoard>(player);
+    barrierA = World::CreateActor<BarrierA>(player);
+    barrierBoard = World::CreateActor<BarrierBoard>(player);
     shuttle = World::CreateActor<BarrierShuttle>(player);
     board = World::CreateActor<BarrierBoard>(player);
 }
@@ -52,7 +54,8 @@ void GameLogic::Update(double dTime)
             break;
 
         auto* newLevel = new Sublevel(
-            GetRandomSubLevel(),
+            Sublevel::subLevels[0],
+            // GetRandomSubLevel(),
             glm::vec3(furthestSubLevel, 0, 0)
         );
 
@@ -84,7 +87,8 @@ GameLogic::~GameLogic()
     subLevels.clear();
 
     book = nullptr;
-    barrier = nullptr;
+    barrierA = nullptr;
+    barrierBoard = nullptr;
     shuttle = nullptr;
     board = nullptr;
 }

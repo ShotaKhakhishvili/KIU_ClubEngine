@@ -9,7 +9,7 @@
 class GameLogic : public Actor{
     Player* player;
     std::vector<Sublevel*> subLevels;
-    double furthestSubLevel = 0.0f;
+    double furthestSubLevel = 30.0f;
     double cullDistance = -25.0f;
     double forwardCullDistance = 20.0f;
     double distBetweenLevels = 10.0f;
@@ -19,7 +19,8 @@ class GameLogic : public Actor{
 
     public:
         static SABook* book;
-        static Barrier* barrier;
+        static Barrier* barrierA;
+        static Barrier* barrierBoard;
         static Barrier* shuttle;
         static Barrier* board;
 

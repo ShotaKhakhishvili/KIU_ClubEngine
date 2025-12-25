@@ -6,9 +6,9 @@ BarrierA::BarrierA(Player *player) : Barrier("A.txt", "orange.png", player, Play
 }
 
 unsigned int BarrierA::AddInstance(glm::vec3 position) {
-    unsigned int newIndex = PlayerDetector::AddInstance(position);
+    unsigned int newIndex = PlayerDetector::AddInstance(position + glm::vec3(0, -0.8, 0));
 
-    SetScale(newIndex, {1.5, 1.5,1.5});
+    SetScale(newIndex, {1.5, 1.5, 1.5});
     SetRotation(newIndex, {0, -90, 0});
     return newIndex;
 }

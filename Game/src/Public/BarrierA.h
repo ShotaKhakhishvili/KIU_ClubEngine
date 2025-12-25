@@ -11,6 +11,6 @@ class BarrierA : public Barrier {
     float GetColZ() const override { return 0.5f; }
 
     float GetColCoordX() const override { return 0.25f; }
-    float GetColCoordY() const override { return 0.0f; }
+    float GetColCoordY() const override { return 0.8f; }
     float GetColCoordZ() const override { return 0.0f; }
 };

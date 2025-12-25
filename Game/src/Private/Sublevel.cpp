@@ -1,48 +1,51 @@
 #include "Sublevel.h"
 
 std::vector<std::vector<Placeholderinfo>> Sublevel::subLevels{
-        {
-            {{ObjectType::Barrier, 0, 1}, {ObjectType::SABook, 0, 1}, {ObjectType::Barrier, 0, 1}, {0,0,0}},
-            {{ObjectType::SABook, 0, 1}, {ObjectType::Barrier, 0, 1}, {ObjectType::Barrier, 0, 1}, {10,0,0}},
-            {{ObjectType::Barrier, 0, 1}, {ObjectType::Barrier, 0, 1}, {ObjectType::SABook, 0, 1}, {20,0,0}}
+    {
+            {{ObjectType::Shuttle, 0, 1}, {ObjectType::Empty, 0, 1}, {ObjectType::BarrierBoard, 0, 1}, {0,0,0}, 10},
+            {{ObjectType::Empty, 0, 1}, {ObjectType::SABookSequence, 1, 5}, {ObjectType::Empty, 0, 1}, {-3,0,0}},
+            {{ObjectType::Empty, 0, 1}, {ObjectType::BarrierBoard, 0, 1}, {ObjectType::BarrierA, 0, 1}, {10,0,0}},
+            {{ObjectType::SABookSequence, 1, 5}, {ObjectType::Empty, 0, 1}, {ObjectType::Empty, 0, 1}, {7,0,0}},
+            {{ObjectType::BarrierBoard, 0, 1}, {ObjectType::BarrierA, 0, 1}, {ObjectType::Empty, 0, 1}, {20,0,0}},
+            {{ObjectType::Empty, 0, 1}, {ObjectType::Empty, 0, 1}, {ObjectType::SABookSequence, 1, 5}, {17,0,0}}
         },
-        {
+    {
             {{ObjectType::Empty, 0, 1}, {ObjectType::SABook, 0, 1}, {ObjectType::Empty, 0, 1}, {6,0,0}},
-            {{ObjectType::Empty, 0, 1}, {ObjectType::Barrier, 0, 1}, {ObjectType::Empty, 0, 1}, {10,0,0}},
+            {{ObjectType::Empty, 0, 1}, {ObjectType::BarrierA, 0, 1}, {ObjectType::Empty, 0, 1}, {10,0,0}},
             {{ObjectType::Empty, 0, 1}, {ObjectType::SABook, 0, 1}, {ObjectType::Empty, 0, 1}, {10,2,0}},
             {{ObjectType::Empty, 0, 1}, {ObjectType::SABook, 0, 1}, {ObjectType::Empty, 0, 1}, {14,0,0}}
         },
     {
             {{ObjectType::SABook, 0, 1}, {ObjectType::Empty, 0, 1}, {ObjectType::SABook, 0, 1}, {6,0,0}},
-            {{ObjectType::Barrier, 0, 1}, {ObjectType::SABook, 0, 1}, {ObjectType::Barrier, 0, 1}, {10,0,0}},
+            {{ObjectType::BarrierA, 0, 1}, {ObjectType::SABook, 0, 1}, {ObjectType::BarrierA, 0, 1}, {10,0,0}},
             {{ObjectType::SABook, 0, 1}, {ObjectType::Empty, 0, 1}, {ObjectType::SABook, 0, 1}, {10,2,0}},
             {{ObjectType::SABook, 0, 1}, {ObjectType::Empty, 0, 1}, {ObjectType::SABook, 0, 1}, {14,0,0}}
         },
     {
             {{ObjectType::Empty, 0, 1}, {ObjectType::SABook, 0, 1}, {ObjectType::Empty, 0, 1}, {0,0,0}},
             {{ObjectType::Empty, 0, 1}, {ObjectType::SABook, 0, 1}, {ObjectType::Empty, 0, 1}, {5,0,0}},
-            {{ObjectType::Empty, 0, 1}, {ObjectType::Barrier, 0, 1}, {ObjectType::Empty, 0, 1}, {10,0,0}},
+            {{ObjectType::Empty, 0, 1}, {ObjectType::BarrierA, 0, 1}, {ObjectType::Empty, 0, 1}, {10,0,0}},
             {{ObjectType::Empty, 0, 1}, {ObjectType::SABook, 0, 1}, {ObjectType::Empty, 0, 1}, {10,2,0}},
             {{ObjectType::Empty, 0, 1}, {ObjectType::SABook, 0, 1}, {ObjectType::Empty, 0, 1}, {15,0,0}},
             {{ObjectType::Empty, 0, 1}, {ObjectType::SABook, 0, 1}, {ObjectType::Empty, 0, 1}, {20,0,0}}
         },
     {
             {{ObjectType::SABook, 0, 1}, {ObjectType::Empty, 0, 1}, {ObjectType::SABook, 0, 1}, {0,0,0}},
-            {{ObjectType::Barrier, 0, 1}, {ObjectType::SABook, 0, 1}, {ObjectType::Barrier, 0, 1}, {5,0,0}},
+            {{ObjectType::BarrierA, 0, 1}, {ObjectType::SABook, 0, 1}, {ObjectType::BarrierA, 0, 1}, {5,0,0}},
             {{ObjectType::SABook, 0, 1}, {ObjectType::Empty, 0, 1}, {ObjectType::SABook, 0, 1}, {5,2,0}},
-            {{ObjectType::SABook, 0, 1}, {ObjectType::Barrier, 0, 1}, {ObjectType::SABook, 0, 1}, {10,0,0}},
+            {{ObjectType::SABook, 0, 1}, {ObjectType::BarrierA, 0, 1}, {ObjectType::SABook, 0, 1}, {10,0,0}},
             {{ObjectType::Empty, 0, 1}, {ObjectType::SABook, 0, 1}, {ObjectType::Empty, 0, 1}, {10,2,0}},
-            {{ObjectType::Barrier, 0, 1}, {ObjectType::SABook, 0, 1}, {ObjectType::Barrier, 0, 1}, {15,0,0}},
+            {{ObjectType::BarrierA, 0, 1}, {ObjectType::SABook, 0, 1}, {ObjectType::BarrierA, 0, 1}, {15,0,0}},
             {{ObjectType::SABook, 0, 1}, {ObjectType::Empty, 0, 1}, {ObjectType::SABook, 0, 1}, {15,2,0}},
             {{ObjectType::SABook, 0, 1}, {ObjectType::Empty, 0, 1}, {ObjectType::SABook, 0, 1}, {20,0,0}}
         },
         {
             {{ObjectType::SABook, 0, 1}, {ObjectType::Empty, 0, 1}, {ObjectType::Empty, 0, 1}, {0,0,0}},
-            {{ObjectType::Barrier, 0, 1}, {ObjectType::SABook, 0, 1}, {ObjectType::Empty, 0, 1}, {5,0,0}},
+            {{ObjectType::BarrierA, 0, 1}, {ObjectType::SABook, 0, 1}, {ObjectType::Empty, 0, 1}, {5,0,0}},
             {{ObjectType::SABook, 0, 1}, {ObjectType::Empty, 0, 1}, {ObjectType::Empty, 0, 1}, {5,2,0}},
-            {{ObjectType::SABook, 0, 1}, {ObjectType::Barrier, 0, 1}, {ObjectType::SABook, 0, 1}, {10,0,0}},
+            {{ObjectType::SABook, 0, 1}, {ObjectType::BarrierA, 0, 1}, {ObjectType::SABook, 0, 1}, {10,0,0}},
             {{ObjectType::Empty, 0, 1}, {ObjectType::SABook, 0, 1}, {ObjectType::Empty, 0, 1}, {10,2,0}},
-            {{ObjectType::Empty, 0, 1}, {ObjectType::SABook, 0, 1}, {ObjectType::Barrier, 0, 1}, {15,0,0}},
+            {{ObjectType::Empty, 0, 1}, {ObjectType::SABook, 0, 1}, {ObjectType::BarrierA, 0, 1}, {15,0,0}},
             {{ObjectType::Empty, 0, 1}, {ObjectType::Empty, 0, 1}, {ObjectType::SABook, 0, 1}, {15,2,0}},
             {{ObjectType::Empty, 0, 1}, {ObjectType::Empty, 0, 1}, {ObjectType::SABook, 0, 1}, {20,0,0}}
         }

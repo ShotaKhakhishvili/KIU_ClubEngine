@@ -4,7 +4,9 @@
 
 enum class ObjectType {
     SABook,
-    Barrier,
+    BarrierA,
+    BarrierBoard,
+    Shuttle,
     SABookSequence,
     Empty
 };
