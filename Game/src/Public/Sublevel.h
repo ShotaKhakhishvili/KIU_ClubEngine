@@ -6,9 +6,9 @@
 #include "Player.h"
 
 struct Placeholderinfo {
-    ObjectType a;
-    ObjectType b;
-    ObjectType c;
+    ObjectWrapper a;
+    ObjectWrapper b;
+    ObjectWrapper c;
     glm::vec3 position;
 };
 
