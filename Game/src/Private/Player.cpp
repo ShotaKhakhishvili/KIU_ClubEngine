@@ -2,6 +2,8 @@
 #include "World.h"
 #include <algorithm>
 
+extern int WINDOW_HEIGHT;
+
 Player::Player(GLFWwindow* win)
     : AnimObject({"run_frame0", "my_animation.000", "roll_frame0", "fall_frame.0"},{16, 62, 28, 50},"WolfTexture.png", "default.frag")
 {
@@ -12,6 +14,7 @@ Player::Player(GLFWwindow* win)
     window = win;
 
     scoreText = World::CreateActor<TextRenderer>();
+    scoreText->SetPosition({20, WINDOW_HEIGHT - 56});
     RefreshText();
 }
 
@@ -59,7 +62,7 @@ Player::~Player() {
 }
 
 void Player::RefreshText() {
-    scoreText->SetText("Score:" + std::to_string(score));
+    scoreText->SetText("GPA: 0." + std::to_string(score));
 }
 
 void Player::HandleInput(double dTime) {

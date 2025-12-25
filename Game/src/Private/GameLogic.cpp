@@ -23,6 +23,9 @@ GameLogic::GameLogic(Player* player) {
     barrierBoard = World::CreateActor<BarrierBoard>(player);
     shuttle = World::CreateActor<BarrierShuttle>(player);
     board = World::CreateActor<BarrierBoard>(player);
+
+    MakeNewSubLevel(0);
+    MakeNewSubLevel(1);
 }
 
 void GameLogic::Update(double dTime)
@@ -54,8 +57,7 @@ void GameLogic::Update(double dTime)
             break;
 
         auto* newLevel = new Sublevel(
-            Sublevel::subLevels[0],
-            // GetRandomSubLevel(),
+            GetRandomSubLevel(),
             glm::vec3(furthestSubLevel, 0, 0)
         );
 
@@ -73,7 +75,7 @@ const std::vector<Placeholderinfo>& GameLogic::GetRandomSubLevel()
         throw std::runtime_error("No sublevel templates available");
 
     std::uniform_int_distribution<std::size_t> dist(
-        0, Sublevel::subLevels.size() - 1
+        1, Sublevel::subLevels.size() - 1
     );
 
     return Sublevel::subLevels[dist(rng)];
@@ -91,4 +93,17 @@ GameLogic::~GameLogic()
     barrierBoard = nullptr;
     shuttle = nullptr;
     board = nullptr;
+}
+
+void GameLogic::MakeNewSubLevel(unsigned int levelIdx) {
+    if (Sublevel::subLevels.empty())
+        return;
+
+    auto* newLevel = new Sublevel(
+        Sublevel::subLevels[levelIdx],
+        glm::vec3(furthestSubLevel, 0, 0)
+    );
+
+    furthestSubLevel += newLevel->size + distBetweenLevels;
+    subLevels.push_back(newLevel);
 }
