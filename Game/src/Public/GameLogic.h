@@ -22,6 +22,7 @@ class GameLogic : public Actor{
         static Barrier* barrierA;
         static Barrier* barrierBoard;
         static Barrier* shuttle;
+        static Barrier* shuttleLit;
         static Barrier* board;
 
         explicit GameLogic(Player* player);

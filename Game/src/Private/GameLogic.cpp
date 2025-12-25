@@ -7,12 +7,14 @@
 #include "SABook.h"
 #include "BarrierA.h"
 #include "BarrierShuttle.h"
+#include "BarrierShuttleLit.h"
 #include "BarrierBoard.h"
 
 SABook* GameLogic::book = nullptr;
 Barrier* GameLogic::barrierA = nullptr;
 Barrier* GameLogic::barrierBoard = nullptr;
 Barrier* GameLogic::shuttle = nullptr;
+Barrier* GameLogic::shuttleLit = nullptr;
 Barrier* GameLogic::board = nullptr;
 
 GameLogic::GameLogic(Player* player) {
@@ -22,6 +24,7 @@ GameLogic::GameLogic(Player* player) {
     barrierA = World::CreateActor<BarrierA>(player);
     barrierBoard = World::CreateActor<BarrierBoard>(player);
     shuttle = World::CreateActor<BarrierShuttle>(player);
+    shuttleLit = World::CreateActor<BarrierShuttleLit>(player);
     board = World::CreateActor<BarrierBoard>(player);
 
     MakeNewSubLevel(0);
@@ -92,6 +95,7 @@ GameLogic::~GameLogic()
     barrierA = nullptr;
     barrierBoard = nullptr;
     shuttle = nullptr;
+    shuttleLit = nullptr;
     board = nullptr;
 }
 
