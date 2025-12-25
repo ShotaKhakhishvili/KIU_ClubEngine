@@ -17,8 +17,8 @@ void PlayerDetector::Update(double dTime)
 
     for (auto& [id, inst] : objInsts)
     {
-        float dist = std::abs(player->GetPosition().x - inst.position.x);
-        if (dist < 0.25f && player->GetPosition().z == inst.position.z)
+        float dist = glm::length(player->GetPosition() + glm::vec3(0, 0.5, 0) - inst.position);
+        if (dist < 0.75f)
             toRemove.push_back(id);
     }
 

@@ -12,11 +12,11 @@ extern GLFWwindow* GAME_WINDOW;
 
 void Game::Init()
 {
-    auto* instObj = World::CreateActor<InstancedObject>("Cube.txt", "1.png", "default.frag");
+    auto* floor = World::CreateActor<Object>("Cube.txt", "1.png", "default.frag");
 
-    instObj->AddInstance(glm::vec3(0,0,0));
-    instObj->SetScale(0,glm::vec3(100,3,100));
-    instObj->SetRotation(0,glm::vec3(0,0,0));
+    floor->SetScale(glm::vec3(50000,3,50000));
+    floor->SetRotation(glm::vec3(0,0,0));
+    floor->SetPosition({0,-0.5,0});
 
     World::AddLight({-4,2,1}, {1,1,1}, 5,4);
     World::AddLight({0,2,1}, {1,1,1}, 10,4);
