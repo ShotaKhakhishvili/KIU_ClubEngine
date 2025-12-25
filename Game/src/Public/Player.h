@@ -42,7 +42,7 @@ class Player : public AnimObject
 
     public:
 
-    float colX = 0.275, colY = 1.5, colZ = 0.5;
+    float colX = 0.275, colY = 1.5, colZ = 0.75;
     float colCoordX = 0.0f, colCoordY = 0.0f, colCoordZ = 0.0f;
 
     PlayerState state = PlayerState::Normal;

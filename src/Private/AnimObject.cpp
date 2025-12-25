@@ -109,7 +109,6 @@ AnimObject::~AnimObject()
 
 void AnimObject::Update(double dTime)
 {
-    std::cout << "index: " << animationIndex << std::endl;
     if (animations.empty() || animations.size() <= animationIndex || frameChangeTime <= 0 || paused)
         return;
 

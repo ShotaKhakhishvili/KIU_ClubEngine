@@ -2,7 +2,7 @@
 
 Camera* Camera::camera = nullptr;
 
-glm::vec3 DirectionFromEuler(glm::vec3 rotationDeg)
+glm::vec3 Camera::DirectionFromEuler(glm::vec3 rotationDeg)
 {
 	float pitch = glm::radians(rotationDeg.x);
 	float yaw   = glm::radians(rotationDeg.y);
@@ -124,3 +124,9 @@ void Camera::Init(int width, int height, glm::vec3 position)
 		delete camera;
 	camera = new Camera(width, height, position);
 }
+
+void Camera::SetOrientation(const glm::vec3& dir)
+{
+	camera->Orientation = glm::normalize(dir);
+}
+

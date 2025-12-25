@@ -47,8 +47,21 @@ void Player::Update(double dTime)
         PlayAnimationOnce(3, 0, 0, 1000, 1.0f);
     }
 
-    Camera::SetPosition(VInterpTo(Camera::GetPosition(), GetPosition() + glm::vec3(-4, 3, 0), 10, dTime));
-    Camera::SetRotation(GetRotation() + glm::vec3(-20, -90, 0));
+    if (state == PlayerState::GameOver) {
+        Camera::SetPosition(VInterpTo(Camera::GetPosition(), GetPosition() + glm::vec3(0, 10, 0), 0.4, dTime));
+        glm::vec3 targetDir = Camera::DirectionFromEuler(glm::vec3(-90,0,0));
+
+        Camera::SetOrientation(
+            glm::normalize(
+                VInterpTo(Camera::GetOrientation(), targetDir, 1.0, dTime)
+            )
+        );
+    }
+    else {
+        Camera::SetPosition(VInterpTo(Camera::GetPosition(), GetPosition() + glm::vec3(-4, 3, 0), 10, dTime));
+        Camera::SetRotation(GetRotation() + glm::vec3(-20, -90, 0));
+    }
+
     //Camera::SetPosition(GetPosition() + glm::vec3(-80, 60, 0));
     //Camera::SetRotation(GetRotation() + glm::vec3(-30, -90, 0));
 
@@ -146,15 +159,11 @@ glm::vec3 Player::VInterpTo(
 
 void Player::SetCollisionToNormal() {
     colCoordX = colCoordY = colCoordZ = 0;
-    colX = 0.275;
     colY = 1.5;
-    colZ = 0.5;
 }
 void Player::SetCollisionToRoll() {
     colCoordX = colCoordY = colCoordZ = 0;
-    colX = 0.275;
     colY = 0.2;
-    colZ = 0.5;
 }
 
 void Player::RefreshState()
