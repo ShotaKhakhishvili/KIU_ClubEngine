@@ -37,5 +37,8 @@ class Camera
     static void SetPosition(glm::vec3 position);
     static void SetRotation(glm::vec3 rotation);
 
+    static glm::vec3 GetPosition(){return camera->Position;}
+    static glm::vec3 GetRotation(){return camera->Orientation;}
+
     static Camera* camera;
 };

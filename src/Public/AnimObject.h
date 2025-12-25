@@ -34,6 +34,8 @@ class AnimObject : public Actor
     float frameChangeTime = 0.05;
     float animSpeed = 1.0f;
 
+    bool paused = false;
+
     glm::vec3 position{0.0f};
     glm::vec3 rotation{0.0f};
     glm::vec3 scale{1.0f};

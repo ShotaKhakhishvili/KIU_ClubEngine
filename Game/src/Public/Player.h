@@ -13,7 +13,7 @@ enum class PlayerInteraction {
 
 enum class PlayerState {
     Normal = 0,
-    Crouching = 1,
+    Rolling = 1,
     Jumping = 2,
     GameOver = 3
 };
@@ -34,11 +34,19 @@ class Player : public AnimObject
     bool noRightLastTime = true;
     bool noDownLastTime = true;
 
+    float jumpTime = 0.0f;
+    float jumpBaseY = 0.0f;
+
+    float jumpDuration = 0.65f;
+    float jumpHeight = 1.0f;
+
     public:
 
-    static constexpr float colX = 0.275, colY = 1.5, colZ = 0.5;
+    float colX = 0.275, colY = 1.5, colZ = 0.5;
+    float colCoordX = 0.0f, colCoordY = 0.0f, colCoordZ = 0.0f;
 
     PlayerState state = PlayerState::Normal;
+    bool alive = true;
 
     Player(GLFWwindow* window);
     ~Player();
@@ -47,5 +55,14 @@ class Player : public AnimObject
     void PlayerInteracted(PlayerInteraction playerInteraction);
     void RefreshText();
     void HandleInput(double dTime);
+
     double DInterpTo(double current, double goal, double interpSpeed, double dTime);
+    glm::vec3 VInterpTo(glm::vec3 current, glm::vec3 goal, double interpSpeed, double dTime);
+
+    void RefreshState();
+    void HandleState();
+
+    void SetCollisionToRoll();
+    void SetCollisionToNormal();
+    void UpdateJump(double dTime);
 };

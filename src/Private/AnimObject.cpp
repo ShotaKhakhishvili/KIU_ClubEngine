@@ -109,7 +109,8 @@ AnimObject::~AnimObject()
 
 void AnimObject::Update(double dTime)
 {
-    if (animations.empty() || animations.size() <= animationIndex || frameChangeTime <= 0)
+    std::cout << "index: " << animationIndex << std::endl;
+    if (animations.empty() || animations.size() <= animationIndex || frameChangeTime <= 0 || paused)
         return;
 
     timePassed += static_cast<float>(dTime) * animSpeed;
@@ -119,12 +120,17 @@ void AnimObject::Update(double dTime)
     if (deltaFrames > 0)
     {
         timePassed -= static_cast<float>(deltaFrames) * frameChangeTime;
-        if (frame + deltaFrames >= static_cast<int>(animations[animationIndex].size()) - ignoredLastFrames) {
+        if (animationIndex >= 0 && (frame + deltaFrames >= static_cast<int>(animations[animationIndex].size()) - ignoredLastFrames)) {
+            if (nextAnimationIndex > 999) {
+                paused = true;
+                return;
+            }
             animationIndex = nextAnimationIndex;
             ignoredLastFrames = 0;
             animSpeed = 1.0f;
         }
-        frame = (frame + deltaFrames) % static_cast<int>(animations[animationIndex].size());
+        if (animationIndex >= 0 )
+            frame = (frame + deltaFrames) % static_cast<int>(animations[animationIndex].size());
     }
 }
 

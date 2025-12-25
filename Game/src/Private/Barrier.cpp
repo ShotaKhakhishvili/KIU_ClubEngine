@@ -20,7 +20,7 @@ bool Barrier::DetectPlayer(glm::vec3 instPos)
 
     const glm::vec3 playerPos = player->GetPosition();
 
-    // ---------------- Barrier collision data ----------------
+    // ================= Barrier collider =================
     const float bSizeX = GetColX();
     const float bSizeY = GetColY();
     const float bSizeZ = GetColZ();
@@ -29,7 +29,6 @@ bool Barrier::DetectPlayer(glm::vec3 instPos)
     const float bOffY = GetColCoordY();
     const float bOffZ = GetColCoordZ();
 
-    // Barrier collider center on X/Z, bottom-based on Y
     const glm::vec3 bColPos = {
         instPos.x + bOffX,
         instPos.y + bOffY,
@@ -48,30 +47,41 @@ bool Barrier::DetectPlayer(glm::vec3 instPos)
     const float bMinY = bColPos.y;
     const float bMaxY = bColPos.y + bSizeY;
 
-    // ---------------- Player collision data ----------------
-    const float pSizeX = Player::colX;
-    const float pSizeY = Player::colY;
-    const float pSizeZ = Player::colZ;
+    // ================= Player collider =================
+    const float pSizeX = player->colX;
+    const float pSizeY = player->colY;
+    const float pSizeZ = player->colZ;
+
+    const float pOffX = player->colCoordX;
+    const float pOffY = player->colCoordY;
+    const float pOffZ = player->colCoordZ;
+
+    const glm::vec3 pColPos = {
+        playerPos.x + pOffX,
+        playerPos.y + pOffY,
+        playerPos.z + pOffZ
+    };
 
     const float pHalfX = pSizeX * 0.5f;
     const float pHalfZ = pSizeZ * 0.5f;
 
-    const float pMinX = playerPos.x - pHalfX;
-    const float pMaxX = playerPos.x + pHalfX;
+    const float pMinX = pColPos.x - pHalfX;
+    const float pMaxX = pColPos.x + pHalfX;
 
-    const float pMinZ = playerPos.z - pHalfZ;
-    const float pMaxZ = playerPos.z + pHalfZ;
+    const float pMinZ = pColPos.z - pHalfZ;
+    const float pMaxZ = pColPos.z + pHalfZ;
 
-    const float pMinY = playerPos.y;
-    const float pMaxY = playerPos.y + pSizeY;
+    const float pMinY = pColPos.y;
+    const float pMaxY = pColPos.y + pSizeY;
 
-    // ---------------- AABB overlap test ----------------
+    // ================= AABB overlap =================
     const bool overlapX = (bMinX <= pMaxX) && (bMaxX >= pMinX);
     const bool overlapY = (bMinY <= pMaxY) && (bMaxY >= pMinY);
     const bool overlapZ = (bMinZ <= pMaxZ) && (bMaxZ >= pMinZ);
 
     return overlapX && overlapY && overlapZ;
 }
+
 
 
 
