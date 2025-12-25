@@ -1,6 +1,6 @@
 #pragma once
 #include "Object.h"
-#include "Player.h"
+#include "InstancedObject.h"
 
 enum class ObjectType {
     SABook,
@@ -11,12 +11,13 @@ enum class ObjectType {
 class Placeholder {
     Object* player{};
 
-    Object* LeftObject;
-    Object* MiddleObject;
-    Object* RightObject;
+    std::pair<InstancedObject*, unsigned int> LeftObject;
+    std::pair<InstancedObject*, unsigned int> MiddleObject;
+    std::pair<InstancedObject*, unsigned int> RightObject;
 
 public:
-    Placeholder(ObjectType a, ObjectType b, ObjectType  c, glm::vec3 Position, Player* player);
-
+    Placeholder(ObjectType a, ObjectType b, ObjectType  c, glm::vec3 Position);
     ~Placeholder();
+
+    InstancedObject* GetInstObjFromObjType(ObjectType);
 };

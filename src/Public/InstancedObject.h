@@ -18,8 +18,8 @@ struct ObjInst {
     bool matValuesChanged = true;
 };
 
-class InstancedObject : public Actor {
-
+class InstancedObject : public Actor
+{
     Shader* shader;
     Texture* texture;
 
@@ -30,9 +30,11 @@ class InstancedObject : public Actor {
     VBO* vbo;
     EBO* ebo;
 
-    std::vector<ObjInst> objInsts;
+    unsigned int currIndex = 0;
+protected:
+    std::unordered_map<unsigned int, ObjInst> objInsts;
 
-    public:
+public:
 
     InstancedObject(const char* modelPath, const char* texturePath, const char* fragShaderPath);
     ~InstancedObject();
@@ -41,14 +43,17 @@ class InstancedObject : public Actor {
     void SetRotation(unsigned int objIndex, glm::vec3 rotation);
     void SetScale(unsigned int objIndex, glm::vec3 scale);
 
-    glm::vec3 GetPosition(unsigned int objIndex){return objInsts[objIndex].position;}
-    glm::vec3 GetRotation(unsigned int objIndex){return objInsts[objIndex].rotation;}
-    glm::vec3 GetScale(unsigned int objIndex){return objInsts[objIndex].scale;}
+    glm::vec3 GetPosition(unsigned int objIndex);
+    glm::vec3 GetRotation(unsigned int objIndex);
+    glm::vec3 GetScale(unsigned int objIndex);
+
+    unsigned int Size(){return objInsts.size();}
 
     void RefreshModelMatrix(ObjInst& instRef);
 
     void Draw() override;
     Shader* GetShader() override;
 
-    void AddInstance(glm::vec3 position);
+    unsigned int AddInstance(glm::vec3 position);
+    void RemoveInstance(unsigned int index);
 };

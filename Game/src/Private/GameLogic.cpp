@@ -6,21 +6,29 @@
 #include "World.h"
 #include "SABook.h"
 
+SABook* GameLogic::book = nullptr;
+Barrier* GameLogic::barrier = nullptr;
+
 GameLogic::GameLogic(Player* player) {
     this->player =player;
+
+    book = World::CreateActor<SABook>(player);
+    barrier = World::CreateActor<Barrier>(player);
 }
 
 void GameLogic::Update(double dTime)
 {
+    std::vector<Sublevel*> toDelete;
+
     subLevels.erase(
         std::remove_if(
             subLevels.begin(),
             subLevels.end(),
             [&](Sublevel* s)
             {
-                if (s && (s->position.x - player->GetPosition().x) < cullDistance)
+                if ((s->position.x - player->GetPosition().x) < cullDistance)
                 {
-                    delete s;
+                    toDelete.push_back(s);
                     return true;
                 }
                 return false;
@@ -28,13 +36,24 @@ void GameLogic::Update(double dTime)
         subLevels.end()
     );
 
+    for (Sublevel* s : toDelete)
+        delete s;
 
-    while (furthestSubLevel < player->GetPosition().x + forwardCullDistance) {
-        auto* newLevel = new Sublevel(Sublevel::subLevels[0], player, glm::vec3(furthestSubLevel, 0, 0));
+    while (furthestSubLevel < player->GetPosition().x + forwardCullDistance)
+    {
+        if (Sublevel::subLevels.empty())
+            break;
+
+        auto* newLevel = new Sublevel(
+            GetRandomSubLevel(),
+            glm::vec3(furthestSubLevel, 0, 0)
+        );
+
         furthestSubLevel += newLevel->size + 1;
         subLevels.push_back(newLevel);
     }
 }
+
 
 const std::vector<Placeholderinfo>& GameLogic::GetRandomSubLevel()
 {
@@ -48,4 +67,15 @@ const std::vector<Placeholderinfo>& GameLogic::GetRandomSubLevel()
     );
 
     return Sublevel::subLevels[dist(rng)];
+}
+
+GameLogic::~GameLogic()
+{
+    for (Sublevel* s : subLevels)
+        delete s;
+
+    subLevels.clear();
+
+    book = nullptr;
+    barrier = nullptr;
 }

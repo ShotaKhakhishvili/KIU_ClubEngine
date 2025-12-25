@@ -1,17 +1,26 @@
 #include "SABook.h"
 
+#include "Sublevel.h"
 
-void SABook::Update(double dTime) {
+
+void SABook::Update(double dTime)
+{
     PlayerDetector::Update(dTime);
 
-    SetPosition(GetPosition() - glm::vec3(0, glm::sin(moveProgress * movementSpeed) * 0.25, 0));
     moveProgress += dTime;
-    SetPosition(GetPosition() + glm::vec3(0, glm::sin(moveProgress * movementSpeed) * 0.25, 0));
 
-    SetRotation(GetRotation() + glm::vec3(0, rotationSpeed * dTime,0 ));
+    for (auto& [id, inst] : objInsts)
+    {
+        glm::vec3 pos = inst.position;
+        pos.y += glm::sin(moveProgress * movementSpeed) * 0.0025f;
+        inst.position = pos;
+
+        inst.rotation.y += rotationSpeed * dTime;
+        inst.matValuesChanged = true;
+    }
 }
 
-SABook::SABook(Player* player, glm::vec3 pos) : PlayerDetector("SA_Book.txt", "bookText.png", "default.frag", player, PlayerInteraction::SABook)
+
+SABook::SABook(Player* player) : PlayerDetector("SA_Book.txt", "bookText.png", "default.frag", player, PlayerInteraction::SABook)
 {
-    SetPosition(pos);
 }

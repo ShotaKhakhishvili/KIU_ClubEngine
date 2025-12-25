@@ -9,6 +9,6 @@ class SABook : public PlayerDetector{
     double moveProgress = 0;
 
     public:
-        SABook(Player* player, glm::vec3 pos);
+        SABook(Player* player);
         void Update(double dTime) override;
 };

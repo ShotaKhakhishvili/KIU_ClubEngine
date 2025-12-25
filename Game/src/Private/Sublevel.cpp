@@ -48,16 +48,19 @@ std::vector<std::vector<Placeholderinfo>> Sublevel::subLevels{
         }
     };
 
-Sublevel::Sublevel(std::vector<Placeholderinfo> infos, Player* player, glm::vec3 position) {
+Sublevel::Sublevel(std::vector<Placeholderinfo> infos, glm::vec3 position) {
     for (int i = 0; i < infos.size(); i++) {
-        Placeholder* newPlaceHolder = new Placeholder(infos[i].a, infos[i].b, infos[i].c, position + infos[i].position, player);
+        auto* newPlaceHolder = new Placeholder(infos[i].a, infos[i].b, infos[i].c, position + infos[i].position);
         Placeholders.push_back(newPlaceHolder);
     }
     this->size = infos.back().position.x;
+    this->position = position;
 }
 
 Sublevel::~Sublevel() {
+    for (auto* p : Placeholders) delete p;
     Placeholders.clear();
 }
+
 
 

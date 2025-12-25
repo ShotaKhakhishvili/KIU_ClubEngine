@@ -28,23 +28,52 @@ InstancedObject::InstancedObject(const char* modelPath, const char* texturePath,
     texture->TexUnit(*shader, "tex0", 0);
 }
 
-void InstancedObject::SetPosition(unsigned int objIndex, glm::vec3 position) {
-    objInsts[objIndex].position = position;
-    objInsts[objIndex].matValuesChanged = true;
+void InstancedObject::SetPosition(unsigned int id, glm::vec3 p)
+{
+    auto it = objInsts.find(id);
+    if (it == objInsts.end()) return;
+    it->second.position = p;
+    it->second.matValuesChanged = true;
 }
-void InstancedObject::SetRotation(unsigned int objIndex, glm::vec3 rotation) {
-    objInsts[objIndex].rotation = rotation;
-    objInsts[objIndex].matValuesChanged = true;
+
+void InstancedObject::SetRotation(unsigned int id, glm::vec3 r) {
+    auto it = objInsts.find(id);
+    if (it == objInsts.end()) return;
+    it->second.rotation = r;
+    it->second.matValuesChanged = true;
 }
-void InstancedObject::SetScale(unsigned int objIndex, glm::vec3 scale) {
-    objInsts[objIndex].scale = scale;
-    objInsts[objIndex].matValuesChanged = true;
+void InstancedObject::SetScale(unsigned int id, glm::vec3 s) {
+    auto it = objInsts.find(id);
+    if (it == objInsts.end()) return;
+    it->second.scale = s;
+    it->second.matValuesChanged = true;
+}
+
+glm::vec3 InstancedObject::GetPosition(unsigned int id)
+{
+    auto it = objInsts.find(id);
+    if (it == objInsts.end()) return glm::vec3(0.0f);
+    return it->second.position;
+}
+
+glm::vec3 InstancedObject::GetRotation(unsigned int id)
+{
+    auto it = objInsts.find(id);
+    if (it == objInsts.end()) return glm::vec3(0.0f);
+    return it->second.rotation;
+}
+glm::vec3 InstancedObject::GetScale(unsigned int id)
+{
+    auto it = objInsts.find(id);
+    if (it == objInsts.end()) return glm::vec3(0.0f);
+    return it->second.scale;
 }
 
 Shader* InstancedObject::GetShader() {
     return shader;
 }
-void InstancedObject::Draw() {
+void InstancedObject::Draw()
+{
     shader->Activate();
 
     Camera::camera->UpdateMatrix(45.0f, 0.1f, 100.0f);
@@ -55,15 +84,17 @@ void InstancedObject::Draw() {
 
     GLint modelMatrixLoc = glGetUniformLocation(shader->getID(), "model");
 
-    for (unsigned int i = 0; i < objInsts.size(); i++) {
-        if (objInsts[i].matValuesChanged) {
-            RefreshModelMatrix(objInsts[i]);
-            objInsts[i].matValuesChanged = false;
+    for (auto& [id, inst] : objInsts)
+    {
+        if (inst.matValuesChanged) {
+            RefreshModelMatrix(inst);
         }
-        glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE, glm::value_ptr(objInsts[i].model));
-        glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+
+        glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE, glm::value_ptr(inst.model));
+        glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, 0);
     }
 }
+
 
 void InstancedObject::RefreshModelMatrix(ObjInst& obj_inst)
 {
@@ -87,9 +118,13 @@ void InstancedObject::RefreshModelMatrix(ObjInst& obj_inst)
     obj_inst.matValuesChanged = false;
 }
 
-void InstancedObject::AddInstance(glm::vec3 position){
-    objInsts.push_back(ObjInst(position));
+unsigned int InstancedObject::AddInstance(glm::vec3 position)
+{
+    unsigned int id = currIndex++;
+    objInsts.emplace(id, ObjInst{position});
+    return id;
 }
+
 
 InstancedObject::~InstancedObject()
 {
@@ -98,4 +133,9 @@ InstancedObject::~InstancedObject()
     delete vbo;
     delete shader;
     delete texture;
+}
+
+void InstancedObject::RemoveInstance(unsigned int index)
+{
+    objInsts.erase(index);
 }

@@ -24,17 +24,23 @@ void Player::PlayerInteracted(PlayerInteraction playerInteraction) {
 
 void Player::Update(double dTime)
 {
-    if (state != PlayerState::GameOver) {
+    if (state != PlayerState::GameOver || 1) {
         AnimObject::Update(dTime);
         SetPosition(GetPosition() + glm::vec3(dTime * 4, 0, 0));
     }
     Camera::SetPosition(GetPosition() + glm::vec3(-4, 3, 0));
     Camera::SetRotation(GetRotation() + glm::vec3(-20, -90, 0));
+    //Camera::SetPosition(GetPosition() + glm::vec3(-80, 60, 0));
+    //Camera::SetRotation(GetRotation() + glm::vec3(-30, -90, 0));
 }
 
 Player::~Player() {
-    delete scoreText;
+    if (scoreText) {
+        World::DestroyActor(scoreText);  // if World supports this
+        scoreText = nullptr;
+    }
 }
+
 
 void Player::RefreshText() {
     scoreText->SetText("Score:" + std::to_string(score));
