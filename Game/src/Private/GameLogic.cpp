@@ -124,13 +124,28 @@ const std::vector<Placeholderinfo>& GameLogic::GetRandomSubLevel()
     if (Sublevel::subLevels.empty())
         throw std::runtime_error("No sublevel templates available");
 
-    // NOTE: Your code used 1..size-1 (skipping template 0). Keeping that behavior.
     if (Sublevel::subLevels.size() == 1)
+    {
+        lastSubLevelIndex = 0;
         return Sublevel::subLevels[0];
+    }
 
-    std::uniform_int_distribution<std::size_t> dist(1, Sublevel::subLevels.size() - 1);
-    return Sublevel::subLevels[dist(rng)];
+    std::uniform_int_distribution<int> dist(
+        1,
+        static_cast<int>(Sublevel::subLevels.size()) - 1
+    );
+
+    int index;
+    do
+    {
+        index = dist(rng);
+    }
+    while (index == lastSubLevelIndex);
+
+    lastSubLevelIndex = index;
+    return Sublevel::subLevels[index];
 }
+
 
 void GameLogic::MakeNewSubLevel(unsigned int levelIdx)
 {
@@ -165,11 +180,14 @@ void GameLogic::OnRestart()
 
     furthestSubLevel = player->GetPosition().x;
 
-    spawned = 0.0;
+    spawned  = 0.0;
     lastTime = 0.0;
+
+    lastSubLevelIndex = -1;
 
     MakeNewSubLevel(0);
     MakeNewSubLevel(1);
 }
+
 
 

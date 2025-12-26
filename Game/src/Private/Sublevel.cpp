@@ -56,7 +56,7 @@ std::vector<std::vector<Placeholderinfo>> Sublevel::subLevels{
             {{ObjectType::BarrierA, 0, 1}, {ObjectType::Empty, 0, 1}, {ObjectType::Empty, 0, 1}, {22,0,0}},
             {{ObjectType::SABookSequence, 2, 4}, {ObjectType::Empty, 0, 1}, {ObjectType::Empty, 0, 1}, {26,0,0}},
             {{ObjectType::ShuttleLit, 0, 1}, {ObjectType::Empty, 0, 1}, {ObjectType::ShuttleLit, 0, 1}, {37,0,0}},
-            {{ObjectType::Shuttle, 6, 2}, {ObjectType::Empty, 0, 1}, {ObjectType::ShuttleLit, 6, 2}, {43,0,0}},
+            {{ObjectType::Shuttle, 6, 2}, {ObjectType::Empty, 0, 1}, {ObjectType::Shuttle, 6, 2}, {43,0,0}},
             {{ObjectType::Empty, 0, 1}, {ObjectType::BarrierBoard, 0, 1}, {ObjectType::Empty, 0, 1}, {46,0,0}},
             {{ObjectType::SABookSequence, 10, 2}, {ObjectType::Empty, 0, 1}, {ObjectType::Empty, 0, 1}, {16,0,0}},
             {{ObjectType::SABookSequence, 6, 2}, {ObjectType::Empty, 0, 1}, {ObjectType::Empty, 0, 1}, {18,0.6,0}},
