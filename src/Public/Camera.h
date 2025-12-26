@@ -20,27 +20,27 @@ class Camera
 
     int width, height;
 
-    // Extras for now
     static constexpr float normalSpeed = 0.01f, highSpeed = 0.05f;
     float speed = 0.01f, sensitivity = 100.0f;
     bool firstClick = true;
 
     Camera(int width, int height, glm::vec3 position);
 
-    public:
-
-    void UpdateMatrix(float FOVdeg, float newPlane, float farPlane);
+public:
+    void UpdateMatrix(float FOVdeg, float nearPlane, float farPlane);
     void ApplyMatrix(Shader& shader, const char* uniform) const;
     void ProccessInputs(GLFWwindow* window);
+
+    static void OnResize(int newWidth, int newHeight);
 
     static void Init(int width, int height, glm::vec3 position);
     static void SetPosition(glm::vec3 position);
     static void SetRotation(glm::vec3 rotation);
     static void SetOrientation(const glm::vec3& rotation);
 
-    static glm::vec3 GetPosition(){return camera->Position;}
-    static glm::vec3 GetRotation(){return camera->Orientation;}
-    static glm::vec3 GetOrientation(){return camera->Orientation;}
+    static glm::vec3 GetPosition(){ return camera->Position; }
+    static glm::vec3 GetOrientation(){ return camera->Orientation; }
+
     static glm::vec3 DirectionFromEuler(glm::vec3 rotationDeg);
 
     static Camera* camera;

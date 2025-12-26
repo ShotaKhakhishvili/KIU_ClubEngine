@@ -13,6 +13,8 @@
 #include "BarrierShuttle.h"
 #include "BarrierShuttleLit.h"
 #include "BarrierBoard.h"
+#include "Audio.h"
+#include "Path.h"
 
 // ===== static pools =====
 SABook*  GameLogic::book         = nullptr;
@@ -24,6 +26,11 @@ Barrier* GameLogic::board        = nullptr;
 
 GameLogic::GameLogic(Player* player)
 {
+    Audio::PlayLoop(
+        Path::Sound("night-sounds-loop.mp3"),
+        0.7f
+    );
+
     this->player = player;
 
     // Pools are created ONCE and then reused across levels/restarts.

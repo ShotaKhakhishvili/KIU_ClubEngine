@@ -5,6 +5,13 @@
 #include "Shader.h"
 #include "Actor.h"
 
+#pragma once
+#include <string>
+#include <glm/glm.hpp>
+#include "Font.h"
+#include "Shader.h"
+#include "Actor.h"
+
 class TextRenderer : public Actor
 {
     unsigned int VAO = 0;
@@ -19,12 +26,34 @@ class TextRenderer : public Actor
     std::string text;
     float size;
 
+    // ----------------------------
+    // STATIC UI STATE (NEW)
+    // ----------------------------
+    static glm::mat4 projection;
+    static int screenWidth;
+    static int screenHeight;
+
 public:
-    TextRenderer(const glm::vec2& position, float size, const glm::vec3& color, Font* font, const std::string& text, unsigned int width, unsigned int height);
+    // ----------------------------
+    // STATIC API (NEW)
+    // ----------------------------
+    static void OnResize(int width, int height);
+    static int  GetScreenWidth();
+    static int  GetScreenHeight();
+
+    // ----------------------------
+    // NORMAL API
+    // ----------------------------
+    TextRenderer(const glm::vec2& position, float size,
+                 const glm::vec3& color, Font* font,
+                 const std::string& text,
+                 unsigned int width, unsigned int height);
+
     TextRenderer(unsigned int width, unsigned int height);
     TextRenderer();
 
     void Init(int screenWidth, int screenHeight);
+
     void Draw(const Font& font,
               const std::string& text,
               float x, float y,
@@ -41,4 +70,6 @@ public:
 
     ~TextRenderer();
 };
+
+
 

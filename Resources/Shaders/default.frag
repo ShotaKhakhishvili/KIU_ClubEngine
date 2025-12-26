@@ -59,6 +59,5 @@ void main()
    }
 
    result += albedo * 0.4;
-
    FragColor = vec4(result, 1.0);
 }

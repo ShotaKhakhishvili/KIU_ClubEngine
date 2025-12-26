@@ -47,6 +47,9 @@ class Player : public AnimObject
 
     bool restarting = false;
 
+    float sinceLastBook = 0.0f;
+    float bookPitch = 1.0f;
+
 public:
     float colX = 0.275f, colY = 1.5f, colZ = 0.75f;
     float colCoordX = 0.0f, colCoordY = 0.0f, colCoordZ = 0.0f;

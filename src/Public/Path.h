@@ -13,6 +13,7 @@ public:
     static std::string Textures();
     static std::string Models();
     static std::string Fonts();
+    static std::string Sounds();
 
     // Generic helpers
     static std::string Asset(const std::string& relative);
@@ -20,4 +21,5 @@ public:
     static std::string Texture(const std::string& relative);
     static std::string Model(const std::string& relative);
     static std::string Font(const std::string& relative);
+    static std::string Sound(const std::string& relative);
 };

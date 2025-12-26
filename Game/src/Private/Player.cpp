@@ -3,9 +3,8 @@
 #include "GameLogic.h"
 
 #include <algorithm>
-
-extern int WINDOW_HEIGHT;
-extern int WINDOW_WIDTH;
+#include "Audio.h"
+#include "Path.h"
 
 Player::Player(GLFWwindow* win)
     : AnimObject(
@@ -22,7 +21,7 @@ Player::Player(GLFWwindow* win)
     SetRotation({ 0, 90, 0 });
 
     scoreText = World::CreateActor<TextRenderer>();
-    scoreText->SetPosition({ 20, WINDOW_HEIGHT - 56 });
+    scoreText->SetPosition({ 20, TextRenderer::GetScreenHeight() - 56 });
     RefreshText();
 }
 
@@ -51,6 +50,9 @@ void Player::PlayerInteracted(PlayerInteraction interaction)
     }
     else if (interaction == PlayerInteraction::SABook)
     {
+        Audio::PlayFromTime(Path::Sound("paper.mp3"),0.20f,1.0, bookPitch);
+        bookPitch += 0.15f;
+        sinceLastBook = 0.0f;
         score++;
         RefreshText();
     }
@@ -59,6 +61,11 @@ void Player::PlayerInteracted(PlayerInteraction interaction)
 void Player::Update(double dTime)
 {
     AnimObject::Update(dTime);
+
+    sinceLastBook += dTime;
+    if (sinceLastBook > 1.3f) {
+        bookPitch = 1.0f;
+    }
 
     if (restarting)
         return;
@@ -89,6 +96,7 @@ void Player::Update(double dTime)
         if (alive)
         {
             alive = false;
+            Audio::Play(Path::Sound("gameover.mp3"),0.30f);
             PlayAnimationOnce(3, 0, 0, 1000, 1.0f);
             DisplayGameOverTexts();
         }
@@ -198,7 +206,7 @@ void Player::OnRestart()
     Camera::SetPosition(GetPosition() + glm::vec3(-4, 3, 0));
     Camera::SetRotation(GetRotation() + glm::vec3(-20, -90, 0));
 
-    scoreText->SetPosition({ 20, WINDOW_HEIGHT - 56 });
+    scoreText->SetPosition({ 20, TextRenderer::GetScreenHeight() - 56 });
     RefreshText();
 
     if (gameOverText)
@@ -220,8 +228,8 @@ void Player::DisplayGameOverTexts()
         return s.length() * 24.0f * size;
     };
 
-    float cx = WINDOW_WIDTH * 0.5f;
-    float cy = WINDOW_HEIGHT * 0.5f;
+    float cx = TextRenderer::GetScreenWidth() * 0.5f;
+    float cy = TextRenderer::GetScreenHeight() * 0.5f;
 
     gameOverText = World::CreateActor<TextRenderer>();
     gameOverText->SetText("Game Over");
@@ -283,6 +291,9 @@ void Player::UpdateJump(double dTime)
 {
     if (state != PlayerState::Jumping)
         return;
+
+    if (jumpTime == 0)
+        Audio::PlayFromTime(Path::Sound("jump.mp3"), 0.3f, 0.8f);
 
     jumpTime += static_cast<float>(dTime);
     float t = std::clamp(jumpTime / jumpDuration, 0.0f, 1.0f);

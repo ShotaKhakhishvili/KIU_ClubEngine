@@ -9,10 +9,13 @@ std::string Path::Shaders(){ return Resources() + "/Shaders";}
 std::string Path::Textures(){ return Resources() + "/Textures";}
 std::string Path::Models(){ return Resources() + "/Models";}
 std::string Path::Fonts(){ return Resources() + "/Fonts";}
+std::string Path::Sounds(){ return Resources() + "/Sounds";}
+
 // helpers
 std::string Path::Asset(const std::string& relative){ return Resources() + "/" + relative;}
 std::string Path::Shader(const std::string& relative){ return Shaders() + "/" + relative;}
 std::string Path::Texture(const std::string& relative){ return Textures() + "/" + relative;}
 std::string Path::Model(const std::string& relative){ return Models() + "/" + relative;}
 std::string Path::Font(const std::string& relative){ return Fonts() + "/" + relative;}
+std::string Path::Sound(const std::string& relative){ return Sounds() + "/" + relative;}
 

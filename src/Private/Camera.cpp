@@ -130,3 +130,14 @@ void Camera::SetOrientation(const glm::vec3& dir)
 	camera->Orientation = glm::normalize(dir);
 }
 
+void Camera::OnResize(int newWidth, int newHeight)
+{
+	if (newHeight == 0) newHeight = 1;
+
+	camera->width  = newWidth;
+	camera->height = newHeight;
+
+	camera->UpdateMatrix(45.0f, 0.1f, 100.0f);
+}
+
+

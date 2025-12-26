@@ -130,17 +130,62 @@ namespace World
     {
         for (Actor* actor : actors)
         {
-            if (actor->pendingKill)
+            if (!actor || actor->pendingKill)
                 continue;
 
-            if (!actor->IsWidget)
-            {
-                Shader* shader = actor->GetShader();
-                if (shader)
-                    UploadLights(*shader);
-            }
+            if (actor->IsWidget)
+                continue;
+
+            Shader* shader = actor->GetShader();
+            if (shader)
+                UploadLights(*shader);
 
             actor->Draw();
         }
+
+        GLboolean prevDepthTest = glIsEnabled(GL_DEPTH_TEST);
+        GLint prevDepthFunc = GL_LESS;
+        glGetIntegerv(GL_DEPTH_FUNC, &prevDepthFunc);
+
+        GLboolean prevBlend = glIsEnabled(GL_BLEND);
+        GLint prevBlendSrcRGB = GL_ONE, prevBlendDstRGB = GL_ZERO;
+        GLint prevBlendSrcA   = GL_ONE, prevBlendDstA   = GL_ZERO;
+        glGetIntegerv(GL_BLEND_SRC_RGB, &prevBlendSrcRGB);
+        glGetIntegerv(GL_BLEND_DST_RGB, &prevBlendDstRGB);
+        glGetIntegerv(GL_BLEND_SRC_ALPHA, &prevBlendSrcA);
+        glGetIntegerv(GL_BLEND_DST_ALPHA, &prevBlendDstA);
+
+        GLboolean prevDepthMask = GL_TRUE;
+        glGetBooleanv(GL_DEPTH_WRITEMASK, &prevDepthMask);
+
+        glDisable(GL_DEPTH_TEST);
+        glDepthMask(GL_FALSE);
+
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        for (Actor* actor : actors)
+        {
+            if (!actor || actor->pendingKill)
+                continue;
+
+            if (!actor->IsWidget)
+                continue;
+
+            actor->Draw();
+        }
+
+        glDepthMask(prevDepthMask);
+
+        if (prevDepthTest) glEnable(GL_DEPTH_TEST);
+        else glDisable(GL_DEPTH_TEST);
+
+        glDepthFunc(prevDepthFunc);
+
+        if (prevBlend) glEnable(GL_BLEND);
+        else glDisable(GL_BLEND);
+
+        glBlendFuncSeparate(prevBlendSrcRGB, prevBlendDstRGB, prevBlendSrcA, prevBlendDstA);
     }
+
 }
