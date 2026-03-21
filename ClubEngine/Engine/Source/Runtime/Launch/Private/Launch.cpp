@@ -1,5 +1,6 @@
 #include <Launch/Launch.h>
-#include <ClubEngine/Application.h>
+#include <Engine/Application.h>
+#include <Core/Log.h>
 #include <iostream>
 
 namespace CE
