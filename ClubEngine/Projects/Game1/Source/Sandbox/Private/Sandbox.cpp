@@ -1,9 +1,10 @@
 #include <Sandbox.h>
-#include <iostream>
+#include <Core/ClubCore.h>
 
 int SandboxApp::Run()
 {
-    std::cout << "Sandbox running!\n";
+    CE_LOG("ClubEngine SandboxApp is running!, printed using the logger by the way");
+    
     for(int i = 0; i > -1; i++){
     }
     return 0;

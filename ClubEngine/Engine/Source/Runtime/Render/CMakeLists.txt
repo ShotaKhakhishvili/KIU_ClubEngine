@@ -18,12 +18,14 @@ target_include_directories(CERender
 target_link_libraries(CERender
   PUBLIC
     ClubEngine::Core
+    ThirdParty::glad
+    ThirdParty::glm
 )
 
 target_compile_definitions(CERender PRIVATE CERENDER_BUILD)
 
-#if (WIN32)
-  #target_link_libraries(CERender PUBLIC opengl32)
-#endif()
+if (WIN32)
+  target_link_libraries(CERender PUBLIC opengl32)
+endif()
 
 ce_apply_warnings(CERender)

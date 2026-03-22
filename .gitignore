@@ -32,3 +32,19 @@ install_manifest.txt
 
 # ---- Backup ----
 *~
+
+# ---- Binaries / compiled outputs ----
+*.exe
+*.dll
+*.so
+*.dylib
+*.lib
+*.a
+*.o
+*.obj
+
+# ---- Debug symbols ----
+*.pdb
+
+# ---- Compile commands (optional) ----
+compile_commands.json
