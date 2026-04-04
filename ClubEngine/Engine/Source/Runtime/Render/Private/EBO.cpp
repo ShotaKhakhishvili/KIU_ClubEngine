@@ -1,16 +1,17 @@
 #include <cassert>
+#include <glad/glad.h>
 #include <Render/EBO.h>
 
-EBO::EBO(const std::vector<uint32_t>& indices, GLenum usage)
+EBO::EBO(const std::vector<uint32_t>& indices, BufferUsage usage)
     : EBO(indices.data(), indices.size() * sizeof(uint32_t), usage)
 {
 }
 
-EBO::EBO(const void* data, size_t size, GLenum usage)
+EBO::EBO(const void* data, size_t size, BufferUsage usage)
 {
     glGenBuffers(1, &ID);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ID);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, usage);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, static_cast<GLenum>(usage));
     
     #ifdef CE_DEBUG
         glObjectLabel(GL_BUFFER, ID, -1, "EBO");
@@ -37,7 +38,7 @@ void EBO::Delete()
     }
 }
 
-GLuint EBO::GetID() const noexcept
+EBOID EBO::GetID() const noexcept
 {
     return ID;
 }

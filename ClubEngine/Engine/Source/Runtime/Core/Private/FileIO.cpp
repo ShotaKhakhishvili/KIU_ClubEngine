@@ -1,4 +1,4 @@
-#include "FileIO.h"
+#include <Core/FileIO.h>
 
 #include <fstream>
 #include <sstream>
@@ -14,47 +14,5 @@ namespace CE::FileIO
         std::ostringstream ss;
         ss << file.rdbuf();
         return ss.str();
-    }
-
-    void WriteTextFile(const std::filesystem::path& path, std::string_view content)
-    {
-    }
-
-    void AppendTextFile(const std::filesystem::path& path, std::string_view content)
-    {
-    }
-
-    std::vector<std::byte> ReadBinaryFile(const std::filesystem::path& path)
-    {
-        return {};
-    }
-
-    void WriteBinaryFile(const std::filesystem::path& path, const std::vector<std::byte>& data)
-    {
-    }
-
-    bool Exists(const std::filesystem::path& path)
-    {
-        return false;
-    }
-
-    bool IsDirectory(const std::filesystem::path& path)
-    {
-        return false;
-    }
-
-    bool CreateDirectories(const std::filesystem::path& path)
-    {
-        return false;
-    }
-
-    bool Remove(const std::filesystem::path& path)
-    {
-        return false;
-    }
-
-    std::uintmax_t FileSize(const std::filesystem::path& path)
-    {
-        return 0;
     }
 }

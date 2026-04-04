@@ -1,12 +1,9 @@
 #pragma once
 
-#include <glad/glad.h>
+#include <Render/RenderTypes.h>
 
 class Shader
 {
-private:
-    GLuint ID{0};
-
 public:
     Shader(const char* vertexPath, const char* fragmentPath);
     ~Shader();
@@ -19,8 +16,10 @@ public:
     Shader(Shader&& other) noexcept;
     Shader& operator=(Shader&& other) noexcept;
 
-    GLuint GetID() const noexcept;
+    ShaderID GetID() const noexcept;
 
 private:
+    ShaderID ID{0};
+
     void Delete();
 };

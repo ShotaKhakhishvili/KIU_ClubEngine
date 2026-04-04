@@ -1,4 +1,5 @@
-#include <Shader.h>
+#include <Render/Shader.h>
+#include "glad/glad.h"
 #include <Core/ClubCore.h>
 
 #include <string>
@@ -115,7 +116,7 @@ void Shader::Delete()
     }
 }
 
-GLuint Shader::GetID() const noexcept
+ShaderID Shader::GetID() const noexcept
 {
     return ID;
 }

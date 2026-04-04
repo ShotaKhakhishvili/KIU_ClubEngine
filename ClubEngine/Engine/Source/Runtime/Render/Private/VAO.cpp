@@ -1,5 +1,6 @@
 #include <Render/VAO.h>
 #include <Render/VBO.h>
+#include <glad/glad.h>
 #include <cassert>
 
 VAO::VAO()
@@ -11,13 +12,13 @@ VAO::VAO()
     #endif
 }
 
-void VAO::LinkAttrib(VBO& vbo, uint32_t layout, uint32_t componentCnt, GLenum type, size_t stride, const void* offset) const
+void VAO::LinkAttrib(VBO& vbo, uint32_t layout, uint32_t componentCnt, ShaderDataType type, size_t stride, const void* offset) const
 {
     assert(ID != 0);
 
     Bind();
     vbo.Bind();
-    glVertexAttribPointer(layout, componentCnt, type, GL_FALSE, stride, offset);
+    glVertexAttribPointer(layout, componentCnt, static_cast<GLenum>(type), GL_FALSE, stride, offset);
     glEnableVertexAttribArray(layout);
     //vbo.Unbind();
 }
@@ -42,7 +43,7 @@ void VAO::Delete()
     }
 }
 
-GLuint VAO::GetID() const noexcept
+VAOID VAO::GetID() const noexcept
 {
     return ID;
 }
