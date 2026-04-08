@@ -1,102 +1,126 @@
 #include <Core/Log.h>
-
-#include <iostream>
-#include <fstream>
-#include <filesystem>
 #include <chrono>
+#include <format>
+#include <filesystem>
+#include <fstream>
 #include <iomanip>
-#include <ctime>
+#include <iostream>
+#include <mutex>
+#include <sstream>
 
 #ifdef _WIN32
-#include <windows.h>
+#include <Windows.h>
 #endif
 
-namespace Logger {
 
-    static std::ofstream s_LogFile;
+namespace CE
+{
+    namespace
+    {
+        std::mutex GLogMutex;
+        std::ofstream GLogFile;
+        bool GInitialized = false;
 
-    // Helper to get current time as a string [HH:MM:SS]
-    static std::string GetCurrentTimeStr() {
-        auto now = std::chrono::system_clock::now();
-        std::time_t now_time = std::chrono::system_clock::to_time_t(now);
-        std::tm lt;
-        #ifdef _WIN32
-            localtime_s(&lt, &now_time);
-        #else
-            lt = *std::localtime(&now_time);
-        #endif
-        std::stringstream ss;
-        ss << "[" << std::put_time(&lt, "%H:%M:%S") << "]";
-        return ss.str();
-    }
+        std::string GetTimeHHMMSS()
+        {
+            auto now = std::chrono::system_clock::now();
+            std::time_t t = std::chrono::system_clock::to_time_t(now);
+            std::tm localTm{};
+            localtime_s(&localTm, &t);
 
-    void Init() {
-        // Ensure the directory exists
-        std::filesystem::path logPath = "Projects/Saved/Logs";
-        if (!std::filesystem::exists(logPath)) {
-            std::filesystem::create_directories(logPath);
+            std::ostringstream oss;
+            oss << std::put_time(&localTm, "%H:%M:%S");
+            return oss.str();
         }
 
-        // Generate Filename
-        auto now = std::chrono::system_clock::now();
-        std::time_t now_time = std::chrono::system_clock::to_time_t(now);
-        std::tm lt;
-        #ifdef _WIN32
-            localtime_s(&lt, &now_time);
-        #else
-            lt = *std::localtime(&now_time);
-        #endif
+        std::string GetFileTimestamp()
+        {
+            auto now = std::chrono::system_clock::now();
+            std::time_t t = std::chrono::system_clock::to_time_t(now);
+            std::tm localTm{};
+            localtime_s(&localTm, &t);
 
-        std::stringstream ss;
-        ss << "Saved/Logs/Log_" << std::put_time(&lt, "%Y-%m-%d_%H-%M-%S") << ".txt";
-        
-        // Open the file
-        s_LogFile.open(ss.str(), std::ios::out | std::ios::app);
-        
-        if (s_LogFile.is_open()) {
-            s_LogFile << "--- Log Session Started: " << std::put_time(&lt, "%Y-%m-%d %H:%M:%S") << " ---\n";
-            s_LogFile.flush();
-        }
-    }
-
-    void LogInternal(LogType type, const std::string& message) {
-        std::string timeStr = GetCurrentTimeStr();
-        std::string typeStr;
-        int colorCode = 7; // Default White
-
-        // Determine Type String and Color
-        switch (type) {
-            case LogType::Info:
-                typeStr = "[Info]";
-                colorCode = 15; // Bright White
-                break;
-            case LogType::Warning:
-                typeStr = "[Warning]";
-                colorCode = 14; // Yellow
-                break;
-            case LogType::Error:
-                typeStr = "[Error]";
-                colorCode = 12; // Red
-                break;
+            std::ostringstream oss;
+            oss << std::put_time(&localTm, "%Y-%m-%d_%H-%M-%S");
+            return oss.str();
         }
 
-        // Construct final message
-        std::string finalMessage = timeStr + " " + typeStr + ": " + message;
+        const char* ToString(LogType type)
+        {
+            switch (type)
+            {
+            case LogType::Info:    return "Info";
+            case LogType::Warning: return "Warning";
+            case LogType::Error:   return "Error";
+            default:               return "Unknown";
+            }
+        }
 
-        // Print to Console with Colors
+        void EnsureInitializedUnlocked()
+        {
+            if (GInitialized)
+                return;
+
+            const std::filesystem::path logDir = std::filesystem::current_path() / "Saved" / "Logs";
+            std::filesystem::create_directories(logDir);
+
+            std::ostringstream oss;
+            oss << "Log_" << GetFileTimestamp() << ".txt";
+            const std::filesystem::path logFilePath = logDir / oss.str();
+            GLogFile.open(logFilePath, std::ios::out | std::ios::app);
+
+            GInitialized = true;
+        }
+
 #ifdef _WIN32
-        HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-        SetConsoleTextAttribute(hConsole, colorCode);
-        std::cout << finalMessage << std::endl;
-        SetConsoleTextAttribute(hConsole, 7); // Reset to default white
-#else
-        std::cout << finalMessage << std::endl;
+        void SetConsoleColor(LogType type)
+        {
+            HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
+
+            WORD color = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE; // white
+            if (type == LogType::Warning)
+                color = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY; // yellow
+            else if (type == LogType::Error)
+                color = FOREGROUND_RED | FOREGROUND_INTENSITY; // red
+
+            SetConsoleTextAttribute(h, color);
+        }
+
+        void ResetConsoleColor()
+        {
+            HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
+            SetConsoleTextAttribute(h, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+        }
+#endif
+    }
+
+    void InitializeLogger()
+    {
+        std::lock_guard<std::mutex> lock(GLogMutex);
+        EnsureInitializedUnlocked();
+    }
+
+    void LogMessage(LogType type, const std::string& message)
+    {
+        std::lock_guard<std::mutex> lock(GLogMutex);
+        EnsureInitializedUnlocked();
+
+        std::ostringstream lineOss;
+        lineOss << "[" << GetTimeHHMMSS() << "] [" << ToString(type) << "]: " << message;
+        const std::string line = lineOss.str();
+
+#ifdef _WIN32
+        SetConsoleColor(type);
+#endif
+        std::cout << line << '\n';
+#ifdef _WIN32
+        ResetConsoleColor();
 #endif
 
-        // Write to File
-        if (s_LogFile.is_open()) {
-            s_LogFile << finalMessage << "\n";
-            s_LogFile.flush(); // Ensure it writes even if engine crashes later
+        if (GLogFile.is_open())
+        {
+            GLogFile << line << '\n';
+            GLogFile.flush();
         }
     }
 }

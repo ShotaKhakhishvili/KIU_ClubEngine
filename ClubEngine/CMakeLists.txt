@@ -28,3 +28,12 @@ endfunction()
 
 add_subdirectory(Engine)
 add_subdirectory(Projects)
+# add logger logic to the engine
+# firstly, we need to create a logger class that can be used throughout the engine
+# this logger class should be able to log messages to the console and to a file
+# we can use spdlog for this, as it is a header-only library that is easy to integrate into our engine
+# we can create a Logger class that wraps around spdlog and provides a simple interface for logging messages
+# we can also create different log levels (e.g. info, warning, error) and allow the user to set the log level at runtime
+# we can also create a log file that is rotated daily, so that we don't have to worry about log files getting too large 
+
+#we should create a file called Logger.h in the Engine directory, and a file called Logger.cpp in the same directory at ./
