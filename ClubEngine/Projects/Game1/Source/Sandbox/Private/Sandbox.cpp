@@ -3,12 +3,20 @@
 
 int SandboxApp::Run()
 {
-    CE_LOG("ClubEngine SandboxApp is running!, printed using the logger by the way");
+
+    int slave = 42;
+    CE_LOG(Warning,  "This is a formatted number: {}", slave);
     
     for(int i = 0; i > -1; i++){
+
     }
     return 0;
 }
+
+// int TheAnswerToTheUltimateQuestionOfLifeTheUniverseAndEverything()
+// {
+//     return 42;
+// }
 
 namespace CE
 {
