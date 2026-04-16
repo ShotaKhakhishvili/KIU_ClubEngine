@@ -172,7 +172,7 @@ void Texture::SetCubemapData(const std::array<ImageData, 6>& faces)
 
 void Texture::TexUnit(Shader& shader, const char* uniform) const
 {
-    shader.Activate();
+    shader.Bind();
     const GLint unit = static_cast<GLint>(static_cast<GLuint>(slot) - GL_TEXTURE0);
     const GLint location = glGetUniformLocation(shader.GetID(), uniform);
 

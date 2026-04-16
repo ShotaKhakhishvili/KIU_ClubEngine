@@ -88,3 +88,18 @@ enum class CubemapFace
     Front,
     Back
 };
+
+enum class CullMode
+{
+    Back,
+    Front,
+    None
+};
+
+enum class BlendMode
+{
+    Opaque,
+    Masked,
+    Translucent,
+    Additive
+};

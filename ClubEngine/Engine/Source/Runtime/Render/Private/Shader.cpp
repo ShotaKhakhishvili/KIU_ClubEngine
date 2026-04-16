@@ -4,6 +4,8 @@
 
 #include <string>
 
+std::map<std::string, int> Shader::globalShaderNames{};
+
 namespace ShaderUtils
 {
     enum class ShaderType
@@ -85,8 +87,11 @@ namespace ShaderUtils
     }
 }
 
-Shader::Shader(const char* vertexPath, const char* fragmentPath)
+Shader::Shader(const std::string& shaderName, const char* vertexPath, const char* fragmentPath)
 {
+    const int nameId = globalShaderNames[shaderName]++;
+    this->runtimeName = shaderName + std::to_string(nameId);
+
     const std::string vertexCode   = CE::FileIO::ReadTextFile(vertexPath);
     const std::string fragmentCode = CE::FileIO::ReadTextFile(fragmentPath);
 
@@ -102,7 +107,7 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath)
     glDeleteShader(fragmentShader);
 }
 
-void Shader::Activate() const
+void Shader::Bind() const
 {
     glUseProgram(ID);
 }
@@ -129,6 +134,12 @@ Shader::~Shader()
 Shader::Shader(Shader&& other) noexcept
     : ID(other.ID)
 {
+    this->runtimeName = std::move(other.runtimeName);
+    this->uniformLocations = std::move(other.uniformLocations);
+
+    other.uniformLocations.clear();
+    other.runtimeName.clear();
+
     other.ID = 0;
 }
 
@@ -137,8 +148,85 @@ Shader& Shader::operator=(Shader&& other) noexcept
     if (this != &other)
     {
         Delete();
+
+        this->runtimeName = std::move(other.runtimeName);
+        this->uniformLocations = std::move(other.uniformLocations);
+
+        other.uniformLocations.clear();
+        other.runtimeName.clear();
+
         ID = other.ID;
         other.ID = 0;
     }
     return *this;
+}
+
+int32_t Shader::GetUniformLocation(const std::string& name)
+{
+    auto it = uniformLocations.find(name);
+    if(it != uniformLocations.end())
+        return it->second;
+
+    const int32_t loc = glGetUniformLocation(ID, name.c_str());
+    if(loc == -1){
+        //CE_LOG(Warning, "Uniform \"{}\" not found in shader \"{}\"", name, runtimeName); 
+    }
+
+    uniformLocations[name] = loc;
+
+    return loc;
+}
+
+void Shader::SetFloat(const std::string& name, const float value)
+{
+    const int32_t location = GetUniformLocation(name);
+    if (location == -1)
+        return;
+
+    glUniform1f(location, value);
+}
+
+void Shader::SetInt(const std::string& name, const int32_t value)
+{
+    const int32_t location = GetUniformLocation(name);
+    if (location == -1)
+        return;
+
+    glUniform1i(location, value);
+}
+
+void Shader::SetBool(const std::string& name, const bool value)
+{
+    const int32_t location = GetUniformLocation(name);
+    if (location == -1)
+        return;
+
+    glUniform1i(location, value ? 1 : 0);
+}
+
+void Shader::SetVec2(const std::string& name, const float x, const float y)
+{
+    const int32_t location = GetUniformLocation(name);
+    if (location == -1)
+        return;
+
+    glUniform2f(location, x,y);
+}
+
+void Shader::SetVec3(const std::string& name, const float x, const float y, const float z)
+{
+    const int32_t location = GetUniformLocation(name);
+    if (location == -1)
+        return;
+
+    glUniform3f(location, x,y,z);
+}
+
+void Shader::SetVec4(const std::string& name, const float x, const float y, const float z, const float k)
+{
+    const int32_t location = GetUniformLocation(name);
+    if (location == -1)
+        return;
+
+    glUniform4f(location, x,y,z,k);
 }
