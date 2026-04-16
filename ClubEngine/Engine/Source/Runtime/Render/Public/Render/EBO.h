@@ -1,18 +1,15 @@
 #pragma once
 
-#include <glad/glad.h>
+#include <Render/RenderTypes.h>
 #include <cstdint>
 #include <cstddef>
 #include <vector>
 
 class EBO
 {
-private:
-    GLuint ID{0};
-
 public:
-    EBO(const std::vector<uint32_t>& indices, GLenum usage = GL_STATIC_DRAW);
-    EBO(const void* data, size_t size, GLenum usage = GL_STATIC_DRAW);
+    EBO(const std::vector<uint32_t>& indices, BufferUsage usage = BufferUsage::StaticDraw);
+    EBO(const void* data, size_t size, BufferUsage usage = BufferUsage::StaticDraw);
     ~EBO();
 
     void Bind() const;
@@ -24,8 +21,10 @@ public:
     EBO(EBO&&) noexcept;
     EBO& operator=(EBO&&) noexcept;
 
-    GLuint GetID() const noexcept;
+    EBOID GetID() const noexcept;
 
 private:
+    EBOID ID{0};
+    
     void Delete();
 };

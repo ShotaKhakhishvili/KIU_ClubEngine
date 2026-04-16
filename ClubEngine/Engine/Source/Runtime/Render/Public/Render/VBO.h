@@ -1,17 +1,15 @@
 #pragma once
 
-#include <glad/glad.h>
 #include <cstddef>
 #include <vector>
 #include <Render/Mesh/Vertex.h>
+#include <Render/RenderTypes.h>
 
 class VBO
 {
-    GLuint ID{0};
-
 public:
-    VBO(const std::vector<Vertex>& vertices, GLenum usage = GL_STATIC_DRAW);
-    VBO(const void* data, size_t size, GLenum usage = GL_STATIC_DRAW);
+    VBO(const std::vector<Vertex>& vertices, BufferUsage usage = BufferUsage::StaticDraw);
+    VBO(const void* data, size_t size, BufferUsage usage = BufferUsage::StaticDraw);
 
     ~VBO();
 
@@ -24,8 +22,10 @@ public:
     VBO(VBO&& other) noexcept;
     VBO& operator=(VBO&& other) noexcept;
 
-    GLuint GetID() const noexcept;
+    VBOID GetID() const noexcept;
 
 private:
+    VBOID ID{0};
+    
     void Delete();
 };

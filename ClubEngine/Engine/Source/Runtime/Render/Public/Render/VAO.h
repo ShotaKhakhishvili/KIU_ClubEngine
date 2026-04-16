@@ -1,6 +1,6 @@
 #pragma once
 
-#include <glad/glad.h>
+#include <Render/RenderTypes.h>
 #include <cstdint>
 #include <cstddef>
 
@@ -8,15 +8,12 @@ class VBO;
 
 class VAO
 {
-private:
-    GLuint ID{0};
-
 public:
 
     ~VAO();
     VAO();
 
-    void LinkAttrib(VBO& vbo, uint32_t layout, uint32_t componentCnt, GLenum type, size_t stride, const void* offset) const;
+    void LinkAttrib(VBO& vbo, uint32_t layout, uint32_t componentCnt, ShaderDataType type, size_t stride, const void* offset) const;
 
     void Bind() const;
     static void Unbind();
@@ -27,8 +24,10 @@ public:
     VAO(VAO&&) noexcept;
     VAO& operator=(VAO&&) noexcept;
 
-    GLuint GetID() const noexcept;
+    VAOID GetID() const noexcept;
 
 private:
+    VAOID ID{0};
+    
     void Delete();
 };

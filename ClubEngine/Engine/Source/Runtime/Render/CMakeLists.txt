@@ -16,9 +16,10 @@ target_include_directories(CERender
 )
 
 target_link_libraries(CERender
-  PUBLIC
+  PRIVATE
     ClubEngine::Core
     ThirdParty::glad
+    ThirdParty::stb 
     ThirdParty::glm
 )
 

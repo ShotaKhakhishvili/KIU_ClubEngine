@@ -1,16 +1,17 @@
 #include <Render/VBO.h>
+#include "glad/glad.h"
 #include <cassert>
 
-VBO::VBO(const std::vector<Vertex>& vertices, GLenum usage)
+VBO::VBO(const std::vector<Vertex>& vertices, BufferUsage usage)
     : VBO(vertices.data(), vertices.size() * sizeof(Vertex), usage)
 {
 }
 
-VBO::VBO(const void* data, size_t size, GLenum usage)
+VBO::VBO(const void* data, size_t size, BufferUsage usage)
 {
     glGenBuffers(1, &ID);
     glBindBuffer(GL_ARRAY_BUFFER, ID);
-    glBufferData(GL_ARRAY_BUFFER, size, data, usage);
+    glBufferData(GL_ARRAY_BUFFER, size, data, static_cast<GLenum>(usage));
     
     #ifdef CE_DEBUG
         glObjectLabel(GL_BUFFER, ID, -1, "VBO");
@@ -37,7 +38,7 @@ void VBO::Delete()
     }
 }
 
-GLuint VBO::GetID() const noexcept
+VBOID VBO::GetID() const noexcept
 {
     return ID;
 }
