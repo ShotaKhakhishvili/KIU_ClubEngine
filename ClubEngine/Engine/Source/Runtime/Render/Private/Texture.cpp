@@ -38,7 +38,7 @@ Texture::Texture(
 
     if (!image.Pixels)
     {
-        CE_LOG("Failed to load texture: {}", imagePath);
+        CE_LOG(Error, "Failed to load texture: {}", imagePath);
         return;
     }
 
@@ -68,7 +68,7 @@ Texture::Texture(
 
         if (!faces[i].Pixels)
         {
-            CE_LOG("Failed to load cubemap face: {}", facePaths[i]);
+            CE_LOG(Error, "Failed to load cubemap face: {}", facePaths[i]);
 
             for (size_t j = 0; j < i; ++j)
                 stbi_image_free(faces[j].Pixels);
@@ -179,15 +179,18 @@ void Texture::TexUnit(Shader& shader, const char* uniform) const
     if(location != -1)
         glUniform1i(location, unit);
 }
+
 void Texture::Bind() const
 {
     assert(ID != 0);
     glBindTexture(static_cast<GLenum>(type), ID);
 }
+
 void Texture::Unbind() const
 {
     glBindTexture(static_cast<GLenum>(type), 0);
 }
+
 void Texture::Delete()
 {
     if (ID != 0)
@@ -196,6 +199,7 @@ void Texture::Delete()
         ID = 0;
     }
 }
+
 Texture::~Texture()
 {
     Delete();

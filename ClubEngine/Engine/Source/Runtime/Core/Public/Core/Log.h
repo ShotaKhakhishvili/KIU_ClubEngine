@@ -17,10 +17,10 @@ namespace CE
     void InitializeLogger();
     void LogMessage(LogType type, const std::string& message);
 
-    template <typename... Args>
+    template<typename... Args>
     inline void LogFormat(LogType type, std::string_view fmt, Args&&... args)
     {
-        LogMessage(type, std::vformat(fmt, std::make_format_args(std::forward<Args>(args)...)));
+        LogMessage(type, std::vformat(fmt, std::make_format_args(args...)));
     }
 }
 

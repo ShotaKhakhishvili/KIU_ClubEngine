@@ -37,7 +37,7 @@ namespace ShaderUtils
             if (success == GL_FALSE)
             {
                 glGetShaderInfoLog(shader, 512, nullptr, infoLog);
-                //CE_LOG(Error, "[Shader][Type : {}] SHADER ERROR:\n{}", ToString(type), infoLog);
+                CE_LOG(Error, "[Shader][Type : {}] SHADER ERROR:\n{}", ToString(type), infoLog);
                 return false;
             }
         }
@@ -47,7 +47,7 @@ namespace ShaderUtils
             if (success == GL_FALSE)
             {
                 glGetProgramInfoLog(shader, 512, nullptr, infoLog);
-                //CE_LOG(Error, "[Shader][Type : {}] PROGRAM LINK ERROR:\n{}", ToString(ShaderType::Program), infoLog);
+                CE_LOG(Error, "[Shader][Type : {}] PROGRAM LINK ERROR:\n{}", ToString(ShaderType::Program), infoLog);
                 return false;
             }
         }
@@ -169,7 +169,7 @@ int32_t Shader::GetUniformLocation(const std::string& name)
 
     const int32_t loc = glGetUniformLocation(ID, name.c_str());
     if(loc == -1){
-        //CE_LOG(Warning, "Uniform \"{}\" not found in shader \"{}\"", name, runtimeName); 
+        CE_LOG(Warning, "Uniform \"{}\" not found in shader \"{}\"", name, runtimeName); 
     }
 
     uniformLocations[name] = loc;
