@@ -38,7 +38,7 @@ Texture::Texture(
 
     if (!image.Pixels)
     {
-        CE_LOG(Error, "Failed to load texture: {}", imagePath);
+        CE_LOG(Error, "Failed to load texture: {}", imagePath.string());
         return;
     }
 
@@ -68,7 +68,7 @@ Texture::Texture(
 
         if (!faces[i].Pixels)
         {
-            CE_LOG(Error, "Failed to load cubemap face: {}", facePaths[i]);
+            CE_LOG(Error, "Failed to load cubemap face: {}", facePaths[i].string());
 
             for (size_t j = 0; j < i; ++j)
                 stbi_image_free(faces[j].Pixels);
@@ -170,19 +170,12 @@ void Texture::SetCubemapData(const std::array<ImageData, 6>& faces)
     GenerateMipmap();
 }
 
-void Texture::TexUnit(Shader& shader, const char* uniform) const
-{
-    shader.Bind();
-    const GLint unit = static_cast<GLint>(static_cast<GLuint>(slot) - GL_TEXTURE0);
-    const GLint location = glGetUniformLocation(shader.GetID(), uniform);
-
-    if(location != -1)
-        glUniform1i(location, unit);
-}
-
-void Texture::Bind() const
+void Texture::Bind(int32_t slot) const
 {
     assert(ID != 0);
+    assert(slot >= 0);
+
+    glActiveTexture(GL_TEXTURE0 + slot);
     glBindTexture(static_cast<GLenum>(type), ID);
 }
 

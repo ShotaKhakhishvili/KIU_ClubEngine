@@ -35,9 +35,8 @@ public:
         
     ~Texture();
 
-    void TexUnit(Shader& shader, const char* uniform) const;
     void GenerateMipmap() const;
-    void Bind() const;
+    void Bind(int32_t slot) const;
     void Unbind() const;
 
     Texture(const Texture&) = delete;

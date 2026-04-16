@@ -70,15 +70,15 @@ void Material::Bind()const
         if(!tex)
             continue;
 
-        tex->Bind();
-        tex->TexUnit(*this->shader, name.c_str());
+        tex->Bind(slot);
+        shader->SetInt(name, slot);
         slot++;
     }
 }
 
 Material& Material::operator=(Material&& other) noexcept
 {
-    if(&other != this)
+    if(&other == this)
         return *this;
 
     this->Reset();

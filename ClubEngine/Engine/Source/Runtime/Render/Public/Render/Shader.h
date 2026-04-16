@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Render/RenderTypes.h>
+#include <Render/Texture.h>
 #include <string>
 #include <map>
 
@@ -26,6 +27,7 @@ public:
     void SetVec2    (const std::string& name, const float   x,      const float y);
     void SetVec3    (const std::string& name, const float   x,      const float y, const float z);
     void SetVec4    (const std::string& name, const float   x,      const float y, const float z, const float a);
+    void SetTexture (const std::string& name, const Texture& texture);
 
     int32_t GetUniformLocation(const std::string& name);
 

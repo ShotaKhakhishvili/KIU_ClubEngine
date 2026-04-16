@@ -8,7 +8,7 @@ int SandboxApp::Run()
     CE_LOG(Warning,  "This is a formatted number: {}", slave);
     
     for(int i = 0; i > -1; i++){
-
+        CE_LOG(Info, "Hello, Frame: {}", i);
     }
     return 0;
 }
