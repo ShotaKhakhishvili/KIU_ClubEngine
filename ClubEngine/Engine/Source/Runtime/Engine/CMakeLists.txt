@@ -18,6 +18,8 @@ target_include_directories(CEEngine
 target_link_libraries(CEEngine
   PUBLIC
     ClubEngine::Core
+    ClubEngine::Asset
+    ClubEngine::Render
 )
 
 target_compile_definitions(CEEngine PRIVATE CEENGINE_BUILD)

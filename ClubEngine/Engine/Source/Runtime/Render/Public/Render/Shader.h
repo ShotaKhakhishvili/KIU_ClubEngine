@@ -3,7 +3,7 @@
 #include <Render/RenderTypes.h>
 #include <Render/Texture.h>
 #include <string>
-#include <map>
+#include <unordered_map>
 
 class Shader
 {
@@ -32,11 +32,11 @@ public:
     int32_t GetUniformLocation(const std::string& name);
 
 private:
-    static std::map<std::string, int> globalShaderNames;
+    static std::unordered_map<std::string, int> globalShaderNames;
     std::string runtimeName;
 
     ShaderID ID{0};
-    std::map<std::string, int32_t> uniformLocations;
+    std::unordered_map<std::string, int32_t> uniformLocations;
 
     void Delete();
 };

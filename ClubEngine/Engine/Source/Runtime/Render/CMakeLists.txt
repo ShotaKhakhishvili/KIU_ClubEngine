@@ -17,7 +17,7 @@ target_include_directories(CERender
 
 target_link_libraries(CERender
   PRIVATE
-    ClubEngine::Core
+    ClubEngine::Asset
     ThirdParty::glad
     ThirdParty::stb 
     ThirdParty::glm

@@ -2,7 +2,6 @@
 
 #include <Render/RenderTypes.h>
 #include <Render/Texture/Image.h>
-#include <Render/Shader.h>
 #include <filesystem>
 #include <array>
 

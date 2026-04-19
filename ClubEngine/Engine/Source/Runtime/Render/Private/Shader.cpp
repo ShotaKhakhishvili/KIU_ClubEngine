@@ -4,7 +4,7 @@
 
 #include <string>
 
-std::map<std::string, int> Shader::globalShaderNames{};
+std::unordered_map<std::string, int> Shader::globalShaderNames{};
 
 namespace ShaderUtils
 {

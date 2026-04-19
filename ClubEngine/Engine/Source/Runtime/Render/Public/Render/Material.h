@@ -1,20 +1,24 @@
 #pragma once
 
-#include <Render/Shader.h>
-#include <Render/Texture.h>
+#include <Asset/Handle.h>
 #include <Render/RenderTypes.h>
+#include <Render/RenderAssets.h>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
-#include <map>
+#include <Render/Shader.h>
+#include <Render/Texture.h>
 #include <string>
+#include <unordered_map>
 
+class Texture;
+class Shader;
 class Render;
 
 class Material
 {
 public:
-    Material(const std::string&materialName, Shader* shader);
+    Material(const std::string&materialName, Handle<Shader> shader);
     ~Material();
 
     Material& operator=(const Material& other) = delete;
@@ -29,12 +33,12 @@ public:
     void SetVec2    (const std::string& name, const float   x,      const float y);
     void SetVec3    (const std::string& name, const float   x,      const float y, const float z);
     void SetVec4    (const std::string& name, const float   x,      const float y, const float z, const float a);
-    void SetTexture (const std::string& name, Texture*      texture);
+    void SetTexture (const std::string& name, Handle<Texture>      texture);
 
     void Reset();
 
 private:
-    static std::map<std::string, int> globalMaterialNames;
+    static std::unordered_map<std::string, int> globalMaterialNames;
 
     friend class Render;
 
@@ -42,15 +46,15 @@ private:
 
     std::string runtimeName;
 
-    Shader* shader = nullptr;
+    Handle<Shader> shader;
 
-    std::map<std::string, bool> bools;
-    std::map<std::string, int32_t> ints;
-    std::map<std::string, float> floats;
-    std::map<std::string, glm::vec2> vectors_2;
-    std::map<std::string, glm::vec3> vectors_3;
-    std::map<std::string, glm::vec4> vectors_4;
-    std::map<std::string, Texture*> textures;
+    std::unordered_map<std::string, bool> bools;
+    std::unordered_map<std::string, int32_t> ints;
+    std::unordered_map<std::string, float> floats;
+    std::unordered_map<std::string, glm::vec2> vectors_2;
+    std::unordered_map<std::string, glm::vec3> vectors_3;
+    std::unordered_map<std::string, glm::vec4> vectors_4;
+    std::unordered_map<std::string, Handle<Texture>> textures;
 
     BlendMode blendMode = BlendMode::Opaque;
     CullMode cullMode = CullMode::Back;
