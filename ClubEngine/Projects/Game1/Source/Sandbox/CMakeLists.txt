@@ -22,7 +22,7 @@ target_include_directories(Game1Sandbox
 
 target_link_libraries(Game1Sandbox
   PUBLIC
-    ClubEngine::Runtime
+    ClubEngine::Launch
 )
 
 ce_apply_warnings(Game1Sandbox)

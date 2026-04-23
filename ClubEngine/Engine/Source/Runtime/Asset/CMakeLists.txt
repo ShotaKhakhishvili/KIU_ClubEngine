@@ -17,7 +17,10 @@ target_include_directories(CEAsset
 
 target_link_libraries(CEAsset
     PUBLIC
-    ClubEngine::Core
+    ClubEngine::CoreUObject
+    ClubEngine::RenderCore
+    PRIVATE
+    ClubEngine::RHIOpenGL
 )
 
 target_compile_definitions(CEAsset PRIVATE CEASSET_BUILD)

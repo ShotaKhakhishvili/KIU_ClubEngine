@@ -3,6 +3,7 @@
 
 int SandboxApp::Run()
 {
+    (void)GetAssetContext();
 
     int slave = 42;
     CE_LOG(Warning,  "This is a formatted number: {}", slave);
