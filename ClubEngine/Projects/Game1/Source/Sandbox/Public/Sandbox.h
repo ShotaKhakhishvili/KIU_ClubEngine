@@ -1,8 +1,15 @@
 #pragma once
+
 #include <Engine/Application.h>
+#include <Engine/FpsSystem.h>
 
 class SandboxApp : public CE::Application
 {
 public:
-    int Run() override;
+    int Update(float dt) override;
+
+    void SetFpsSystem(FpsSystem* newFPSSystem);
+
+private:
+    FpsSystem* FPSSystem = nullptr;
 };

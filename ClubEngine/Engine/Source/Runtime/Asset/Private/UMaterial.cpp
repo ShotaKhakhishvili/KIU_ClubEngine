@@ -40,7 +40,7 @@ void UMaterial::Bind() const
     if(!this->shader.IsValid())
         return;
 
-    UShader* shader = CE::ResolveShader(this->shader);
+    UShader* shader = CE::Resolve(this->shader);
 
     if(shader == nullptr)
         return;
@@ -72,7 +72,7 @@ void UMaterial::Bind() const
         if(!tex.IsValid())
             continue;
 
-        UTexture* texture = CE::ResolveTexture(tex);
+        UTexture* texture = CE::Resolve(tex);
 
         if(texture == nullptr)
             continue;

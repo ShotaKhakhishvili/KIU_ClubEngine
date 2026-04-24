@@ -23,18 +23,6 @@ namespace CE
             return registry.Create<T>(std::forward<Args>(args)...);
         }
 
-        TObjectHandle<UShader> CreateShader(
-            std::filesystem::path vertexPath,
-            std::filesystem::path fragmentPath,
-            std::string name = "UShader"
-        );
-
-        TObjectHandle<UTexture> CreateTexture(
-            std::filesystem::path sourcePath,
-            UTexture::ImportSettings settings = UTexture::ImportSettings(),
-            std::string name = "UTexture"
-        );
-
         void Destroy(UObjectHandle handle);
 
         UShader* Resolve(TObjectHandle<UShader> handle) const override;

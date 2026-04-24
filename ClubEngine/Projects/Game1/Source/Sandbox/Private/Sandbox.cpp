@@ -1,28 +1,38 @@
 #include <Sandbox.h>
+
 #include <Core/ClubCore.h>
 
-int SandboxApp::Run()
+int SandboxApp::Update(float dt)
 {
-    (void)GetAssetContext();
-
-    int slave = 42;
-    CE_LOG(Warning,  "This is a formatted number: {}", slave);
+    static float cnt = 0;
     
-    for(int i = 0; i > -1; i++){
-        CE_LOG(Info, "Hello, Frame: {}", i);
+    GetAssetContext();
+
+    (void)dt;
+
+    cnt += dt;
+
+    if(cnt >= 1.0f && this->FPSSystem != nullptr) // Log fps every second
+    {
+        CE_LOG(Info,  "FPS: {}", FPSSystem->GetFPS());
+        cnt -= 1.0f;
     }
+    
     return 0;
 }
 
-// int TheAnswerToTheUltimateQuestionOfLifeTheUniverseAndEverything()
-// {
-//     return 42;
-// }
+void SandboxApp::SetFpsSystem(FpsSystem* newFPSSystem)
+{
+    this->FPSSystem = newFPSSystem;
+}
 
 namespace CE
 {
     Application* CreateApplication()
     {
-        return new SandboxApp();
+        auto sandbox =  new SandboxApp();
+        sandbox->SetFpsSystem(&(sandbox->AddSystem<FpsSystem>()));
+
+        return sandbox;
     }
 }
