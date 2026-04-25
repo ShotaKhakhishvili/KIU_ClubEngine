@@ -12,12 +12,14 @@ Texture::Texture(
         TextureInternalFormat internalFormat,
         TextureFormat readFormat,
         TexturePixelType pixelType,
+        bool generateMipmaps,
         const void* data
     )
     :   type(TextureType::Texture2D), 
         internalFormat(internalFormat), 
         readFormat(readFormat), 
         pixelType(pixelType),
+        generateMipmaps(generateMipmaps),
         width(width),
         height(height)
 {
@@ -43,7 +45,8 @@ Texture::Texture(
         data
     );
 
-    GenerateMipmap();
+    if(generateMipmaps)
+        GenerateMipmap();
 
     glBindTexture(GL_TEXTURE_2D, 0);
 }
@@ -54,12 +57,14 @@ Texture::Texture(
         TextureInternalFormat internalFormat,
         TextureFormat readFormat,
         TexturePixelType pixelType,
+        bool generateMipmaps,
         const void* const* data
     )
     :   type(TextureType::TextureCubeMap),
         internalFormat(internalFormat),
         readFormat(readFormat),
         pixelType(pixelType),
+        generateMipmaps(generateMipmaps),
         width(width),
         height(height)
 {
@@ -92,7 +97,8 @@ Texture::Texture(
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-    GenerateMipmap();
+    if(generateMipmaps)
+        GenerateMipmap();
 
     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }

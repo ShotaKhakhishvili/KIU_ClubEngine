@@ -25,6 +25,12 @@ void OpenGLRHI::Shutdown()
     vertexArrays.clear();
 
     currentShader = {};
+
+    for (auto& [id, glBuffer] : uniformBuffers)
+    {
+        glDeleteBuffers(1, &glBuffer);
+    }
+    uniformBuffers.clear();
 }
 
 RHIShaderHandle OpenGLRHI::CreateShader(const RHIShaderDesc& desc)
@@ -92,6 +98,7 @@ RHITextureHandle OpenGLRHI::CreateTexture(const RHITextureDesc& desc, const void
                     desc.format,
                     desc.readFormat,
                     desc.pixelType,
+                    desc.generateMipmaps,
                     data
     );
 
@@ -112,6 +119,7 @@ RHITextureHandle OpenGLRHI::CreateCubemap(const RHITextureDesc& desc, const void
                     desc.format,
                     desc.readFormat,
                     desc.pixelType,
+                    desc.generateMipmaps,
                     faceData
     );
 
@@ -157,6 +165,7 @@ RHIBufferHandle OpenGLRHI::CreateBuffer(const RHIBufferDesc& desc, const void* d
                 desc.usage
             );
             vertexBuffers[id] = std::move(buffer);
+            break;
         }
 
         case RHIBufferType::Index:
@@ -167,6 +176,7 @@ RHIBufferHandle OpenGLRHI::CreateBuffer(const RHIBufferDesc& desc, const void* d
                 desc.usage
             );
             indexBuffers[id] = std::move(buffer);
+            break;
         }
 
         case RHIBufferType::Uniform:
@@ -178,6 +188,7 @@ RHIBufferHandle OpenGLRHI::CreateBuffer(const RHIBufferDesc& desc, const void* d
             glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
             uniformBuffers[id] = glBuffer;
+            break;
         }
     }
 
@@ -393,12 +404,18 @@ void OpenGLRHI::SetUniformVec4(const std::string& name, const Vec4f& value)
 
 void OpenGLRHI::DrawIndexed(const RHIDrawIndexedDesc& desc)
 {
+    const uint32_t indexSize =
+    desc.indexType == RHIIndexType::UInt16 ? sizeof(uint16_t) : sizeof(uint32_t);
+
+    const uintptr_t byteOffset =
+        static_cast<uintptr_t>(desc.indexOffset) * indexSize;
+
     glDrawElements(
-        ToGL(desc.primitiveYype),
+        ToGL(desc.primitiveType),
         static_cast<GLsizei>(desc.indexCount),
         ToGL(desc.indexType),
         reinterpret_cast<const void*>(
-            static_cast<uintptr_t>(desc.indexOffset)
+            static_cast<uintptr_t>(byteOffset)
         )
     );
 }

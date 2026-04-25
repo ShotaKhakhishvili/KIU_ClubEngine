@@ -23,7 +23,6 @@ target_link_libraries(CERHIOpenGL
   PRIVATE
     ClubEngine::Core
     ThirdParty::glad
-    ThirdParty::stb
     ThirdParty::glm
 )
 

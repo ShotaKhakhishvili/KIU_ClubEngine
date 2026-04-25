@@ -6,19 +6,19 @@ template<typename T>
 class RHIHandle
 {
 public:
-    uint32_t id;
+    uint32_t id{0};
 
     bool IsValid() const noexcept
     {
         return id != 0;
     }
 
-    bool operator==(RHIHandle& other)const
+    bool operator==(const RHIHandle& other)const
     {
         return this->id == other.id;
     }
 
-    bool operator!=(RHIHandle& other)const
+    bool operator!=(const RHIHandle& other)const
     {
         return this->id != other.id;
     }

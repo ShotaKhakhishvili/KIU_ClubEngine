@@ -48,6 +48,7 @@ bool UTexture::Load()
 		settings.internalFormat,
 		settings.readFormat,
 		settings.pixelType,
+		settings.generateMipmaps,
 		image.Pixels
 	);
 

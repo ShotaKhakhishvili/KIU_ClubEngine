@@ -98,7 +98,7 @@ struct RHIVertexArrayDesc
 
 struct RHIDrawIndexedDesc
 {
-    RHIPrimitiveType primitiveYype = RHIPrimitiveType::Triangles;
+    RHIPrimitiveType primitiveType = RHIPrimitiveType::Triangles;
     RHIIndexType indexType = RHIIndexType::UInt32;
     
     uint32_t indexCount = 0;

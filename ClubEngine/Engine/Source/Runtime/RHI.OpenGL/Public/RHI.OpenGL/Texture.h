@@ -14,6 +14,7 @@ public:
         TextureInternalFormat internalFormat,
         TextureFormat readFormat,
         TexturePixelType pixelType,
+        bool generateMipmaps,
         const void* data
     );
     Texture(
@@ -22,6 +23,7 @@ public:
         TextureInternalFormat internalFormat,
         TextureFormat readFormat,
         TexturePixelType pixelType,
+        bool generateMipmaps,
         const void* const* data
     );
         
@@ -56,6 +58,8 @@ private:
 
     uint32_t width{0};
     uint32_t height{0};
+
+    bool generateMipmaps = true;
 
     void ResetToDefault();
     void Delete();

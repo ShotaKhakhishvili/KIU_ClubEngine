@@ -20,11 +20,13 @@ public:
             TextureSlot inSlot = TextureSlot::Slot0,
             TextureInternalFormat inInternalFormat = TextureInternalFormat::RGBA8,
             TextureFormat inReadFormat = TextureFormat::RGBA,
-            TexturePixelType inPixelType = TexturePixelType::UnsignedByte)
+            TexturePixelType inPixelType = TexturePixelType::UnsignedByte,
+            bool inGenerateMipmaps = true)
             : slot(inSlot)
             , internalFormat(inInternalFormat)
             , readFormat(inReadFormat)
             , pixelType(inPixelType)
+            , generateMipmaps(inGenerateMipmaps)
         {
         }
 
@@ -32,6 +34,7 @@ public:
         TextureInternalFormat internalFormat;
         TextureFormat readFormat;
         TexturePixelType pixelType;
+        bool generateMipmaps;
     };
 
     UTexture(std::filesystem::path inSourcePath,

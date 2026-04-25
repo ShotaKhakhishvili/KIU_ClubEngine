@@ -23,7 +23,6 @@ void VAO::LinkAttrib(VBO& vbo, uint32_t layout, uint32_t componentCnt, ShaderDat
     vbo.Bind();
     glVertexAttribPointer(layout, componentCnt, ToGL(type), GL_FALSE, stride, offset);
     glEnableVertexAttribArray(layout);
-    //vbo.Unbind();
 }
 
 void VAO::Bind() const
