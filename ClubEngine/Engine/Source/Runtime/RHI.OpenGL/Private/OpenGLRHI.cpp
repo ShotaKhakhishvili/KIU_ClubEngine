@@ -38,7 +38,7 @@ RHIShaderHandle OpenGLRHI::CreateShader(const RHIShaderDesc& desc)
     std::string vertexShader;
     std::string fragmentShader;
 
-    for(auto src : desc.stages)
+    for(const auto& src : desc.stages)
     {
         switch(src.stage)
         {
@@ -224,22 +224,22 @@ RHIVertexArrayHandle OpenGLRHI::CreateVertexArray(
     assert(vertexBufferHandle.IsValid());
     assert(indexBufferHandle.IsValid());
 
-    auto VBO = vertexBuffers.find(vertexBufferHandle.id);
-    auto EBO = indexBuffers.find(indexBufferHandle.id);
+    auto VBOIt = vertexBuffers.find(vertexBufferHandle.id);
+    auto EBOIt = indexBuffers.find(indexBufferHandle.id);
 
-    assert(VBO != vertexBuffers.end());
-    assert(EBO != indexBuffers.end());
+    assert(VBOIt != vertexBuffers.end());
+    assert(EBOIt != indexBuffers.end());
 
     auto vao = std::make_unique<VAO>();
 
     vao->Bind();
-    VBO->second->Bind();
-    EBO->second->Bind();
+    VBOIt->second->Bind();
+    EBOIt->second->Bind();
 
-    for(const auto attribute : desc.attributes)
+    for(const auto& attribute : desc.attributes)
     {
         vao->LinkAttrib(
-            *VBO->second,
+            *VBOIt->second,
             attribute.location,
             attribute.componentCount,
             attribute.dataType,
@@ -328,6 +328,10 @@ void OpenGLRHI::SetCullMode(CullMode mode)
             glCullFace(GL_FRONT);
             break;
 
+        case CullMode::Count:
+            assert(false && "Invalid CullMode");
+            break;
+
         case CullMode::None:
             break;
     }
@@ -341,6 +345,10 @@ void OpenGLRHI::SetBlendMode(BlendMode mode)
             glDisable(GL_BLEND);
             break;
 
+        case BlendMode::Masked:
+            glDisable(GL_BLEND);
+            break;
+
         case BlendMode::Translucent:
             glEnable(GL_BLEND);
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -349,6 +357,10 @@ void OpenGLRHI::SetBlendMode(BlendMode mode)
         case BlendMode::Additive:
             glEnable(GL_BLEND);
             glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+            break;
+
+        case BlendMode::Count:
+            assert(false && "Invalid BlendMode");
             break;
     }
 }

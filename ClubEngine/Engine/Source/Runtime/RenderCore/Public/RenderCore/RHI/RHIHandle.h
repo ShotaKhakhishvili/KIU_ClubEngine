@@ -13,12 +13,12 @@ public:
         return id != 0;
     }
 
-    bool operator==(const RHIHandle& other)const
+    bool operator==(const RHIHandle& other)const noexcept
     {
         return this->id == other.id;
     }
 
-    bool operator!=(const RHIHandle& other)const
+    bool operator!=(const RHIHandle& other)const noexcept
     {
         return this->id != other.id;
     }
