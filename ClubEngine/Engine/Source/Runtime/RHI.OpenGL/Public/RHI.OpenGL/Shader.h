@@ -29,7 +29,7 @@ public:
     void SetVec2    (const std::string& name, const float   x,      const float y);
     void SetVec3    (const std::string& name, const float   x,      const float y, const float z);
     void SetVec4    (const std::string& name, const float   x,      const float y, const float z, const float w);
-    void SetTexture (const std::string& name, const Texture& texture);
+    void SetTexture (const std::string& name, const Texture& texture, uint32_t slot);
 
     int32_t GetUniformLocation(const std::string& name);
 

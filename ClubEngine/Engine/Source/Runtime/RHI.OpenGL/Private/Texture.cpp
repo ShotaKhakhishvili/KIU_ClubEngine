@@ -4,112 +4,27 @@
 
 #include <RHI.OpenGL/Texture.h>
 
-#include <stb/stb_image.h>
 #include <cassert>
 
 Texture::Texture(
         const uint32_t width, 
         const uint32_t height, 
-        const void* data,
-        TextureSlot slot,
         TextureInternalFormat internalFormat,
         TextureFormat readFormat,
-        TexturePixelType pixelType
-    )
-    :   type(TextureType::Texture2D), 
-        slot(slot),    
-        internalFormat(internalFormat), 
-        readFormat(readFormat), 
-        pixelType(pixelType)
-{
-    SetTextureData(width, height, data);
-}
-
-Texture::Texture(
-        const std::filesystem::path& imagePath,
-        TextureSlot slot,
-        TextureInternalFormat internalFormat,
-        TextureFormat readFormat,
-        TexturePixelType pixelType
-    )
-    :   type(TextureType::Texture2D), 
-        slot(slot), 
-        internalFormat(internalFormat), 
-        readFormat(readFormat), 
-        pixelType(pixelType)
-{
-    ImageData image = LoadImage(imagePath);
-
-    if (!image.Pixels)
-    {
-        CE_LOG(Error, "Failed to load texture: {}", imagePath.string());
-        return;
-    }
-
-    SetTextureData(image.Width, image.Height, image.Pixels);
-
-    stbi_image_free(image.Pixels);
-}
-
-Texture::Texture(
-        const std::array<std::filesystem::path, 6>& facePaths,
-        TextureSlot slot,
-        TextureInternalFormat internalFormat,
-        TextureFormat readFormat,
-        TexturePixelType pixelType
-    )
-    :   type(TextureType::TextureCubeMap),
-        slot(slot),
-        internalFormat(internalFormat),
-        readFormat(readFormat),
-        pixelType(pixelType)
-{
-    std::array<ImageData, 6> faces{};
-
-    for (size_t i = 0; i < 6; ++i)
-    {
-        faces[i] = LoadImage(facePaths[i], false);
-
-        if (!faces[i].Pixels)
-        {
-            CE_LOG(Error, "Failed to load cubemap face: {}", facePaths[i].string());
-
-            for (size_t j = 0; j < i; ++j)
-                stbi_image_free(faces[j].Pixels);
-
-            return;
-        }
-        
-        if(i > 0)
-        {
-            assert(faces[i].Width == faces[0].Width);
-            assert(faces[i].Height == faces[0].Height);
-            assert(faces[i].Channels == faces[0].Channels);
-        }
-    }
-
-    SetCubemapData(faces);
-
-    for (size_t i = 0; i < 6; ++i)
-        stbi_image_free(faces[i].Pixels);
-}
-
-void Texture::SetTextureData(
-        const uint32_t width, 
-        const uint32_t height, 
+        TexturePixelType pixelType,
         const void* data
     )
+    :   type(TextureType::Texture2D), 
+        internalFormat(internalFormat), 
+        readFormat(readFormat), 
+        pixelType(pixelType),
+        width(width),
+        height(height)
 {
-    Delete();
-
-    this->width = width;
-    this->height = height;
-
     assert(type == TextureType::Texture2D);
 
     glGenTextures(1, &ID);
-    glActiveTexture(ToGL(slot));
-    glBindTexture(ToGL(type), ID);
+    glBindTexture(GL_TEXTURE_2D, ID);
 
     glTexParameteri(ToGL(type), GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(ToGL(type), GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -129,39 +44,45 @@ void Texture::SetTextureData(
     );
 
     GenerateMipmap();
+
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void Texture::SetCubemapData(const std::array<ImageData, 6>& faces)
+Texture::Texture(
+        const uint32_t width,
+        const uint32_t height,
+        TextureInternalFormat internalFormat,
+        TextureFormat readFormat,
+        TexturePixelType pixelType,
+        const void* const* data
+    )
+    :   type(TextureType::TextureCubeMap),
+        internalFormat(internalFormat),
+        readFormat(readFormat),
+        pixelType(pixelType),
+        width(width),
+        height(height)
 {
-    Delete();
-
     assert(type == TextureType::TextureCubeMap);
-
-    width = static_cast<uint32_t>(faces[0].Width);
-    height = static_cast<uint32_t>(faces[0].Height);
-
-    for (size_t i = 1; i < 6; ++i)
-    {
-        assert(faces[i].Width == faces[0].Width);
-        assert(faces[i].Height == faces[0].Height);
-    }
+    assert(data != nullptr);
 
     glGenTextures(1, &ID);
-    glActiveTexture(ToGL(slot));
     glBindTexture(GL_TEXTURE_CUBE_MAP, ID);
 
     for (size_t i = 0; i < 6; ++i)
     {
+        assert(data[i] != nullptr);
+
         glTexImage2D(
-            GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+            GL_TEXTURE_CUBE_MAP_POSITIVE_X + static_cast<GLenum>(i),
             0,
             ToGL(internalFormat),
-            static_cast<GLsizei>(faces[i].Width),
-            static_cast<GLsizei>(faces[i].Height),
+            static_cast<GLsizei>(width),
+            static_cast<GLsizei>(height),
             0,
             ToGL(readFormat),
             ToGL(pixelType),
-            faces[i].Pixels
+            data[i]
         );
     }
 
@@ -172,6 +93,8 @@ void Texture::SetCubemapData(const std::array<ImageData, 6>& faces)
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
     GenerateMipmap();
+
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }
 
 void Texture::Bind(int32_t slot) const
@@ -205,7 +128,6 @@ Texture::~Texture()
 Texture::Texture(Texture&& other) noexcept
     :   ID(other.ID), 
         type(other.type), 
-        slot(other.slot), 
         internalFormat(other.internalFormat),
         readFormat(other.readFormat), 
         pixelType(other.pixelType), 
@@ -223,7 +145,6 @@ Texture& Texture::operator=(Texture&& other) noexcept
 
         ID = other.ID;
         type = other.type;
-        slot = other.slot;
         internalFormat = other.internalFormat;
         readFormat = other.readFormat;
         pixelType = other.pixelType;
@@ -239,7 +160,6 @@ void Texture::ResetToDefault()
 {
     ID = 0;
     type = TextureType::Texture2D;
-    slot = TextureSlot::Slot0;
     internalFormat = TextureInternalFormat::RGBA8;
     readFormat = TextureFormat::RGBA;
     pixelType = TexturePixelType::UnsignedByte;
@@ -259,7 +179,6 @@ void Texture::GenerateMipmap() const
 
 TextureID Texture::GetID() const{return ID;}
 TextureType Texture::GetType() const{return type;}
-TextureSlot Texture::GetSlot() const{return slot;}
 TextureInternalFormat Texture::GetInternalFormat() const{return internalFormat;}
 TextureFormat Texture::GetReadFormat() const{return readFormat;}
 TexturePixelType Texture::GetPixelType() const{return pixelType;}

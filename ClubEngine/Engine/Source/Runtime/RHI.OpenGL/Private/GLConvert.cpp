@@ -112,3 +112,38 @@ GLenum ToGL(TexturePixelType v) noexcept
     assert(false && "Unhandled TexturePixelType");
     return GL_UNSIGNED_BYTE;
 }
+
+GLenum ToGL(RHIBufferType type)
+{
+    switch (type)
+    {
+        case RHIBufferType::Vertex:  return GL_ARRAY_BUFFER;
+        case RHIBufferType::Index:   return GL_ELEMENT_ARRAY_BUFFER;
+        case RHIBufferType::Uniform: return GL_UNIFORM_BUFFER;
+    }
+    assert(false && "Unhandled RHIBufferType");
+    return GL_ARRAY_BUFFER;
+}
+
+GLenum ToGL(RHIPrimitiveType primitive)
+{
+    switch (primitive)
+    {
+        case RHIPrimitiveType::Triangles: return GL_TRIANGLES;
+        case RHIPrimitiveType::Lines:     return GL_LINES;
+        case RHIPrimitiveType::Points:    return GL_POINTS;
+    }
+    assert(false && "Unhandled RHIPrimitiveType");
+    return GL_TRIANGLES;
+}
+
+GLenum ToGL(RHIIndexType type)
+{
+    switch (type)
+    {
+        case RHIIndexType::UInt16: return GL_UNSIGNED_SHORT;
+        case RHIIndexType::UInt32: return GL_UNSIGNED_INT;
+    }
+    assert(false && "Unhandled RHIIndexType");
+    return GL_UNSIGNED_INT;
+}

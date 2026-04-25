@@ -1,4 +1,8 @@
+#include <Core/ClubCore.h>
+
 #include <Asset/UTexture.h>
+
+#include <AssetImport/Image.h>
 
 #include <RHI.OpenGL/Texture.h>
 
@@ -30,12 +34,21 @@ bool UTexture::Load()
 {
 	Unload();
 
+	CE_STB::ImageData image = CE_STB::LoadImage(sourcePath);
+
+    if (!image.Pixels)
+    {
+        CE_LOG(Error, "Failed to load texture: {}", sourcePath.string());
+        return false;
+    }
+
 	resource = std::make_unique<Texture>(
-		sourcePath,
-		settings.slot,
+		image.Width,
+		image.Height,
 		settings.internalFormat,
 		settings.readFormat,
-		settings.pixelType
+		settings.pixelType,
+		image.Pixels
 	);
 
 	if(resource == nullptr || resource->GetID() == 0)
@@ -43,6 +56,8 @@ bool UTexture::Load()
 		resource.reset();
 		return false;
 	}
+
+	CE_STB::FreeImageData(image);
 
 	return true;
 }

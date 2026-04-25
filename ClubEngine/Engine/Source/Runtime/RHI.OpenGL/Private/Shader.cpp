@@ -224,13 +224,11 @@ void Shader::SetVec4(const std::string& name, const float x, const float y, cons
     glUniform4f(location, x,y,z,w);
 }
 
-void Shader::SetTexture(const std::string& name, const Texture& texture)
+void Shader::SetTexture(const std::string& name, const Texture& texture, uint32_t slot)
 {
     const int32_t location = GetUniformLocation(name);
     if (location == -1)
         return;
 
-    const int32_t unit = static_cast<int32_t>(ToTextureUnitIndex(texture.GetSlot()));
-
-    glUniform1i(location, unit);
+    glUniform1i(location, slot);
 }

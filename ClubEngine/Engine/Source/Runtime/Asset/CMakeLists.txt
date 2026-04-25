@@ -21,6 +21,7 @@ target_link_libraries(CEAsset
     ClubEngine::RenderCore
     PRIVATE
     ClubEngine::RHIOpenGL
+    ClubEngine::AssetImport
 )
 
 target_compile_definitions(CEAsset PRIVATE CEASSET_BUILD)
