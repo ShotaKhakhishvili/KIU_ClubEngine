@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Engine/Application.h>
-#include <Engine/FpsSystem.h>
+#include <Engine/Systems/FpsSystem.h>
 
 class SandboxApp : public CE::Application
 {

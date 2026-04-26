@@ -8,6 +8,11 @@
 
 namespace RHI
 {
+    enum class Backend
+    {
+        OpenGL
+    };
+
     enum class BufferType
     {
         Vertex,
@@ -122,5 +127,13 @@ namespace RHI
         Translucent,
         Additive,
         Count
+    };
+
+    struct ViewportDesc
+    {
+        uint32_t x = 0;
+        uint32_t y = 0;
+        uint32_t width = 0;
+        uint32_t height = 0;
     };
 }

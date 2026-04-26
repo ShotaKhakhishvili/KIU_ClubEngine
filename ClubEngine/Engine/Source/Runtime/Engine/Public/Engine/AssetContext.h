@@ -3,6 +3,7 @@
 #include <Asset/IAssetResolver.h>
 #include <Asset/UShader.h>
 #include <Asset/UTexture.h>
+#include <Asset/UMaterial.h>
 
 #include <CoreUObject/UObjectRegistry.h>
 
@@ -27,6 +28,7 @@ namespace CE
 
         UShader* Resolve(TObjectHandle<UShader> handle) const override;
         UTexture* Resolve(TObjectHandle<UTexture> handle) const override;
+        UMaterial* Resolve(TObjectHandle<UMaterial> handle) const override;
 
     private:
         mutable UObjectRegistry registry;

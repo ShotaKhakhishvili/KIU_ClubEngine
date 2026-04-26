@@ -2,15 +2,18 @@
 
 namespace
 {
-    IAssetResolver* GDefaultAssetResolver = nullptr;
+    IAssetResolver* GAssetResolver = nullptr;
 }
 
-IAssetResolver* GetDefaultAssetResolver() noexcept
+namespace Asset
 {
-    return GDefaultAssetResolver;
-}
+    IAssetResolver* GetCurrentAssetResolver() noexcept
+    {
+        return GAssetResolver;
+    }
 
-void SetDefaultAssetResolver(IAssetResolver* resolver) noexcept
-{
-    GDefaultAssetResolver = resolver;
+    void SetCurrentAssetResolver(IAssetResolver* resolver) noexcept
+    {
+        GAssetResolver = resolver;
+    }
 }

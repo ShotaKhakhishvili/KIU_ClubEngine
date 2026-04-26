@@ -19,6 +19,7 @@ target_link_libraries(CEEngine
   PUBLIC
     ClubEngine::Core
     ClubEngine::Asset
+  PRIVATE
     ClubEngine::Renderer
 )
 

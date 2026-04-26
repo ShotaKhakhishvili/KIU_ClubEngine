@@ -113,7 +113,7 @@ GLenum ToGL(TexturePixelType v) noexcept
     return GL_UNSIGNED_BYTE;
 }
 
-GLenum ToGL(RHI::BufferType type)
+GLenum ToGL(RHI::BufferType type) noexcept
 {
     switch (type)
     {
@@ -125,7 +125,7 @@ GLenum ToGL(RHI::BufferType type)
     return GL_ARRAY_BUFFER;
 }
 
-GLenum ToGL(RHI::PrimitiveType primitive)
+GLenum ToGL(RHI::PrimitiveType primitive) noexcept
 {
     switch (primitive)
     {
@@ -137,7 +137,7 @@ GLenum ToGL(RHI::PrimitiveType primitive)
     return GL_TRIANGLES;
 }
 
-GLenum ToGL(RHI::IndexType type)
+GLenum ToGL(RHI::IndexType type) noexcept
 {
     switch (type)
     {

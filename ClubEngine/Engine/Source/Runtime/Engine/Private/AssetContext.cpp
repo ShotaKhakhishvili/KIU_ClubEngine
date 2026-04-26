@@ -18,4 +18,9 @@ namespace CE
     {
         return registry.Resolve(handle);
     }
+
+    UMaterial* AssetContext::Resolve(TObjectHandle<UMaterial> handle) const
+    {
+        return registry.Resolve(handle);
+    }
 }

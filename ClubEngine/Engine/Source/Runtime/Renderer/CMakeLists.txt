@@ -22,6 +22,7 @@ target_link_libraries(CERenderer
     ClubEngine::RenderCore
   PRIVATE
     ClubEngine::Core
+    ClubEngine::Asset
     ClubEngine::RHIOpenGL
 )
 

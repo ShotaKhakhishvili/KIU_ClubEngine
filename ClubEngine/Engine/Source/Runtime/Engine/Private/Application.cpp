@@ -16,7 +16,7 @@ namespace CE
     {
         return assetContext;
     }
-
+    
     int Application::Run()
     {
         this->running = true;

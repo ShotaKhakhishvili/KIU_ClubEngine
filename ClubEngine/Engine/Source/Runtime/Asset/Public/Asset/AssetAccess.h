@@ -11,7 +11,7 @@ namespace CE
     template<typename T>
     T* Resolve(TObjectHandle<T> handle) noexcept
     {
-        IAssetResolver* resolver = GetDefaultAssetResolver();
+        IAssetResolver* resolver = Asset::GetCurrentAssetResolver();
 
         if(resolver == nullptr)
             return nullptr;

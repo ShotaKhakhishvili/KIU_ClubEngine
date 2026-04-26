@@ -1,15 +1,18 @@
 #include <Core/ClubCore.h>
 
 #include "GLConvert.h"
+#include <RHI.OpenGL/GLRHI.h>
 #include <RHI.OpenGL/GLShader.h>
 #include <RHI.OpenGL/GLTexture.h>
+#include <RHI.OpenGL/GLVertexArray.h>
 #include <RHI.OpenGL/GLVertexBuffer.h>
 #include <RHI.OpenGL/GLIndexBuffer.h>
-#include <RHI.OpenGL/GLVertexArray.h>
-#include <RHI.OpenGL/GLRHI.h>
 
 #include <glad/glad.h>
 #include <cassert>
+
+GLRHI::GLRHI() = default;
+GLRHI::~GLRHI() = default;
 
 void GLRHI::Init()
 {
@@ -280,13 +283,13 @@ void GLRHI::BindVertexArray(RHI::VertexArrayHandle handle)
     VAO->second->Bind();
 }
 
-void GLRHI::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
+void GLRHI::SetViewport(const RHI::ViewportDesc& desc)
 {
     glViewport(
-        static_cast<GLint>(x),
-        static_cast<GLint>(y),
-        static_cast<GLsizei>(width),
-        static_cast<GLsizei>(height)
+        static_cast<GLint>(desc.x),
+        static_cast<GLint>(desc.y),
+        static_cast<GLsizei>(desc.width),
+        static_cast<GLsizei>(desc.height)
     );
 }
 
@@ -416,14 +419,14 @@ void GLRHI::SetUniformVec4(const std::string& name, const Vec4f& value)
 
 void GLRHI::SetTexture(const std::string& name, RHI::TextureHandle texture, uint32_t slot)
 {
-    auto shaderIt = shaders.find(currentShader.GetID());
+    auto shaderIt = shaders.find(currentShader.id);
     if (shaderIt == shaders.end() || !shaderIt->second)
     {
         CE_LOG(Error, "Tried to set texture [{}] without valid bound shader", name);
         return;
     }
 
-    auto textureIt = textures.find(texture.GetID());
+    auto textureIt = textures.find(texture.id);
     if (textureIt == textures.end() || !textureIt->second)
     {
         CE_LOG(Error, "Tried to set invalid texture [{}]", name);
