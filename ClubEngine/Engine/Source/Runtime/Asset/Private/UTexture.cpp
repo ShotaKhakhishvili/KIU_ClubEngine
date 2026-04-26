@@ -39,7 +39,7 @@ bool UTexture::Load()
 
     if (!image.Pixels)
     {
-        CE_LOG(Error, "Failed To Load Texture: {}", this->GetName());
+        CE_LOG(Error, "Failed To Load Texture: [{}]", this->GetName());
         return false;
     }
 
@@ -47,7 +47,7 @@ bool UTexture::Load()
 
 	if(!handle.IsValid())
 	{
-		CE_LOG(Error, "Failed To Load Texture: {}", this->GetName());
+		CE_LOG(Error, "Failed To Load Texture: [{}]", this->GetName());
 		return false;
 	}
 

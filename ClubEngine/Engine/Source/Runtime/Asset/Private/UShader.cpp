@@ -32,7 +32,7 @@ bool UShader::Load()
 
 	if(!handle.IsValid())
 	{
-		CE_LOG(Error, "Failed To Load Shader: {}", this->GetName());
+		CE_LOG(Error, "Failed To Load Shader: [{}]", this->GetName());
 		return false;
 	}
 
