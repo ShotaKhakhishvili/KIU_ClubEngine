@@ -1,6 +1,6 @@
 #include <Core/ClubCore.h>
 
-#include <RHI.OpenGL/Shader.h>
+#include <RHI.OpenGL/GLShader.h>
 
 #include <glad/glad.h>
 
@@ -87,7 +87,7 @@ namespace ShaderUtils
     }
 }
 
-Shader::Shader(const char* vertexPath, const char* fragmentPath)
+GLShader::GLShader(const char* vertexPath, const char* fragmentPath)
 {
     const std::string vertexCode   = CE::FileIO::ReadTextFile(vertexPath);
     const std::string fragmentCode = CE::FileIO::ReadTextFile(fragmentPath);
@@ -104,12 +104,12 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath)
     glDeleteShader(fragmentShader);
 }
 
-void Shader::Bind() const
+void GLShader::Bind() const
 {
     glUseProgram(ID);
 }
 
-void Shader::Delete()
+void GLShader::Delete()
 {
     if (ID != 0)
     {
@@ -118,17 +118,17 @@ void Shader::Delete()
     }
 }
 
-ShaderID Shader::GetID() const noexcept
+ShaderID GLShader::GetID() const noexcept
 {
     return ID;
 }
 
-Shader::~Shader()
+GLShader::~GLShader()
 {
     Delete();
 }
 
-Shader::Shader(Shader&& other) noexcept
+GLShader::GLShader(GLShader&& other) noexcept
     : ID(other.ID)
 {
     this->uniformLocations = std::move(other.uniformLocations);
@@ -138,7 +138,7 @@ Shader::Shader(Shader&& other) noexcept
     other.ID = 0;
 }
 
-Shader& Shader::operator=(Shader&& other) noexcept
+GLShader& GLShader::operator=(GLShader&& other) noexcept
 {
     if (this != &other)
     {
@@ -154,7 +154,7 @@ Shader& Shader::operator=(Shader&& other) noexcept
     return *this;
 }
 
-int32_t Shader::GetUniformLocation(const std::string& name)
+int32_t GLShader::GetUniformLocation(const std::string& name)
 {
     auto it = uniformLocations.find(name);
     if(it != uniformLocations.end())
@@ -162,7 +162,7 @@ int32_t Shader::GetUniformLocation(const std::string& name)
 
     const int32_t loc = glGetUniformLocation(ID, name.c_str());
     if(loc == -1){
-        CE_LOG(Warning, "Uniform \"{}\" not found in shader", name); 
+        CE_LOG(Warning, "Uniform \"{}\" not found in GLShader", name); 
     }
 
     uniformLocations[name] = loc;
@@ -170,7 +170,7 @@ int32_t Shader::GetUniformLocation(const std::string& name)
     return loc;
 }
 
-void Shader::SetFloat(const std::string& name, const float value)
+void GLShader::SetFloat(const std::string& name, const float value)
 {
     const int32_t location = GetUniformLocation(name);
     if (location == -1)
@@ -179,7 +179,7 @@ void Shader::SetFloat(const std::string& name, const float value)
     glUniform1f(location, value);
 }
 
-void Shader::SetInt(const std::string& name, const int32_t value)
+void GLShader::SetInt(const std::string& name, const int32_t value)
 {
     const int32_t location = GetUniformLocation(name);
     if (location == -1)
@@ -188,7 +188,7 @@ void Shader::SetInt(const std::string& name, const int32_t value)
     glUniform1i(location, value);
 }
 
-void Shader::SetBool(const std::string& name, const bool value)
+void GLShader::SetBool(const std::string& name, const bool value)
 {
     const int32_t location = GetUniformLocation(name);
     if (location == -1)
@@ -197,7 +197,7 @@ void Shader::SetBool(const std::string& name, const bool value)
     glUniform1i(location, value ? 1 : 0);
 }
 
-void Shader::SetVec2(const std::string& name, const float x, const float y)
+void GLShader::SetVec2(const std::string& name, const float x, const float y)
 {
     const int32_t location = GetUniformLocation(name);
     if (location == -1)
@@ -206,7 +206,7 @@ void Shader::SetVec2(const std::string& name, const float x, const float y)
     glUniform2f(location, x,y);
 }
 
-void Shader::SetVec3(const std::string& name, const float x, const float y, const float z)
+void GLShader::SetVec3(const std::string& name, const float x, const float y, const float z)
 {
     const int32_t location = GetUniformLocation(name);
     if (location == -1)
@@ -215,7 +215,7 @@ void Shader::SetVec3(const std::string& name, const float x, const float y, cons
     glUniform3f(location, x,y,z);
 }
 
-void Shader::SetVec4(const std::string& name, const float x, const float y, const float z, const float w)
+void GLShader::SetVec4(const std::string& name, const float x, const float y, const float z, const float w)
 {
     const int32_t location = GetUniformLocation(name);
     if (location == -1)
@@ -224,7 +224,7 @@ void Shader::SetVec4(const std::string& name, const float x, const float y, cons
     glUniform4f(location, x,y,z,w);
 }
 
-void Shader::SetTexture(const std::string& name, const Texture& texture, uint32_t slot)
+void GLShader::SetTexture(const std::string& name, const GLTexture& texture, uint32_t slot)
 {
     const int32_t location = GetUniformLocation(name);
     if (location == -1)

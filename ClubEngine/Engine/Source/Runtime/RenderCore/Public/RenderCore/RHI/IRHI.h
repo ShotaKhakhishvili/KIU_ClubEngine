@@ -19,41 +19,41 @@ public:
 
     // ------------ Shader ------------
 
-    virtual RHIShaderHandle CreateShader(const RHIShaderDesc& desc) = 0;
-    virtual void DestroyShader(RHIShaderHandle handle) = 0;
+    virtual ShaderHandle CreateShader(const ShaderDesc& desc) = 0;
+    virtual void DestroyShader(ShaderHandle handle) = 0;
 
     // ------------ Textures ------------
 
-    virtual RHITextureHandle CreateTexture(
-        const RHITextureDesc& desc,
+    virtual TextureHandle CreateTexture(
+        const TextureDesc& desc,
         const void* data
     ) = 0;
 
-    virtual RHITextureHandle CreateCubemap(
-        const RHITextureDesc& desc,
+    virtual TextureHandle CreateCubemap(
+        const TextureDesc& desc,
         const void* const*  faceData
     ) = 0;
 
-    virtual void DestroyTexture(RHITextureHandle handle) = 0;
+    virtual void DestroyTexture(TextureHandle handle) = 0;
   
     // ------------  Buffers ------------
 
-    virtual RHIBufferHandle CreateBuffer(
-        const RHIBufferDesc& desc,
+    virtual BufferHandle CreateBuffer(
+        const BufferDesc& desc,
         const void* data
     ) = 0;
 
-    virtual void DestroyBuffer(RHIBufferHandle handle) = 0;
+    virtual void DestroyBuffer(BufferHandle handle) = 0;
 
     // ------------ Vertex Array ------------
 
-    virtual RHIVertexArrayHandle CreateVertexArray(
-        RHIBufferHandle vertexBufferHandle,
-        RHIBufferHandle indexBufferHandle,
-        const RHIVertexArrayDesc& vertexArrayDesc
+    virtual VertexArrayHandle CreateVertexArray(
+        BufferHandle vertexBufferHandle,
+        BufferHandle indexBufferHandle,
+        const VertexArrayDesc& vertexArrayDesc
     ) = 0;
 
-    virtual void DestroyVertexArray(RHIVertexArrayHandle handle) = 0;
+    virtual void DestroyVertexArray(VertexArrayHandle handle) = 0;
 
     // ------------ Render State ------------
 
@@ -68,9 +68,9 @@ public:
 
     // ------------ Binding ------------
 
-    virtual void BindShader(RHIShaderHandle handle) = 0;
-    virtual void BindTexture(RHITextureHandle handle, uint32_t slot) = 0;
-    virtual void BindVertexArray(RHIVertexArrayHandle handle) = 0;
+    virtual void BindShader(ShaderHandle handle) = 0;
+    virtual void BindTexture(TextureHandle handle, uint32_t slot) = 0;
+    virtual void BindVertexArray(VertexArrayHandle handle) = 0;
 
     // ------------ Uniforms ------------
 
@@ -83,5 +83,11 @@ public:
 
     // ------------ Draw ------------
 
-    virtual void DrawIndexed(const RHIDrawIndexedDesc& desc) = 0;
+    virtual void DrawIndexed(const DrawIndexedDesc& desc) = 0;
 };
+
+namespace RHI
+{
+    IRHI& Get();
+    void Set(IRHI* rhi);
+}

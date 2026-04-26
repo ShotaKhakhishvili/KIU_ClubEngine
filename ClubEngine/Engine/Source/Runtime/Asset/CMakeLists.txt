@@ -20,7 +20,6 @@ target_link_libraries(CEAsset
     ClubEngine::CoreUObject
     ClubEngine::RenderCore
     PRIVATE
-    ClubEngine::RHIOpenGL
     ClubEngine::AssetImport
 )
 

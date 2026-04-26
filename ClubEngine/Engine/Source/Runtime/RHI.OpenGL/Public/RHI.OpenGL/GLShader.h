@@ -2,24 +2,24 @@
 
 #include <RenderCore/RenderTypes.h>
 
-#include <RHI.OpenGL/Texture.h>
+#include <RHI.OpenGL/GLTexture.h>
 
 #include <string>
 #include <unordered_map>
 
-class Shader
+class GLShader
 {
 public:
-    Shader(const char* vertexPath, const char* fragmentPath);
-    ~Shader();
+    GLShader(const char* vertexPath, const char* fragmentPath);
+    ~GLShader();
 
     void Bind() const;
 
-    Shader(const Shader&) = delete;
-    Shader& operator=(const Shader&) = delete;
+    GLShader(const GLShader&) = delete;
+    GLShader& operator=(const GLShader&) = delete;
 
-    Shader(Shader&& other) noexcept;
-    Shader& operator=(Shader&& other) noexcept;
+    GLShader(GLShader&& other) noexcept;
+    GLShader& operator=(GLShader&& other) noexcept;
 
     ShaderID GetID() const noexcept;
 
@@ -29,7 +29,7 @@ public:
     void SetVec2    (const std::string& name, const float   x,      const float y);
     void SetVec3    (const std::string& name, const float   x,      const float y, const float z);
     void SetVec4    (const std::string& name, const float   x,      const float y, const float z, const float w);
-    void SetTexture (const std::string& name, const Texture& texture, uint32_t slot);
+    void SetTexture (const std::string& name, const GLTexture& texture, uint32_t slot);
 
     int32_t GetUniformLocation(const std::string& name);
 

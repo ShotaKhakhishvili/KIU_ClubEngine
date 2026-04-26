@@ -6,39 +6,39 @@
 #include <string>
 #include <vector>
 
-enum class RHIBufferType
+enum class BufferType
 {
     Vertex,
     Index,
     Uniform
 };
 
-enum class RHIIndexType
+enum class IndexType
 {
     UInt16,
     UInt32
 };
 
-enum class RHIPrimitiveType
+enum class PrimitiveType
 {
     Triangles,
     Lines,
     Points
 };
 
-enum class RHITextureDimension
+enum class TextureDimension
 {
     Texture2D,
     TextureCube
 };
 
-enum class RHIShaderStage
+enum class ShaderStage
 {
     Vertex,
     Fragment
 };
 
-enum class RHIUniformType
+enum class UniformType
 {
     Bool,
     Int,
@@ -49,16 +49,16 @@ enum class RHIUniformType
     Mat4
 };
 
-struct RHIBufferDesc
+struct BufferDesc
 {
-    RHIBufferType type = RHIBufferType::Vertex;
+    BufferType type = BufferType::Vertex;
     BufferUsage usage = BufferUsage::StaticDraw;
     uint32_t size = 0;
 };
 
-struct RHITextureDesc
+struct TextureDesc
 {
-    RHITextureDimension dimension = RHITextureDimension::Texture2D;
+    TextureDimension dimension = TextureDimension::Texture2D;
 
     uint32_t width = 0;
     uint32_t height = 0;
@@ -70,18 +70,18 @@ struct RHITextureDesc
     bool generateMipmaps = true;
 };
 
-struct RHIShaderSource
+struct ShaderSource
 {
-    RHIShaderStage stage = RHIShaderStage::Vertex;
+    ShaderStage stage = ShaderStage::Vertex;
     std::string source;
 };
 
-struct RHIShaderDesc
+struct ShaderDesc
 {
-    std::vector<RHIShaderSource> stages;
+    std::vector<ShaderSource> stages;
 };
 
-struct RHIVertexAttributeDesc
+struct VertexAttributeDesc
 {
     uint32_t location = 0;
     uint32_t componentCount = 0;
@@ -91,15 +91,15 @@ struct RHIVertexAttributeDesc
     uint32_t offset = 0;
 };
 
-struct RHIVertexArrayDesc
+struct VertexArrayDesc
 {
-    std::vector<RHIVertexAttributeDesc> attributes;
+    std::vector<VertexAttributeDesc> attributes;
 };
 
-struct RHIDrawIndexedDesc
+struct DrawIndexedDesc
 {
-    RHIPrimitiveType primitiveType = RHIPrimitiveType::Triangles;
-    RHIIndexType indexType = RHIIndexType::UInt32;
+    PrimitiveType primitiveType = PrimitiveType::Triangles;
+    IndexType indexType = IndexType::UInt32;
     
     uint32_t indexCount = 0;
     uint32_t indexOffset = 0;

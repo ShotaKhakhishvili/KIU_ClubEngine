@@ -1,21 +1,21 @@
 #include "GLConvert.h"
 
-#include <RHI.OpenGL/VAO.h>
-#include <RHI.OpenGL/VBO.h>
+#include <RHI.OpenGL/GLVertexArray.h>
+#include <RHI.OpenGL/GLVertexBuffer.h>
 
 #include <glad/glad.h>
 #include <cassert>
 
-VAO::VAO()
+GLVertexArray::GLVertexArray()
 {
     glGenVertexArrays(1, &ID);
 
     #ifdef CE_DEBUG
-        glObjectLabel(GL_VERTEX_ARRAY, ID, -1, "VAO");
+        glObjectLabel(GL_VERTEX_ARRAY, ID, -1, "GLVertexArray");
     #endif
 }
 
-void VAO::LinkAttrib(VBO& vbo, uint32_t layout, uint32_t componentCnt, ShaderDataType type, size_t stride, const void* offset) const
+void GLVertexArray::LinkAttrib(GLVertexBuffer& vbo, uint32_t layout, uint32_t componentCnt, ShaderDataType type, size_t stride, const void* offset) const
 {
     assert(ID != 0);
 
@@ -25,18 +25,18 @@ void VAO::LinkAttrib(VBO& vbo, uint32_t layout, uint32_t componentCnt, ShaderDat
     glEnableVertexAttribArray(layout);
 }
 
-void VAO::Bind() const
+void GLVertexArray::Bind() const
 {
     assert(ID != 0);
     glBindVertexArray(ID);
 }
 
-void VAO::Unbind()
+void GLVertexArray::Unbind()
 {
     glBindVertexArray(0);
 }
 
-void VAO::Delete()
+void GLVertexArray::Delete()
 {
     if (ID != 0)
     {
@@ -45,23 +45,23 @@ void VAO::Delete()
     }
 }
 
-VAOID VAO::GetID() const noexcept
+VertexArrayID GLVertexArray::GetID() const noexcept
 {
     return ID;
 }
 
-VAO::~VAO()
+GLVertexArray::~GLVertexArray()
 {
     Delete();
 }
 
-VAO::VAO(VAO&& other) noexcept
+GLVertexArray::GLVertexArray(GLVertexArray&& other) noexcept
     : ID(other.ID)
 {
     other.ID = 0;
 }
 
-VAO& VAO::operator=(VAO&& other) noexcept
+GLVertexArray& GLVertexArray::operator=(GLVertexArray&& other) noexcept
 {
     if (this != &other)
     {

@@ -3,42 +3,19 @@
 #include <CoreUObject/UObject.h>
 
 #include <RenderCore/RenderTypes.h>
+#include <RenderCore/RHI/RHITypes.h>
+#include <RenderCore/RHI/RHIHandle.h>
 
 #include <filesystem>
 #include <memory>
 #include <string>
 #include <cstdint>
 
-class Texture;
-
 class UTexture final : public UObject
 {
 public:
-    struct ImportSettings
-    {
-        ImportSettings(
-            TextureSlot inSlot = TextureSlot::Slot0,
-            TextureInternalFormat inInternalFormat = TextureInternalFormat::RGBA8,
-            TextureFormat inReadFormat = TextureFormat::RGBA,
-            TexturePixelType inPixelType = TexturePixelType::UnsignedByte,
-            bool inGenerateMipmaps = true)
-            : slot(inSlot)
-            , internalFormat(inInternalFormat)
-            , readFormat(inReadFormat)
-            , pixelType(inPixelType)
-            , generateMipmaps(inGenerateMipmaps)
-        {
-        }
-
-        TextureSlot slot;
-        TextureInternalFormat internalFormat;
-        TextureFormat readFormat;
-        TexturePixelType pixelType;
-        bool generateMipmaps;
-    };
-
     UTexture(std::filesystem::path inSourcePath,
-             ImportSettings inSettings = ImportSettings(),
+             const TextureDesc& inDesc = TextureDesc(),
              std::string inName = "UTexture");
     ~UTexture() override;
 
@@ -60,6 +37,6 @@ public:
 
 private:
     std::filesystem::path sourcePath;
-    ImportSettings settings;
-    std::unique_ptr<Texture> resource;    
+    TextureDesc desc;
+    TextureHandle handle;    
 };

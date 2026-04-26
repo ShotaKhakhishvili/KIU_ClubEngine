@@ -2,11 +2,11 @@
 
 #include <Core/ClubCore.h>
 
-#include <RHI.OpenGL/Texture.h>
+#include <RHI.OpenGL/GLTexture.h>
 
 #include <cassert>
 
-Texture::Texture(
+GLTexture::GLTexture(
         const uint32_t width, 
         const uint32_t height, 
         TextureInternalFormat internalFormat,
@@ -51,7 +51,7 @@ Texture::Texture(
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-Texture::Texture(
+GLTexture::GLTexture(
         const uint32_t width,
         const uint32_t height,
         TextureInternalFormat internalFormat,
@@ -103,7 +103,7 @@ Texture::Texture(
     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }
 
-void Texture::Bind(int32_t slot) const
+void GLTexture::Bind(int32_t slot) const
 {
     assert(ID != 0);
     assert(slot >= 0);
@@ -112,12 +112,12 @@ void Texture::Bind(int32_t slot) const
     glBindTexture(ToGL(type), ID);
 }
 
-void Texture::Unbind() const
+void GLTexture::Unbind() const
 {
     glBindTexture(ToGL(type), 0);
 }
 
-void Texture::Delete()
+void GLTexture::Delete()
 {
     if (ID != 0)
     {
@@ -126,12 +126,12 @@ void Texture::Delete()
     }
 }
 
-Texture::~Texture()
+GLTexture::~GLTexture()
 {
     Delete();
 }
 
-Texture::Texture(Texture&& other) noexcept
+GLTexture::GLTexture(GLTexture&& other) noexcept
     :   ID(other.ID), 
         type(other.type), 
         internalFormat(other.internalFormat),
@@ -143,7 +143,7 @@ Texture::Texture(Texture&& other) noexcept
     other.ResetToDefault();
 }
 
-Texture& Texture::operator=(Texture&& other) noexcept
+GLTexture& GLTexture::operator=(GLTexture&& other) noexcept
 {
     if (this != &other)
     {
@@ -162,7 +162,7 @@ Texture& Texture::operator=(Texture&& other) noexcept
     return *this;
 }
 
-void Texture::ResetToDefault()
+void GLTexture::ResetToDefault()
 {
     ID = 0;
     type = TextureType::Texture2D;
@@ -173,7 +173,7 @@ void Texture::ResetToDefault()
     height = 0;
 }
 
-void Texture::GenerateMipmap() const
+void GLTexture::GenerateMipmap() const
 {
     if (ID != 0)
     {
@@ -183,10 +183,10 @@ void Texture::GenerateMipmap() const
     }
 }
 
-TextureID Texture::GetID() const{return ID;}
-TextureType Texture::GetType() const{return type;}
-TextureInternalFormat Texture::GetInternalFormat() const{return internalFormat;}
-TextureFormat Texture::GetReadFormat() const{return readFormat;}
-TexturePixelType Texture::GetPixelType() const{return pixelType;}
-uint32_t Texture::GetWidth() const{return width;}
-uint32_t Texture::GetHeight() const{return height;}
+TextureID GLTexture::GetID() const{return ID;}
+TextureType GLTexture::GetType() const{return type;}
+TextureInternalFormat GLTexture::GetInternalFormat() const{return internalFormat;}
+TextureFormat GLTexture::GetReadFormat() const{return readFormat;}
+TexturePixelType GLTexture::GetPixelType() const{return pixelType;}
+uint32_t GLTexture::GetWidth() const{return width;}
+uint32_t GLTexture::GetHeight() const{return height;}

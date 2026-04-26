@@ -2,19 +2,18 @@
 
 #include <CoreUObject/UObject.h>
 
+#include <RenderCore/RHI/RHITypes.h>
+#include <RenderCore/RHI/RHIHandle.h>
+
 #include <filesystem>
 #include <memory>
 #include <string>
-
-class Shader;
 
 class UShader final : public UObject
 {
 public:
 
-    UShader(std::filesystem::path inVertexPath,
-            std::filesystem::path inFragmentPath,
-            std::string inName = "UShader");
+    UShader(const ShaderDesc& shaderDesc, std::string inName = "UShader");
     ~UShader() override;
 
     UShader(const UShader&) = delete;
@@ -37,7 +36,6 @@ public:
     void SetVec4(const std::string& name, float x, float y, float z, float w);
 
 private:
-    std::filesystem::path fragmentPath;
-    std::filesystem::path vertexPath;
-    std::unique_ptr<Shader> resource;    
+    ShaderDesc shaderDesc;
+    ShaderHandle handle;    
 };

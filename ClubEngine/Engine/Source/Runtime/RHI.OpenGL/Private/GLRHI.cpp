@@ -1,12 +1,12 @@
 #include <Core/ClubCore.h>
 
 #include "GLConvert.h"
-#include <RHI.OpenGL/Shader.h>
-#include <RHI.OpenGL/Texture.h>
-#include <RHI.OpenGL/VAO.h>
-#include <RHI.OpenGL/EBO.h>
-#include <RHI.OpenGL/VBO.h>
-#include <RHI.OpenGL/OpenGLRHI.h>
+#include <RHI.OpenGL/GLShader.h>
+#include <RHI.OpenGL/GLTexture.h>
+#include <RHI.OpenGL/GLVertexBuffer.h>
+#include <RHI.OpenGL/GLIndexBuffer.h>
+#include <RHI.OpenGL/GLVertexArray.h>
+#include <RHI.OpenGL/GLRHI.h>
 
 #include <glad/glad.h>
 #include <cassert>
@@ -33,7 +33,7 @@ void OpenGLRHI::Shutdown()
     uniformBuffers.clear();
 }
 
-RHIShaderHandle OpenGLRHI::CreateShader(const RHIShaderDesc& desc)
+ShaderHandle OpenGLRHI::CreateShader(const ShaderDesc& desc)
 {
     std::string vertexShader;
     std::string fragmentShader;
@@ -42,10 +42,10 @@ RHIShaderHandle OpenGLRHI::CreateShader(const RHIShaderDesc& desc)
     {
         switch(src.stage)
         {
-            case RHIShaderStage::Vertex:
+            case ShaderStage::Vertex:
                 vertexShader = src.source;
                 break;
-            case RHIShaderStage::Fragment:
+            case ShaderStage::Fragment:
                 fragmentShader = src.source;
                 break;
         }
@@ -54,16 +54,16 @@ RHIShaderHandle OpenGLRHI::CreateShader(const RHIShaderDesc& desc)
     assert(!vertexShader.empty());
     assert(!fragmentShader.empty());
 
-    auto shader = std::make_unique<Shader>(vertexShader.c_str(), fragmentShader.c_str());
+    auto shader = std::make_unique<GLShader>(vertexShader.c_str(), fragmentShader.c_str());
 
     const uint32_t id = nextShaderHandle++;
 
     shaders[id] = std::move(shader);
 
-    return RHIShaderHandle{id};
+    return ShaderHandle{id};
 }
 
-void OpenGLRHI::DestroyShader(RHIShaderHandle handle)
+void OpenGLRHI::DestroyShader(ShaderHandle handle)
 {
     if(!handle.IsValid())
     {
@@ -77,7 +77,7 @@ void OpenGLRHI::DestroyShader(RHIShaderHandle handle)
         currentShader = {};
 }
 
-void OpenGLRHI::BindShader(RHIShaderHandle handle)
+void OpenGLRHI::BindShader(ShaderHandle handle)
 {
     assert(handle.IsValid());
 
@@ -88,11 +88,11 @@ void OpenGLRHI::BindShader(RHIShaderHandle handle)
     currentShader = handle;
 }
 
-RHITextureHandle OpenGLRHI::CreateTexture(const RHITextureDesc& desc, const void* data)
+TextureHandle OpenGLRHI::CreateTexture(const TextureDesc& desc, const void* data)
 {
-    assert(desc.dimension == RHITextureDimension::Texture2D);
+    assert(desc.dimension == TextureDimension::Texture2D);
 
-    auto texture = std::make_unique<Texture>(
+    auto texture = std::make_unique<GLTexture>(
                     desc.width,
                     desc.height,
                     desc.format,
@@ -106,14 +106,14 @@ RHITextureHandle OpenGLRHI::CreateTexture(const RHITextureDesc& desc, const void
 
     textures[id] = std::move(texture);
 
-    return RHITextureHandle{id};
+    return TextureHandle{id};
 }
 
-RHITextureHandle OpenGLRHI::CreateCubemap(const RHITextureDesc& desc, const void* const* faceData)
+TextureHandle OpenGLRHI::CreateCubemap(const TextureDesc& desc, const void* const* faceData)
 {
-    assert(desc.dimension == RHITextureDimension::TextureCube);
+    assert(desc.dimension == TextureDimension::TextureCube);
 
-    auto texture = std::make_unique<Texture>(
+    auto texture = std::make_unique<GLTexture>(
                     desc.width,
                     desc.height,
                     desc.format,
@@ -127,10 +127,10 @@ RHITextureHandle OpenGLRHI::CreateCubemap(const RHITextureDesc& desc, const void
 
     textures[id] = std::move(texture);
 
-    return RHITextureHandle{id};
+    return TextureHandle{id};
 }
 
-void OpenGLRHI::DestroyTexture(RHITextureHandle handle)
+void OpenGLRHI::DestroyTexture(TextureHandle handle)
 {
     if(!handle.IsValid())
     {
@@ -141,7 +141,7 @@ void OpenGLRHI::DestroyTexture(RHITextureHandle handle)
     textures.erase(handle.id);
 }
 
-void OpenGLRHI::BindTexture(RHITextureHandle handle, uint32_t slot)
+void OpenGLRHI::BindTexture(TextureHandle handle, uint32_t slot)
 {
     assert(handle.IsValid());
 
@@ -151,15 +151,15 @@ void OpenGLRHI::BindTexture(RHITextureHandle handle, uint32_t slot)
     it->second->Bind(slot);
 }
 
-RHIBufferHandle OpenGLRHI::CreateBuffer(const RHIBufferDesc& desc, const void* data)
+BufferHandle OpenGLRHI::CreateBuffer(const BufferDesc& desc, const void* data)
 {
     const uint32_t id = nextBufferHandle++;
 
     switch(desc.type)
     {
-        case RHIBufferType::Vertex:
+        case BufferType::Vertex:
         {
-            auto buffer = std::make_unique<VBO>(
+            auto buffer = std::make_unique<GLVertexBuffer>(
                 data,
                 desc.size,
                 desc.usage
@@ -168,9 +168,9 @@ RHIBufferHandle OpenGLRHI::CreateBuffer(const RHIBufferDesc& desc, const void* d
             break;
         }
 
-        case RHIBufferType::Index:
+        case BufferType::Index:
         {
-            auto buffer = std::make_unique<EBO>(
+            auto buffer = std::make_unique<GLIndexBuffer>(
                 data,
                 desc.size,
                 desc.usage
@@ -179,7 +179,7 @@ RHIBufferHandle OpenGLRHI::CreateBuffer(const RHIBufferDesc& desc, const void* d
             break;
         }
 
-        case RHIBufferType::Uniform:
+        case BufferType::Uniform:
         {
             GLuint glBuffer = 0;
             glGenBuffers(1, &glBuffer);
@@ -192,10 +192,10 @@ RHIBufferHandle OpenGLRHI::CreateBuffer(const RHIBufferDesc& desc, const void* d
         }
     }
 
-    return RHIBufferHandle{id};
+    return BufferHandle{id};
 }
 
-void OpenGLRHI::DestroyBuffer(RHIBufferHandle handle)
+void OpenGLRHI::DestroyBuffer(BufferHandle handle)
 {
     if(!handle.IsValid())
     {
@@ -215,10 +215,10 @@ void OpenGLRHI::DestroyBuffer(RHIBufferHandle handle)
     }
 }
 
-RHIVertexArrayHandle OpenGLRHI::CreateVertexArray(
-    RHIBufferHandle vertexBufferHandle,
-    RHIBufferHandle indexBufferHandle,
-    const RHIVertexArrayDesc& desc
+VertexArrayHandle OpenGLRHI::CreateVertexArray(
+    BufferHandle vertexBufferHandle,
+    BufferHandle indexBufferHandle,
+    const VertexArrayDesc& desc
 )
 {
     assert(vertexBufferHandle.IsValid());
@@ -230,7 +230,7 @@ RHIVertexArrayHandle OpenGLRHI::CreateVertexArray(
     assert(VBOIt != vertexBuffers.end());
     assert(EBOIt != indexBuffers.end());
 
-    auto vao = std::make_unique<VAO>();
+    auto vao = std::make_unique<GLVertexArray>();
 
     vao->Bind();
     VBOIt->second->Bind();
@@ -248,18 +248,18 @@ RHIVertexArrayHandle OpenGLRHI::CreateVertexArray(
         );  
     }
 
-    VAO::Unbind();
-    VBO::Unbind();
-    EBO::Unbind();
+    GLVertexArray::Unbind();
+    GLVertexBuffer::Unbind();
+    GLIndexBuffer::Unbind();
 
     const uint32_t id = nextVertexArrayHandle++;
 
     vertexArrays[id] = std::move(vao);
 
-    return RHIVertexArrayHandle{id};
+    return VertexArrayHandle{id};
 }
 
-void OpenGLRHI::DestroyVertexArray(RHIVertexArrayHandle handle)
+void OpenGLRHI::DestroyVertexArray(VertexArrayHandle handle)
 {
     if(!handle.IsValid())
     {
@@ -270,7 +270,7 @@ void OpenGLRHI::DestroyVertexArray(RHIVertexArrayHandle handle)
     vertexArrays.erase(handle.id);
 }
 
-void OpenGLRHI::BindVertexArray(RHIVertexArrayHandle handle)
+void OpenGLRHI::BindVertexArray(VertexArrayHandle handle)
 {
     assert(handle.IsValid());
 
@@ -414,10 +414,10 @@ void OpenGLRHI::SetUniformVec4(const std::string& name, const Vec4f& value)
     shaders[currentShader.id]->SetVec4(name, value.x, value.y, value.z, value.w);
 }
 
-void OpenGLRHI::DrawIndexed(const RHIDrawIndexedDesc& desc)
+void OpenGLRHI::DrawIndexed(const DrawIndexedDesc& desc)
 {
     const uint32_t indexSize =
-    desc.indexType == RHIIndexType::UInt16 ? sizeof(uint16_t) : sizeof(uint32_t);
+    desc.indexType == IndexType::UInt16 ? sizeof(uint16_t) : sizeof(uint32_t);
 
     const uintptr_t byteOffset =
         static_cast<uintptr_t>(desc.indexOffset) * indexSize;

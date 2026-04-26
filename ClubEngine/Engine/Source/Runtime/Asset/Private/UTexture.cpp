@@ -1,10 +1,11 @@
 #include <Core/ClubCore.h>
 
+#include <RenderCore/RHI/RHIHandle.h>
+#include <RenderCore/RHI/IRHI.h>
+
 #include <Asset/UTexture.h>
 
 #include <AssetImport/Image.h>
-
-#include <RHI.OpenGL/Texture.h>
 
 #include <cstdint>
 #include <memory>
@@ -12,11 +13,11 @@
 #include <utility>
 
 UTexture::UTexture(std::filesystem::path inSourcePath,
-				   ImportSettings inSettings,
+				   const TextureDesc& inDesc,
 				   std::string inName)
 	: UObject(std::move(inName))
 	, sourcePath(std::move(inSourcePath))
-	, settings(inSettings)
+	, desc(inDesc)
 {
 }
 
@@ -38,23 +39,15 @@ bool UTexture::Load()
 
     if (!image.Pixels)
     {
-        CE_LOG(Error, "Failed to load texture: {}", sourcePath.string());
+        CE_LOG(Error, "Failed To Load Texture: {}", this->GetName());
         return false;
     }
 
-	resource = std::make_unique<Texture>(
-		image.Width,
-		image.Height,
-		settings.internalFormat,
-		settings.readFormat,
-		settings.pixelType,
-		settings.generateMipmaps,
-		image.Pixels
-	);
+	handle = RHI::Get().CreateTexture(desc, image.Pixels);
 
-	if(resource == nullptr || resource->GetID() == 0)
+	if(!handle.IsValid())
 	{
-		resource.reset();
+		CE_LOG(Error, "Failed To Load Texture: {}", this->GetName());
 		return false;
 	}
 
@@ -65,34 +58,38 @@ bool UTexture::Load()
 
 void UTexture::Unload()
 {
-	resource.reset();
+	if(!handle.IsValid())
+		return;
+
+	RHI::Get().DestroyTexture(handle);
+	handle.Invalidate();
 }
 
 bool UTexture::IsReady() const noexcept
 {
-	return resource != nullptr && resource->GetID() != 0;
+	return handle.IsValid();
 }
 
 void UTexture::Bind(uint32_t slot) const
 {
-	if(resource == nullptr)
+	if(!handle.IsValid())
 		return;
 
-	resource->Bind(static_cast<int32_t>(slot));
+	RHI::Get().BindTexture(handle, slot);
 }
 
 uint32_t UTexture::GetWidth() const noexcept
 {
-	if(resource == nullptr)
+	if(!handle.IsValid())
 		return 0;
 
-	return resource->GetWidth();
+	return desc.width;
 }
 
 uint32_t UTexture::GetHeight() const noexcept
 {
-	if(resource == nullptr)
+	if(!handle.IsValid())
 		return 0;
 
-	return resource->GetHeight();
+	return desc.height;
 }

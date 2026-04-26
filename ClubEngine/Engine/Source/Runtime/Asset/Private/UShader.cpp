@@ -1,18 +1,16 @@
+#include <Core/ClubCore.h>
+
 #include <Asset/UShader.h>
 
-#include <RHI.OpenGL/Shader.h>
+#include <RenderCore/RHI/IRHI.h>
 
 #include <cstdint>
 #include <memory>
 #include <string>
 #include <utility>
 
-UShader::UShader(std::filesystem::path inVertexPath,
-				 std::filesystem::path inFragmentPath,
-				 std::string inName)
-	: UObject(std::move(inName))
-	, fragmentPath(std::move(inFragmentPath))
-	, vertexPath(std::move(inVertexPath))
+UShader::UShader(const ShaderDesc& inShaderDesc, std::string inName)
+	: UObject(std::move(inName)), shaderDesc(inShaderDesc)
 {
 }
 
@@ -30,14 +28,11 @@ bool UShader::Load()
 {
 	Unload();
 
-	const std::string vertexPathString = vertexPath.string();
-	const std::string fragmentPathString = fragmentPath.string();
+	handle = RHI::Get().CreateShader(shaderDesc);
 
-	resource = std::make_unique<Shader>(vertexPathString.c_str(), fragmentPathString.c_str());
-
-	if(resource == nullptr || resource->GetID() == 0)
+	if(!handle.IsValid())
 	{
-		resource.reset();
+		CE_LOG(Error, "Failed To Load Shader: {}", this->GetName());
 		return false;
 	}
 
@@ -46,67 +41,77 @@ bool UShader::Load()
 
 void UShader::Unload()
 {
-	resource.reset();
+	if(!handle.IsValid())
+		return;
+
+	RHI::Get().DestroyShader(handle);
+	handle.Invalidate();
 }
 
 bool UShader::IsReady() const noexcept
 {
-	return resource != nullptr && resource->GetID() != 0;
+	return handle.IsValid();
 }
 
 void UShader::Bind() const
 {
-	if(resource == nullptr)
+	if(!handle.IsValid())
 		return;
 
-	resource->Bind();
+	RHI::Get().BindShader(handle);
 }
 
 void UShader::SetBool(const std::string& name, bool value)
 {
-	if(resource == nullptr)
+	if(!handle.IsValid())
 		return;
 
-	resource->SetBool(name, value);
+	RHI::Get().BindShader(handle);
+	RHI::Get().SetUniformBool(name, value);
 }
 
 void UShader::SetInt(const std::string& name, int32_t value)
 {
-	if(resource == nullptr)
+	if(!handle.IsValid())
 		return;
 
-	resource->SetInt(name, value);
+	RHI::Get().BindShader(handle);
+	RHI::Get().SetUniformInt(name, value);
 }
 
 void UShader::SetFloat(const std::string& name, float value)
 {
-	if(resource == nullptr)
+	if(!handle.IsValid())
 		return;
 
-	resource->SetFloat(name, value);
+	RHI::Get().BindShader(handle);
+	RHI::Get().SetUniformFloat(name, value);
 }
 
 void UShader::SetVec2(const std::string& name, float x, float y)
 {
-	if(resource == nullptr)
+	if(!handle.IsValid())
 		return;
 
-	resource->SetVec2(name, x, y);
+	RHI::Get().BindShader(handle);
+	RHI::Get().SetUniformVec2(name, {x,y});
 }
 
 void UShader::SetVec3(const std::string& name, float x, float y, float z)
 {
-	if(resource == nullptr)
+	if(!handle.IsValid())
 		return;
 
-	resource->SetVec3(name, x, y, z);
+	RHI::Get().BindShader(handle);
+	RHI::Get().SetUniformVec3(name, {x,y,z});
 }
 
 void UShader::SetVec4(const std::string& name, float x, float y, float z, float w)
 {
-	if(resource == nullptr)
+	if(!handle.IsValid())
 		return;
 
-	resource->SetVec4(name, x, y, z, w);
+	RHI::Get().BindShader(handle);
+	RHI::Get().SetUniformVec4(name, {x,y,z,w});
 }
 

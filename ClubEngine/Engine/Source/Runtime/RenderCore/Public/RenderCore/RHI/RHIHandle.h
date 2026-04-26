@@ -8,6 +8,11 @@ class RHIHandle
 public:
     uint32_t id{0};
 
+    void Invalidate() noexcept
+    {
+        id = 0;
+    }
+
     bool IsValid() const noexcept
     {
         return id != 0;
@@ -29,7 +34,7 @@ class RHITextureTag{};
 class RHIBufferTag{};
 class RHIVertexArrayTag{};
 
-using RHIShaderHandle           = RHIHandle<RHIShaderTag>;
-using RHITextureHandle          = RHIHandle<RHITextureTag>;
-using RHIBufferHandle           = RHIHandle<RHIBufferTag>;
-using RHIVertexArrayHandle      = RHIHandle<RHIVertexArrayTag>;
+using ShaderHandle           = RHIHandle<RHIShaderTag>;
+using TextureHandle          = RHIHandle<RHITextureTag>;
+using BufferHandle           = RHIHandle<RHIBufferTag>;
+using VertexArrayHandle      = RHIHandle<RHIVertexArrayTag>;

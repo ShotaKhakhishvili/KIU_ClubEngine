@@ -4,9 +4,9 @@
 
 using ShaderID = uint32_t;
 using TextureID = uint32_t;
-using VAOID = uint32_t;
-using VBOID = uint32_t;
-using EBOID = uint32_t;
+using VertexArrayID = uint32_t;
+using VertexBufferID = uint32_t;
+using IndexBufferID = uint32_t;
 
 enum class ShaderDataType
 {

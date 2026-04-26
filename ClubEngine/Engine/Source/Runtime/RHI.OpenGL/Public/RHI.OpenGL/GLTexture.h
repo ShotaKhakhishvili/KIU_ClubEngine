@@ -5,10 +5,10 @@
 #include <filesystem>
 #include <array>
 
-class Texture
+class GLTexture
 {
 public:
-    Texture(
+    GLTexture(
         const uint32_t width, 
         const uint32_t height, 
         TextureInternalFormat internalFormat,
@@ -17,7 +17,7 @@ public:
         bool generateMipmaps,
         const void* data
     );
-    Texture(
+    GLTexture(
         const uint32_t width,
         const uint32_t height,
         TextureInternalFormat internalFormat,
@@ -27,17 +27,17 @@ public:
         const void* const* data
     );
         
-    ~Texture();
+    ~GLTexture();
 
     void GenerateMipmap() const;
     void Bind(int32_t slot) const;
     void Unbind() const;
 
-    Texture(const Texture&) = delete;
-    Texture& operator=(const Texture&) = delete;
+    GLTexture(const GLTexture&) = delete;
+    GLTexture& operator=(const GLTexture&) = delete;
 
-    Texture(Texture&& other) noexcept;
-    Texture& operator=(Texture&& other) noexcept;
+    GLTexture(GLTexture&& other) noexcept;
+    GLTexture& operator=(GLTexture&& other) noexcept;
 
     TextureID GetID() const;
     TextureType GetType() const;
