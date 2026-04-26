@@ -224,7 +224,7 @@ void GLShader::SetVec4(const std::string& name, const float x, const float y, co
     glUniform4f(location, x,y,z,w);
 }
 
-void GLShader::SetTexture(const std::string& name, const GLTexture& texture, uint32_t slot)
+void GLShader::SetTexture(const std::string& name, uint32_t slot)
 {
     const int32_t location = GetUniformLocation(name);
     if (location == -1)

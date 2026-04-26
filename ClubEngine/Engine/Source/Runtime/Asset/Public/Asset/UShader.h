@@ -13,7 +13,7 @@ class UShader final : public UObject
 {
 public:
 
-    UShader(const ShaderDesc& shaderDesc, std::string inName = "UShader");
+    UShader(const RHI::ShaderDesc& shaderDesc, std::string inName = "UShader");
     ~UShader() override;
 
     UShader(const UShader&) = delete;
@@ -36,6 +36,6 @@ public:
     void SetVec4(const std::string& name, float x, float y, float z, float w);
 
 private:
-    ShaderDesc shaderDesc;
-    ShaderHandle handle;    
+    RHI::ShaderDesc shaderDesc;
+    RHI::ShaderHandle handle;    
 };

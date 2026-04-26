@@ -13,7 +13,7 @@
 #include <utility>
 
 UTexture::UTexture(std::filesystem::path inSourcePath,
-				   const TextureDesc& inDesc,
+				   const RHI::TextureDesc& inDesc,
 				   std::string inName)
 	: UObject(std::move(inName))
 	, sourcePath(std::move(inSourcePath))

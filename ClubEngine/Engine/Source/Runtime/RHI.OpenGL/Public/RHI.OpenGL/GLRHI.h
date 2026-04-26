@@ -11,42 +11,42 @@ class GLVertexArray;
 class GLVertexBuffer;
 class GLIndexBuffer;
 
-class OpenGLRHI final : public IRHI
+class GLRHI final : public RHI::IRHI
 {
 public:
     void Init() override;
     void Shutdown() override;
 
-    ShaderHandle CreateShader(const ShaderDesc& desc) override;
-    void DestroyShader(ShaderHandle shader) override;
+    RHI::ShaderHandle CreateShader(const RHI::ShaderDesc& desc) override;
+    void DestroyShader(RHI::ShaderHandle shader) override;
 
-    TextureHandle CreateTexture(const TextureDesc& desc, const void* data) override;
-    TextureHandle CreateCubemap(const TextureDesc& desc, const void* const* faceData) override;
-    void DestroyTexture(TextureHandle texture) override;
+    RHI::TextureHandle CreateTexture(const RHI::TextureDesc& desc, const void* data) override;
+    RHI::TextureHandle CreateCubemap(const RHI::TextureDesc& desc, const void* const* faceData) override;
+    void DestroyTexture(RHI::TextureHandle texture) override;
 
-    BufferHandle CreateBuffer(const BufferDesc& desc, const void* data) override;
-    void DestroyBuffer(BufferHandle buffer) override;
+    RHI::BufferHandle CreateBuffer(const RHI::BufferDesc& desc, const void* data) override;
+    void DestroyBuffer(RHI::BufferHandle buffer) override;
 
-    VertexArrayHandle CreateVertexArray(
-        BufferHandle vertexBuffer,
-        BufferHandle indexBuffer,
-        const VertexArrayDesc& desc
+    RHI::VertexArrayHandle CreateVertexArray(
+        RHI::BufferHandle vertexBuffer,
+        RHI::BufferHandle indexBuffer,
+        const RHI::VertexArrayDesc& desc
     ) override;
 
-    void DestroyVertexArray(VertexArrayHandle vertexArray) override;
+    void DestroyVertexArray(RHI::VertexArrayHandle vertexArray) override;
 
     void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) override;
     void SetClearColor(float r, float g, float b, float a) override;
     void Clear(bool color, bool depth) override;
 
-    void SetCullMode(CullMode mode) override;
-    void SetBlendMode(BlendMode mode) override;
+    void SetCullMode(RHI::CullMode mode) override;
+    void SetBlendMode(RHI::BlendMode mode) override;
     void SetDepthTest(bool enabled) override;
     void SetDepthWrite(bool enabled) override;
 
-    void BindShader(ShaderHandle shader) override;
-    void BindVertexArray(VertexArrayHandle vertexArray) override;
-    void BindTexture(TextureHandle texture, uint32_t slot) override;
+    void BindShader(RHI::ShaderHandle shader) override;
+    void BindVertexArray(RHI::VertexArrayHandle vertexArray) override;
+    void BindTexture(RHI::TextureHandle texture, uint32_t slot) override;
 
     void SetUniformBool(const std::string& name, bool value) override;
     void SetUniformInt(const std::string& name, int32_t value) override;
@@ -54,8 +54,9 @@ public:
     void SetUniformVec2(const std::string& name, const Vec2f& value) override;
     void SetUniformVec3(const std::string& name, const Vec3f& value) override;
     void SetUniformVec4(const std::string& name, const Vec4f& value) override;
-
-    void DrawIndexed(const DrawIndexedDesc& desc) override;
+    void SetTexture(const std::string& name, RHI::TextureHandle texture, uint32_t slot) override;
+    
+    void DrawIndexed(const RHI::DrawIndexedDesc& desc) override;
 
 private:
     uint32_t nextShaderHandle = 1;
@@ -63,7 +64,7 @@ private:
     uint32_t nextBufferHandle = 1;
     uint32_t nextVertexArrayHandle = 1;
 
-    ShaderHandle currentShader{};
+    RHI::ShaderHandle currentShader{};
 
     std::unordered_map<uint32_t, std::unique_ptr<GLShader>> shaders;
     std::unordered_map<uint32_t, std::unique_ptr<GLTexture>> textures;

@@ -120,8 +120,8 @@ void UMaterial::Reset()
     vectors_3.clear();
     vectors_4.clear();
     
-    blendMode = BlendMode::Opaque;
-    cullMode = CullMode::Back;
+    blendMode = RHI::BlendMode::Opaque;
+    cullMode = RHI::CullMode::Back;
     depthWrite = true;
     depthTest = true;
     shader = TObjectHandle<UShader>{};

@@ -98,23 +98,6 @@ enum class CubemapFace
     Count
 };
 
-enum class CullMode
-{
-    Back,
-    Front,
-    None,
-    Count
-};
-
-enum class BlendMode
-{
-    Opaque,
-    Masked,
-    Translucent,
-    Additive,
-    Count
-};
-
 constexpr uint32_t ToTextureUnitIndex(const TextureSlot slot) noexcept
 {
     return static_cast<uint32_t>(slot);

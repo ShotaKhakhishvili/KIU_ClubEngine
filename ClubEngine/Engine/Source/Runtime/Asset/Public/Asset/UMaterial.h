@@ -46,8 +46,8 @@ private:
     std::unordered_map<std::string, Vec4f> vectors_4;
     std::unordered_map<std::string, TObjectHandle<UTexture>> textures;
 
-    BlendMode blendMode = BlendMode::Opaque;
-    CullMode cullMode = CullMode::Back;
+    RHI::BlendMode blendMode = RHI::BlendMode::Opaque;
+    RHI::CullMode cullMode = RHI::CullMode::Back;
     bool depthWrite = true;
     bool depthTest = true;
 };

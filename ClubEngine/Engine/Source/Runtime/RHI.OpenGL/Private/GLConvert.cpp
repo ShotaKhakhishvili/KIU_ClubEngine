@@ -113,36 +113,36 @@ GLenum ToGL(TexturePixelType v) noexcept
     return GL_UNSIGNED_BYTE;
 }
 
-GLenum ToGL(BufferType type)
+GLenum ToGL(RHI::BufferType type)
 {
     switch (type)
     {
-        case BufferType::Vertex:  return GL_ARRAY_BUFFER;
-        case BufferType::Index:   return GL_ELEMENT_ARRAY_BUFFER;
-        case BufferType::Uniform: return GL_UNIFORM_BUFFER;
+        case RHI::BufferType::Vertex:  return GL_ARRAY_BUFFER;
+        case RHI::BufferType::Index:   return GL_ELEMENT_ARRAY_BUFFER;
+        case RHI::BufferType::Uniform: return GL_UNIFORM_BUFFER;
     }
     assert(false && "Unhandled BufferType");
     return GL_ARRAY_BUFFER;
 }
 
-GLenum ToGL(PrimitiveType primitive)
+GLenum ToGL(RHI::PrimitiveType primitive)
 {
     switch (primitive)
     {
-        case PrimitiveType::Triangles: return GL_TRIANGLES;
-        case PrimitiveType::Lines:     return GL_LINES;
-        case PrimitiveType::Points:    return GL_POINTS;
+        case RHI::PrimitiveType::Triangles: return GL_TRIANGLES;
+        case RHI::PrimitiveType::Lines:     return GL_LINES;
+        case RHI::PrimitiveType::Points:    return GL_POINTS;
     }
     assert(false && "Unhandled PrimitiveType");
     return GL_TRIANGLES;
 }
 
-GLenum ToGL(IndexType type)
+GLenum ToGL(RHI::IndexType type)
 {
     switch (type)
     {
-        case IndexType::UInt16: return GL_UNSIGNED_SHORT;
-        case IndexType::UInt32: return GL_UNSIGNED_INT;
+        case RHI::IndexType::UInt16: return GL_UNSIGNED_SHORT;
+        case RHI::IndexType::UInt32: return GL_UNSIGNED_INT;
     }
     assert(false && "Unhandled IndexType");
     return GL_UNSIGNED_INT;

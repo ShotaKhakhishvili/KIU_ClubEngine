@@ -2,39 +2,42 @@
 
 #include <cstdint>
 
-template<typename T>
-class RHIHandle
+namespace RHI
 {
-public:
-    uint32_t id{0};
-
-    void Invalidate() noexcept
+    template<typename T>
+    class RHIHandle
     {
-        id = 0;
-    }
+    public:
+        uint32_t id{0};
 
-    bool IsValid() const noexcept
-    {
-        return id != 0;
-    }
+        void Invalidate() noexcept
+        {
+            id = 0;
+        }
 
-    bool operator==(const RHIHandle& other)const noexcept
-    {
-        return this->id == other.id;
-    }
+        bool IsValid() const noexcept
+        {
+            return id != 0;
+        }
 
-    bool operator!=(const RHIHandle& other)const noexcept
-    {
-        return this->id != other.id;
-    }
-};
+        bool operator==(const RHIHandle& other)const noexcept
+        {
+            return this->id == other.id;
+        }
 
-class RHIShaderTag{};
-class RHITextureTag{};
-class RHIBufferTag{};
-class RHIVertexArrayTag{};
+        bool operator!=(const RHIHandle& other)const noexcept
+        {
+            return this->id != other.id;
+        }
+    };
 
-using ShaderHandle           = RHIHandle<RHIShaderTag>;
-using TextureHandle          = RHIHandle<RHITextureTag>;
-using BufferHandle           = RHIHandle<RHIBufferTag>;
-using VertexArrayHandle      = RHIHandle<RHIVertexArrayTag>;
+    class RHIShaderTag{};
+    class RHITextureTag{};
+    class RHIBufferTag{};
+    class RHIVertexArrayTag{};
+
+    using ShaderHandle           = RHIHandle<RHIShaderTag>;
+    using TextureHandle          = RHIHandle<RHITextureTag>;
+    using BufferHandle           = RHIHandle<RHIBufferTag>;
+    using VertexArrayHandle      = RHIHandle<RHIVertexArrayTag>;
+}

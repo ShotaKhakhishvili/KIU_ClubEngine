@@ -11,12 +11,12 @@
 #include <glad/glad.h>
 #include <cassert>
 
-void OpenGLRHI::Init()
+void GLRHI::Init()
 {
     glEnable(GL_DEPTH_TEST);
 }
 
-void OpenGLRHI::Shutdown()
+void GLRHI::Shutdown()
 {
     shaders.clear();
     textures.clear();
@@ -33,7 +33,7 @@ void OpenGLRHI::Shutdown()
     uniformBuffers.clear();
 }
 
-ShaderHandle OpenGLRHI::CreateShader(const ShaderDesc& desc)
+RHI::ShaderHandle GLRHI::CreateShader(const RHI::ShaderDesc& desc)
 {
     std::string vertexShader;
     std::string fragmentShader;
@@ -42,10 +42,10 @@ ShaderHandle OpenGLRHI::CreateShader(const ShaderDesc& desc)
     {
         switch(src.stage)
         {
-            case ShaderStage::Vertex:
+            case RHI::ShaderStage::Vertex:
                 vertexShader = src.source;
                 break;
-            case ShaderStage::Fragment:
+            case RHI::ShaderStage::Fragment:
                 fragmentShader = src.source;
                 break;
         }
@@ -60,10 +60,10 @@ ShaderHandle OpenGLRHI::CreateShader(const ShaderDesc& desc)
 
     shaders[id] = std::move(shader);
 
-    return ShaderHandle{id};
+    return RHI::ShaderHandle{id};
 }
 
-void OpenGLRHI::DestroyShader(ShaderHandle handle)
+void GLRHI::DestroyShader(RHI::ShaderHandle handle)
 {
     if(!handle.IsValid())
     {
@@ -77,7 +77,7 @@ void OpenGLRHI::DestroyShader(ShaderHandle handle)
         currentShader = {};
 }
 
-void OpenGLRHI::BindShader(ShaderHandle handle)
+void GLRHI::BindShader(RHI::ShaderHandle handle)
 {
     assert(handle.IsValid());
 
@@ -88,9 +88,9 @@ void OpenGLRHI::BindShader(ShaderHandle handle)
     currentShader = handle;
 }
 
-TextureHandle OpenGLRHI::CreateTexture(const TextureDesc& desc, const void* data)
+RHI::TextureHandle GLRHI::CreateTexture(const RHI::TextureDesc& desc, const void* data)
 {
-    assert(desc.dimension == TextureDimension::Texture2D);
+    assert(desc.dimension == RHI::TextureDimension::Texture2D);
 
     auto texture = std::make_unique<GLTexture>(
                     desc.width,
@@ -106,12 +106,12 @@ TextureHandle OpenGLRHI::CreateTexture(const TextureDesc& desc, const void* data
 
     textures[id] = std::move(texture);
 
-    return TextureHandle{id};
+    return RHI::TextureHandle{id};
 }
 
-TextureHandle OpenGLRHI::CreateCubemap(const TextureDesc& desc, const void* const* faceData)
+RHI::TextureHandle GLRHI::CreateCubemap(const RHI::TextureDesc& desc, const void* const* faceData)
 {
-    assert(desc.dimension == TextureDimension::TextureCube);
+    assert(desc.dimension == RHI::TextureDimension::TextureCube);
 
     auto texture = std::make_unique<GLTexture>(
                     desc.width,
@@ -127,10 +127,10 @@ TextureHandle OpenGLRHI::CreateCubemap(const TextureDesc& desc, const void* cons
 
     textures[id] = std::move(texture);
 
-    return TextureHandle{id};
+    return RHI::TextureHandle{id};
 }
 
-void OpenGLRHI::DestroyTexture(TextureHandle handle)
+void GLRHI::DestroyTexture(RHI::TextureHandle handle)
 {
     if(!handle.IsValid())
     {
@@ -141,7 +141,7 @@ void OpenGLRHI::DestroyTexture(TextureHandle handle)
     textures.erase(handle.id);
 }
 
-void OpenGLRHI::BindTexture(TextureHandle handle, uint32_t slot)
+void GLRHI::BindTexture(RHI::TextureHandle handle, uint32_t slot)
 {
     assert(handle.IsValid());
 
@@ -151,13 +151,13 @@ void OpenGLRHI::BindTexture(TextureHandle handle, uint32_t slot)
     it->second->Bind(slot);
 }
 
-BufferHandle OpenGLRHI::CreateBuffer(const BufferDesc& desc, const void* data)
+RHI::BufferHandle GLRHI::CreateBuffer(const RHI::BufferDesc& desc, const void* data)
 {
     const uint32_t id = nextBufferHandle++;
 
     switch(desc.type)
     {
-        case BufferType::Vertex:
+        case RHI::BufferType::Vertex:
         {
             auto buffer = std::make_unique<GLVertexBuffer>(
                 data,
@@ -168,7 +168,7 @@ BufferHandle OpenGLRHI::CreateBuffer(const BufferDesc& desc, const void* data)
             break;
         }
 
-        case BufferType::Index:
+        case RHI::BufferType::Index:
         {
             auto buffer = std::make_unique<GLIndexBuffer>(
                 data,
@@ -179,7 +179,7 @@ BufferHandle OpenGLRHI::CreateBuffer(const BufferDesc& desc, const void* data)
             break;
         }
 
-        case BufferType::Uniform:
+        case RHI::BufferType::Uniform:
         {
             GLuint glBuffer = 0;
             glGenBuffers(1, &glBuffer);
@@ -192,10 +192,10 @@ BufferHandle OpenGLRHI::CreateBuffer(const BufferDesc& desc, const void* data)
         }
     }
 
-    return BufferHandle{id};
+    return RHI::BufferHandle{id};
 }
 
-void OpenGLRHI::DestroyBuffer(BufferHandle handle)
+void GLRHI::DestroyBuffer(RHI::BufferHandle handle)
 {
     if(!handle.IsValid())
     {
@@ -215,10 +215,10 @@ void OpenGLRHI::DestroyBuffer(BufferHandle handle)
     }
 }
 
-VertexArrayHandle OpenGLRHI::CreateVertexArray(
-    BufferHandle vertexBufferHandle,
-    BufferHandle indexBufferHandle,
-    const VertexArrayDesc& desc
+RHI::VertexArrayHandle GLRHI::CreateVertexArray(
+    RHI::BufferHandle vertexBufferHandle,
+    RHI::BufferHandle indexBufferHandle,
+    const RHI::VertexArrayDesc& desc
 )
 {
     assert(vertexBufferHandle.IsValid());
@@ -256,10 +256,10 @@ VertexArrayHandle OpenGLRHI::CreateVertexArray(
 
     vertexArrays[id] = std::move(vao);
 
-    return VertexArrayHandle{id};
+    return RHI::VertexArrayHandle{id};
 }
 
-void OpenGLRHI::DestroyVertexArray(VertexArrayHandle handle)
+void GLRHI::DestroyVertexArray(RHI::VertexArrayHandle handle)
 {
     if(!handle.IsValid())
     {
@@ -270,7 +270,7 @@ void OpenGLRHI::DestroyVertexArray(VertexArrayHandle handle)
     vertexArrays.erase(handle.id);
 }
 
-void OpenGLRHI::BindVertexArray(VertexArrayHandle handle)
+void GLRHI::BindVertexArray(RHI::VertexArrayHandle handle)
 {
     assert(handle.IsValid());
 
@@ -280,7 +280,7 @@ void OpenGLRHI::BindVertexArray(VertexArrayHandle handle)
     VAO->second->Bind();
 }
 
-void OpenGLRHI::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
+void GLRHI::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
 {
     glViewport(
         static_cast<GLint>(x),
@@ -290,12 +290,12 @@ void OpenGLRHI::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t hei
     );
 }
 
-void OpenGLRHI::SetClearColor(float r, float g, float b, float a)
+void GLRHI::SetClearColor(float r, float g, float b, float a)
 {
     glClearColor(r, g, b, a);
 }
 
-void OpenGLRHI::Clear(bool color, bool depth)
+void GLRHI::Clear(bool color, bool depth)
 {
     GLbitfield flags = 0;
 
@@ -308,9 +308,9 @@ void OpenGLRHI::Clear(bool color, bool depth)
     glClear(flags);
 }
 
-void OpenGLRHI::SetCullMode(CullMode mode)
+void GLRHI::SetCullMode(RHI::CullMode mode)
 {
-    if (mode == CullMode::None)
+    if (mode == RHI::CullMode::None)
     {
         glDisable(GL_CULL_FACE);
         return;
@@ -320,52 +320,52 @@ void OpenGLRHI::SetCullMode(CullMode mode)
 
     switch (mode)
     {
-        case CullMode::Back:
+        case RHI::CullMode::Back:
             glCullFace(GL_BACK);
             break;
 
-        case CullMode::Front:
+        case RHI::CullMode::Front:
             glCullFace(GL_FRONT);
             break;
 
-        case CullMode::Count:
+        case RHI::CullMode::Count:
             assert(false && "Invalid CullMode");
             break;
 
-        case CullMode::None:
+        case RHI::CullMode::None:
             break;
     }
 }
 
-void OpenGLRHI::SetBlendMode(BlendMode mode)
+void GLRHI::SetBlendMode(RHI::BlendMode mode)
 {
     switch (mode)
     {
-        case BlendMode::Opaque:
+        case RHI::BlendMode::Opaque:
             glDisable(GL_BLEND);
             break;
 
-        case BlendMode::Masked:
+        case RHI::BlendMode::Masked:
             glDisable(GL_BLEND);
             break;
 
-        case BlendMode::Translucent:
+        case RHI::BlendMode::Translucent:
             glEnable(GL_BLEND);
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
             break;
 
-        case BlendMode::Additive:
+        case RHI::BlendMode::Additive:
             glEnable(GL_BLEND);
             glBlendFunc(GL_SRC_ALPHA, GL_ONE);
             break;
 
-        case BlendMode::Count:
+        case RHI::BlendMode::Count:
             assert(false && "Invalid BlendMode");
             break;
     }
 }
 
-void OpenGLRHI::SetDepthTest(bool enabled)
+void GLRHI::SetDepthTest(bool enabled)
 {
     if (enabled)
         glEnable(GL_DEPTH_TEST);
@@ -373,51 +373,72 @@ void OpenGLRHI::SetDepthTest(bool enabled)
         glDisable(GL_DEPTH_TEST);
 }
 
-void OpenGLRHI::SetDepthWrite(bool enabled)
+void GLRHI::SetDepthWrite(bool enabled)
 {
     glDepthMask(enabled ? GL_TRUE : GL_FALSE);
 }
 
-void OpenGLRHI::SetUniformBool(const std::string& name, bool value)
+void GLRHI::SetUniformBool(const std::string& name, bool value)
 {
     assert(currentShader.IsValid());
     shaders[currentShader.id]->SetBool(name, value);
 }
 
-void OpenGLRHI::SetUniformInt(const std::string& name, int32_t value)
+void GLRHI::SetUniformInt(const std::string& name, int32_t value)
 {
     assert(currentShader.IsValid());
     shaders[currentShader.id]->SetInt(name, value);
 }
 
-void OpenGLRHI::SetUniformFloat(const std::string& name, float value)
+void GLRHI::SetUniformFloat(const std::string& name, float value)
 {
     assert(currentShader.IsValid());
     shaders[currentShader.id]->SetFloat(name, value);
 }
 
-void OpenGLRHI::SetUniformVec2(const std::string& name, const Vec2f& value)
+void GLRHI::SetUniformVec2(const std::string& name, const Vec2f& value)
 {
     assert(currentShader.IsValid());
     shaders[currentShader.id]->SetVec2(name, value.x, value.y);
 }
 
-void OpenGLRHI::SetUniformVec3(const std::string& name, const Vec3f& value)
+void GLRHI::SetUniformVec3(const std::string& name, const Vec3f& value)
 {
     assert(currentShader.IsValid());
     shaders[currentShader.id]->SetVec3(name, value.x, value.y, value.z);
 }
 
-void OpenGLRHI::SetUniformVec4(const std::string& name, const Vec4f& value)
+void GLRHI::SetUniformVec4(const std::string& name, const Vec4f& value)
 {
     assert(currentShader.IsValid());
     shaders[currentShader.id]->SetVec4(name, value.x, value.y, value.z, value.w);
 }
 
-void OpenGLRHI::DrawIndexed(const DrawIndexedDesc& desc)
+void GLRHI::SetTexture(const std::string& name, RHI::TextureHandle texture, uint32_t slot)
+{
+    auto shaderIt = shaders.find(currentShader.GetID());
+    if (shaderIt == shaders.end() || !shaderIt->second)
+    {
+        CE_LOG(Error, "Tried to set texture [{}] without valid bound shader", name);
+        return;
+    }
+
+    auto textureIt = textures.find(texture.GetID());
+    if (textureIt == textures.end() || !textureIt->second)
+    {
+        CE_LOG(Error, "Tried to set invalid texture [{}]", name);
+        return;
+    }
+
+    BindTexture(texture, slot);
+
+    shaderIt->second->SetInt(name, static_cast<int32_t>(slot));
+}
+
+void GLRHI::DrawIndexed(const RHI::DrawIndexedDesc& desc)
 {
     const uint32_t indexSize =
-    desc.indexType == IndexType::UInt16 ? sizeof(uint16_t) : sizeof(uint32_t);
+    desc.indexType == RHI::IndexType::UInt16 ? sizeof(uint16_t) : sizeof(uint32_t);
 
     const uintptr_t byteOffset =
         static_cast<uintptr_t>(desc.indexOffset) * indexSize;

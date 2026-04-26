@@ -9,7 +9,7 @@
 #include <string>
 #include <utility>
 
-UShader::UShader(const ShaderDesc& inShaderDesc, std::string inName)
+UShader::UShader(const RHI::ShaderDesc& inShaderDesc, std::string inName)
 	: UObject(std::move(inName)), shaderDesc(inShaderDesc)
 {
 }

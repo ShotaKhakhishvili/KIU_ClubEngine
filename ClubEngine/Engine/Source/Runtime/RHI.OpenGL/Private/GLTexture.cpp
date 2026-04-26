@@ -19,9 +19,9 @@ GLTexture::GLTexture(
         internalFormat(internalFormat), 
         readFormat(readFormat), 
         pixelType(pixelType),
-        generateMipmaps(generateMipmaps),
         width(width),
-        height(height)
+        height(height),
+        generateMipmaps(generateMipmaps)
 {
     assert(type == TextureType::Texture2D);
 
@@ -64,9 +64,9 @@ GLTexture::GLTexture(
         internalFormat(internalFormat),
         readFormat(readFormat),
         pixelType(pixelType),
-        generateMipmaps(generateMipmaps),
         width(width),
-        height(height)
+        height(height),
+        generateMipmaps(generateMipmaps)
 {
     assert(type == TextureType::TextureCubeMap);
     assert(data != nullptr);
