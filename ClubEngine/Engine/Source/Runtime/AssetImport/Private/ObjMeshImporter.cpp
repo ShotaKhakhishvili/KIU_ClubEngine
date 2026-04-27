@@ -9,7 +9,7 @@ struct ObjVertexKey
 {
     int positionIndex = -1;
     int texCoordIndex = -1;
-    int normalIndex = -1;
+    int normalIndex   = -1;
 
     bool operator==(const ObjVertexKey& other) const
     {
@@ -23,9 +23,9 @@ struct ObjVertexKeyHash
 {
     std::size_t operator()(const ObjVertexKey& key) const
     {
-        std::size_t h1 = std::hash<int>{}(key.positionIndex);
-        std::size_t h2 = std::hash<int>{}(key.texCoordIndex);
-        std::size_t h3 = std::hash<int>{}(key.normalIndex);
+        const std::size_t h1 = std::hash<int>{}(key.positionIndex);
+        const std::size_t h2 = std::hash<int>{}(key.texCoordIndex);
+        const std::size_t h3 = std::hash<int>{}(key.normalIndex);
 
         return h1 ^ (h2 << 1) ^ (h3 << 2);
     }
@@ -36,78 +36,7 @@ ObjMeshImporter::ObjMeshImporter(ObjImportSettings inSettings)
 {
 }
 
-const std::vector<std::string>& ObjMeshImporter::GetErrors() const
-{
-    return errors;
-}
-
-const std::vector<std::string>& ObjMeshImporter::GetWarnings() const
-{
-    return warnings;
-}
-
-void ObjMeshImporter::ClearMessages()
-{
-    errors.clear();
-    warnings.clear();
-}
-
-void ObjMeshImporter::AddError(std::string message)
-{
-    errors.push_back(std::move(message));
-}
-
-void ObjMeshImporter::AddWarning(std::string message)
-{
-    warnings.push_back(std::move(message));
-}
-
-static ObjVertexKey ParseFaceVertex(const std::string& text)
-{
-    ObjVertexKey key;
-
-    std::stringstream ss(text);
-    std::string part;
-
-    if (std::getline(ss, part, '/') && !part.empty())
-        key.positionIndex = std::stoi(part) - 1;
-
-    if (std::getline(ss, part, '/') && !part.empty())
-        key.texCoordIndex = std::stoi(part) - 1;
-
-    if (std::getline(ss, part, '/') && !part.empty())
-        key.normalIndex = std::stoi(part) - 1;
-
-    return key;
-}
-
-static StaticMeshImportVertex BuildVertex(
-    const ObjVertexKey& key,
-    const std::vector<glm::vec3>& positions,
-    const std::vector<glm::vec2>& texCoords,
-    const std::vector<glm::vec3>& normals,
-    const ObjImportSettings& settings)
-{
-    StaticMeshImportVertex vertex;
-
-    if (key.positionIndex >= 0 && key.positionIndex < static_cast<int>(positions.size()))
-        vertex.position = positions[key.positionIndex] * settings.scale;
-
-    if (key.texCoordIndex >= 0 && key.texCoordIndex < static_cast<int>(texCoords.size()))
-    {
-        vertex.texCoord = texCoords[key.texCoordIndex];
-
-        if (settings.flipV)
-            vertex.texCoord.y = 1.0f - vertex.texCoord.y;
-    }
-
-    if (key.normalIndex >= 0 && key.normalIndex < static_cast<int>(normals.size()))
-        vertex.normal = normals[key.normalIndex];
-
-    return vertex;
-}
-
-std::optional<StaticMeshImportData> ObjMeshImporter::Import(const std::filesystem::path& path)
+std::optional<MeshImportResult> ObjMeshImporter::Import(const std::filesystem::path& path)
 {
     ClearMessages();
 
@@ -119,15 +48,15 @@ std::optional<StaticMeshImportData> ObjMeshImporter::Import(const std::filesyste
         return std::nullopt;
     }
 
-    StaticMeshImportData result;
+    MeshImportResult result;
 
-    std::vector<glm::vec3> positions;
-    std::vector<glm::vec2> texCoords;
-    std::vector<glm::vec3> normals;
+    std::vector<Vec3f> positions;
+    std::vector<Vec2f> texCoords;
+    std::vector<Vec3f> normals;
 
     std::unordered_map<ObjVertexKey, uint32_t, ObjVertexKeyHash> vertexCache;
 
-    StaticMeshImportSection currentSection;
+    MeshImportSection currentSection;
     currentSection.name = "Default";
     currentSection.materialName = "Default";
     currentSection.indexStart = 0;
@@ -138,7 +67,67 @@ std::optional<StaticMeshImportData> ObjMeshImporter::Import(const std::filesyste
             static_cast<uint32_t>(result.indices.size()) - currentSection.indexStart;
 
         if (currentSection.indexCount > 0)
+        {
             result.sections.push_back(currentSection);
+        }
+    };
+
+    auto ParseFaceVertex = [](const std::string& text) -> ObjVertexKey
+    {
+        ObjVertexKey key;
+
+        std::stringstream ss(text);
+        std::string part;
+
+        if (std::getline(ss, part, '/') && !part.empty())
+        {
+            key.positionIndex = std::stoi(part) - 1;
+        }
+
+        if (std::getline(ss, part, '/') && !part.empty())
+        {
+            key.texCoordIndex = std::stoi(part) - 1;
+        }
+
+        if (std::getline(ss, part, '/') && !part.empty())
+        {
+            key.normalIndex = std::stoi(part) - 1;
+        }
+
+        return key;
+    };
+
+    auto BuildVertex = [&](const ObjVertexKey& key) -> Vertex
+    {
+        Vertex vertex;
+
+        if (key.positionIndex >= 0 && key.positionIndex < static_cast<int>(positions.size()))
+        {
+            vertex.coord = positions[key.positionIndex];
+
+            vertex.coord.x *= settings.scale;
+            vertex.coord.y *= settings.scale;
+            vertex.coord.z *= settings.scale;
+        }
+
+        if (key.normalIndex >= 0 && key.normalIndex < static_cast<int>(normals.size()))
+        {
+            vertex.normal = normals[key.normalIndex];
+        }
+
+        if (key.texCoordIndex >= 0 && key.texCoordIndex < static_cast<int>(texCoords.size()))
+        {
+            vertex.texUV = texCoords[key.texCoordIndex];
+
+            if (settings.flipV)
+            {
+                vertex.texUV.y = 1.0f - vertex.texUV.y;
+            }
+        }
+
+        vertex.color = Vec3f{1.0f, 1.0f, 1.0f};
+
+        return vertex;
     };
 
     std::string line;
@@ -149,7 +138,9 @@ std::optional<StaticMeshImportData> ObjMeshImporter::Import(const std::filesyste
         ++lineNumber;
 
         if (line.empty() || line[0] == '#')
+        {
             continue;
+        }
 
         std::stringstream ss(line);
 
@@ -158,21 +149,21 @@ std::optional<StaticMeshImportData> ObjMeshImporter::Import(const std::filesyste
 
         if (type == "v")
         {
-            glm::vec3 p;
-            ss >> p.x >> p.y >> p.z;
-            positions.push_back(p);
+            Vec3f position;
+            ss >> position.x >> position.y >> position.z;
+            positions.push_back(position);
         }
         else if (type == "vt")
         {
-            glm::vec2 uv;
-            ss >> uv.x >> uv.y;
-            texCoords.push_back(uv);
+            Vec2f texCoord;
+            ss >> texCoord.x >> texCoord.y;
+            texCoords.push_back(texCoord);
         }
         else if (type == "vn")
         {
-            glm::vec3 n;
-            ss >> n.x >> n.y >> n.z;
-            normals.push_back(n);
+            Vec3f normal;
+            ss >> normal.x >> normal.y >> normal.z;
+            normals.push_back(normal);
         }
         else if (type == "o" || type == "g")
         {
@@ -182,7 +173,9 @@ std::optional<StaticMeshImportData> ObjMeshImporter::Import(const std::filesyste
             ss >> currentSection.name;
 
             if (currentSection.name.empty())
+            {
                 currentSection.name = "Unnamed";
+            }
 
             currentSection.materialName = "Default";
             currentSection.indexStart = static_cast<uint32_t>(result.indices.size());
@@ -196,7 +189,9 @@ std::optional<StaticMeshImportData> ObjMeshImporter::Import(const std::filesyste
             ss >> currentSection.materialName;
 
             if (currentSection.materialName.empty())
+            {
                 currentSection.materialName = "Default";
+            }
 
             currentSection.indexStart = static_cast<uint32_t>(result.indices.size());
         }
@@ -227,10 +222,9 @@ std::optional<StaticMeshImportData> ObjMeshImporter::Import(const std::filesyste
                 }
                 else
                 {
-                    StaticMeshImportVertex vertex =
-                        BuildVertex(key, positions, texCoords, normals, settings);
+                    Vertex vertex = BuildVertex(key);
 
-                    uint32_t newIndex = static_cast<uint32_t>(result.vertices.size());
+                    const uint32_t newIndex = static_cast<uint32_t>(result.vertices.size());
 
                     result.vertices.push_back(vertex);
                     vertexCache[key] = newIndex;
@@ -268,4 +262,30 @@ std::optional<StaticMeshImportData> ObjMeshImporter::Import(const std::filesyste
     }
 
     return result;
+}
+
+const std::vector<std::string>& ObjMeshImporter::GetErrors() const
+{
+    return errors;
+}
+
+const std::vector<std::string>& ObjMeshImporter::GetWarnings() const
+{
+    return warnings;
+}
+
+void ObjMeshImporter::ClearMessages()
+{
+    errors.clear();
+    warnings.clear();
+}
+
+void ObjMeshImporter::AddError(std::string message)
+{
+    errors.push_back(std::move(message));
+}
+
+void ObjMeshImporter::AddWarning(std::string message)
+{
+    warnings.push_back(std::move(message));
 }

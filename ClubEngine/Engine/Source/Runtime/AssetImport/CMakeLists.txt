@@ -20,7 +20,6 @@ target_include_directories(CEAssetImport
 target_link_libraries(CEAssetImport
   PUBLIC
     ClubEngine::RenderCore
-    ThirdParty::glm
   PRIVATE
     ClubEngine::Core
     ThirdParty::stb
