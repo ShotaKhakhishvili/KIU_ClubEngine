@@ -7,12 +7,12 @@ cmake-build-debug/
 cmake-build-release/
 cmake-build-*/
 build/
+Build/
 out/
 
 # ---- OS junk ----
 .DS_Store
 Thumbs.db
-
 
 # ---- CMake generated files ----
 CMakeFiles/
@@ -46,5 +46,11 @@ install_manifest.txt
 # ---- Debug symbols ----
 *.pdb
 
-# ---- Compile commands (optional) ----
+# ---- Compile commands ----
 compile_commands.json
+
+# ---- ClubEngine generated/user-local data ----
+ClubEngine/Saved/
+ClubEngine/Build/
+ClubEngine/Binaries/
+ClubEngine/Intermediate/
