@@ -1,11 +1,13 @@
 #pragma once
 
+#include <Core/Types/RHITypes.h>
+#include <Core/Math/Vector.h>
+
 #include <RenderCore/RHI/RHIHandle.h>
-#include <RenderCore/RHI/RHITypes.h>
-#include <RenderCore/Vector.h>
 
 #include <cstdint>
 #include <string>
+#include <memory>
 
 namespace RHI
 {
@@ -90,5 +92,5 @@ namespace RHI
     };
     
     IRHI& Get();
-    void Set(IRHI* rhi);
+    void Set(std::unique_ptr<IRHI> newRHI);
 }

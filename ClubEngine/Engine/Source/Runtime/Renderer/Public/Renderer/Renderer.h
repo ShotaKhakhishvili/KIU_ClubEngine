@@ -1,6 +1,6 @@
 #pragma once
 
-#include <RenderCore/RHI/RHITypes.h>
+#include <Core/Types/RHITypes.h>
 
 #include <Asset/UStaticMesh.h>
 

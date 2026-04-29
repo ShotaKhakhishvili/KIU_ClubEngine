@@ -18,8 +18,6 @@ target_include_directories(CEAssetImport
 )
 
 target_link_libraries(CEAssetImport
-  PUBLIC
-    ClubEngine::RenderCore
   PRIVATE
     ClubEngine::Core
     ThirdParty::stb

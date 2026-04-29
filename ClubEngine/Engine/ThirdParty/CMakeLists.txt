@@ -37,4 +37,12 @@ target_include_directories(ThirdParty_glad PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/glad/include
 )
 
+# ---------------- nlohmann JSON (header-only) ----------------
+add_library(ThirdParty_nlohmann INTERFACE)
+add_library(ThirdParty::nlohmann ALIAS ThirdParty_nlohmann)
+
+target_include_directories(ThirdParty_nlohmann INTERFACE
+  ${CMAKE_CURRENT_SOURCE_DIR}/nlohmann
+)
+
 set_target_properties(ThirdParty_glad PROPERTIES POSITION_INDEPENDENT_CODE ON)

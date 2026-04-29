@@ -1,7 +1,7 @@
 #pragma once
 
-#include <RenderCore/RenderTypes.h>
-#include <RenderCore/RHI/RHITypes.h>
+#include <Core/Types/RenderTypes.h>
+#include <Core/Types/RHITypes.h>
 
 #include <glad/glad.h>
 

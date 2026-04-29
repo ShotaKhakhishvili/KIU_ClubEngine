@@ -26,7 +26,12 @@ namespace CE
             auto now = std::chrono::system_clock::now();
             std::time_t t = std::chrono::system_clock::to_time_t(now);
             std::tm localTm{};
-            localtime_s(&localTm, &t);
+            
+            #ifdef _WIN32
+                localtime_s(&localTm, &t);
+            #else
+                localtime_r(&t, &localTm);
+            #endif
 
             std::ostringstream oss;
             oss << std::put_time(&localTm, "%H:%M:%S");
@@ -38,7 +43,12 @@ namespace CE
             auto now = std::chrono::system_clock::now();
             std::time_t t = std::chrono::system_clock::to_time_t(now);
             std::tm localTm{};
-            localtime_s(&localTm, &t);
+
+            #ifdef _WIN32
+                localtime_s(&localTm, &t);
+            #else
+                localtime_r(&t, &localTm);
+            #endif
 
             std::ostringstream oss;
             oss << std::put_time(&localTm, "%Y-%m-%d_%H-%M-%S");

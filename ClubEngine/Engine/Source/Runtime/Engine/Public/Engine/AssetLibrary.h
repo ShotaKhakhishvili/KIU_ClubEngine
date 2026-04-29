@@ -1,11 +1,11 @@
 #pragma once
 
+#include <Core/ClubCore.h>
+
 #include <Engine/AssetContext.h>
 
 #include <CoreUObject/TObjectHandle.h>
 #include <CoreUObject/UObjectHandle.h>
-
-#include <Core/ClubCore.h>
 
 #include <filesystem>
 #include <string>

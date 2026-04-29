@@ -1,9 +1,9 @@
 #pragma once
 
-#include <CoreUObject/TObjectHandle.h>
+#include <Core/Types/RenderTypes.h>
+#include <Core/Math/Vector.h>
 
-#include <RenderCore/RenderTypes.h>
-#include <RenderCore/Vector.h>
+#include <CoreUObject/TObjectHandle.h>
 
 #include <Asset/UShader.h>
 #include <Asset/UTexture.h>
@@ -14,6 +14,8 @@
 class UMaterial : public UObject
 {
 public:
+    const char* GetClassName() const noexcept override;
+    
     UMaterial(TObjectHandle<UShader> shader);
     ~UMaterial();
 

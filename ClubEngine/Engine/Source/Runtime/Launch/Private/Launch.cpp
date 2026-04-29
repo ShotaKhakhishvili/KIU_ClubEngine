@@ -3,7 +3,6 @@
 #include <Engine/AssetLibrary.h>
 #include <Asset/IAssetResolver.h>
 #include <Core/ClubCore.h>
-#include <iostream>
 
 namespace CE
 {

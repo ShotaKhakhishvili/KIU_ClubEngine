@@ -3,6 +3,8 @@
 
 #include <Core/ClubCore.h>
 
+const char* UMaterial::GetClassName() const noexcept { return "UMaterial";}
+
 UMaterial::UMaterial(TObjectHandle<UShader> inShader)
     : UObject("UMaterial"), shader(inShader)
     {

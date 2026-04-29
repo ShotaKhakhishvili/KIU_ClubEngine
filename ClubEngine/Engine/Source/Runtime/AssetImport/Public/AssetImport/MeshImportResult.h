@@ -1,6 +1,6 @@
 #pragma once
 
-#include <RenderCore/Vertex.h>
+#include <Core/Types/Vertex.h>
 
 #include <cstdint>
 #include <string>

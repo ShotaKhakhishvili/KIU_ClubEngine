@@ -1,9 +1,10 @@
 #pragma once
 
+#include <Core/Types/RenderTypes.h>
+#include <Core/Types/RHITypes.h>
+
 #include <CoreUObject/UObject.h>
 
-#include <RenderCore/RenderTypes.h>
-#include <RenderCore/RHI/RHITypes.h>
 #include <RenderCore/RHI/RHIHandle.h>
 
 #include <filesystem>

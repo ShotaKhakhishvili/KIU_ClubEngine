@@ -1,8 +1,10 @@
 #include <Engine/Systems/RenderSystem.h>
 
-RenderSystem::RenderSystem(RHI::Backend backend)
+#include "../CEConvert.h"
+
+RenderSystem::RenderSystem(CE::RenderBackend backend)
 {
-    renderer = std::make_unique<Renderer>(backend);
+    renderer = std::make_unique<Renderer>(ToRHI(backend));
 }
 
 bool RenderSystem::Initialize()

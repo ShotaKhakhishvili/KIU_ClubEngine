@@ -1,7 +1,7 @@
 #pragma once
 
-#include <RenderCore/Vertex.h>
-#include <RenderCore/RenderTypes.h>
+#include <Core/Types/Vertex.h>
+#include <Core/Types/RenderTypes.h>
 
 #include <cstddef>
 #include <vector>

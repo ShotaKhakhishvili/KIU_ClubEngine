@@ -1,11 +1,11 @@
 #pragma once
 
+#include <CoreUObject/UObjectRegistry.h>
+
 #include <Asset/IAssetResolver.h>
 #include <Asset/UShader.h>
 #include <Asset/UTexture.h>
 #include <Asset/UMaterial.h>
-
-#include <CoreUObject/UObjectRegistry.h>
 
 #include <filesystem>
 #include <utility>

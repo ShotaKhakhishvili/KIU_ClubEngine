@@ -16,8 +16,10 @@ target_include_directories(CEProject
 )
 
 target_link_libraries(CEProject
-  PUBLIC
-    ClubEngine::Core
+    PUBLIC
+        ClubEngine::Core
+    PRIVATE
+        ThirdParty::nlohmann
 )
 
 target_compile_definitions(CEProject PRIVATE CEPROJECT_BUILD)

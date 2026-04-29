@@ -18,12 +18,11 @@ target_include_directories(CERenderer
 )
 
 target_link_libraries(CERenderer
-  PUBLIC
-    ClubEngine::RenderCore
   PRIVATE
     ClubEngine::Core
     ClubEngine::Asset
     ClubEngine::RHIOpenGL
+    ClubEngine::RenderCore
 )
 
 target_compile_definitions(CERenderer PRIVATE CERENDERER_BUILD)

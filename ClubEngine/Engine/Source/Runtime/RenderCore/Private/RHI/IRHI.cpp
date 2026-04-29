@@ -4,7 +4,7 @@
 
 namespace RHI
 {
-    static IRHI* GCurrentRHI = nullptr;
+    static std::unique_ptr<IRHI> GCurrentRHI;
 
     IRHI& Get()
     {
@@ -12,8 +12,8 @@ namespace RHI
         return *GCurrentRHI;
     }
 
-    void Set(IRHI* rhi)
+    void Set(std::unique_ptr<IRHI> newRHI)
     {
-        GCurrentRHI = rhi;
+        GCurrentRHI = std::move(newRHI);
     }
 }

@@ -63,9 +63,9 @@ void Renderer::SetBackend(RHI::Backend backend)
     {
         case RHI::Backend::OpenGL:
         {
-            GLRHI* glrhi = new GLRHI();
+            std::unique_ptr<GLRHI> glrhi = std::make_unique<GLRHI>();
             glrhi->Init();
-            RHI::Set(glrhi);
+            RHI::Set(std::move(glrhi));
             return;
         }
     }

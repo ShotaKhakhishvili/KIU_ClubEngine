@@ -1,18 +1,19 @@
 #pragma once
 
-#include <RenderCore/RHI/RHITypes.h>
+#include <Core/Types/RHITypes.h>
 
 #include <Asset/UStaticMesh.h>
 
 #include <Renderer/Renderer.h>
 
+#include <Engine/EngineTypes.h>
 #include <Engine/ISystem.h>
 
 class RenderSystem final : public ISystem
 {
 public:
 
-    RenderSystem(RHI::Backend backend = RHI::Backend::OpenGL); // Make OpenGL a default (not like we don't have anything else)
+    RenderSystem(CE::RenderBackend backend = CE::RenderBackend::OpenGL); // Make OpenGL a default (not like we don't have anything else)
 
     const char* GetName() const noexcept override;
 

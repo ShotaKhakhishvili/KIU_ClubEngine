@@ -1,6 +1,6 @@
 #pragma once
 
-#include <RenderCore/RenderTypes.h>
+#include <Core/Types/RenderTypes.h>
 
 #include <cstdint>
 #include <cstddef>
