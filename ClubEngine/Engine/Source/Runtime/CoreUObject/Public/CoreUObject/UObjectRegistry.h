@@ -46,7 +46,6 @@ public:
         return TObjectHandle<T>(handle);
     }
     
-
     template<typename T>
     T* Resolve(const TObjectHandle<T>& handle)
     {

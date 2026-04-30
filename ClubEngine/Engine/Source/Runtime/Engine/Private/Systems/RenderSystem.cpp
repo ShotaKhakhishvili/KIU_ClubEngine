@@ -39,9 +39,9 @@ int RenderSystem::Update(float dt)
     return 0;
 }
 
-void RenderSystem::SetBackend(RHI::Backend backend)
+void RenderSystem::SetBackend(CE::RenderBackend backend)
 {
-    renderer->SetBackend(backend);
+    renderer->SetBackend(ToRHI(backend));
 }
 
 void RenderSystem::AddMesh(UStaticMesh* newMesh)

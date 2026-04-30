@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Core/Types/RHITypes.h>
-
 #include <Asset/UStaticMesh.h>
 
 #include <Renderer/Renderer.h>
@@ -21,7 +19,7 @@ public:
     void Shutdown() override;
     int Update(float dt) override;
 
-    void SetBackend(RHI::Backend backend);
+    void SetBackend(CE::RenderBackend backend);
 
     void AddMesh(UStaticMesh* newMesh);
 
