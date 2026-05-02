@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-namespace RHI
+namespace CE::RHI
 {
     template<typename T>
     class RHIHandle

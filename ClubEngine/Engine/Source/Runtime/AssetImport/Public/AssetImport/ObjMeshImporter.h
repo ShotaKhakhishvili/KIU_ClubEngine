@@ -7,32 +7,35 @@
 #include <string>
 #include <vector>
 
-struct ObjImportSettings
+namespace CE
 {
-    bool flipV = true;
-    bool triangulate = true;
-    float scale = 1.0f;
-};
+    struct ObjImportSettings
+    {
+        bool flipV = true;
+        bool triangulate = true;
+        float scale = 1.0f;
+    };
 
-class ObjMeshImporter
-{
-public:
-    explicit ObjMeshImporter(ObjImportSettings settings = {});
+    class ObjMeshImporter
+    {
+    public:
+        explicit ObjMeshImporter(ObjImportSettings settings = {});
 
-    std::optional<MeshImportResult> Import(const std::filesystem::path& path);
+        std::optional<MeshImportResult> Import(const std::filesystem::path& path);
 
-    const std::vector<std::string>& GetErrors() const;
-    const std::vector<std::string>& GetWarnings() const;
+        const std::vector<std::string>& GetErrors() const;
+        const std::vector<std::string>& GetWarnings() const;
 
-private:
-    void ClearMessages();
+    private:
+        void ClearMessages();
 
-    void AddError(std::string message);
-    void AddWarning(std::string message);
+        void AddError(std::string message);
+        void AddWarning(std::string message);
 
-    ObjImportSettings settings;
+        ObjImportSettings settings;
 
-    std::vector<std::string> errors;
-    std::vector<std::string> warnings;
+        std::vector<std::string> errors;
+        std::vector<std::string> warnings;
 
-};
+    };
+}

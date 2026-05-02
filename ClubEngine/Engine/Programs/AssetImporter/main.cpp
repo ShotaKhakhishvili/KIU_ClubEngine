@@ -4,12 +4,12 @@
 
 int main()
 {
-    ObjImportSettings settings;
+    CE::ObjImportSettings settings;
     settings.flipV = true;
     settings.triangulate = true;
     settings.scale = 1.0f;
 
-    ObjMeshImporter importer(settings);
+    CE::ObjMeshImporter importer(settings);
 
     auto mesh = importer.Import("Assets/cube.obj");
 

@@ -1,75 +1,198 @@
 #pragma once
 
-struct Vec2f
+#include <concepts>
+#include <cmath>
+
+namespace CE
 {
-    float x{0.0f};
-    float y{0.0f};
 
-    constexpr Vec2f() = default;
-    constexpr Vec2f(float inX, float inY) : x(inX), y(inY) {}
+template<typename T>
+struct TVector2
+{
+    T x{}, y{};
 
-    template<typename TVec2>
-    explicit constexpr Vec2f(const TVec2& v)
-        : x(static_cast<float>(v.x)), y(static_cast<float>(v.y))
+    constexpr TVector2() = default;
+    constexpr TVector2(T x, T y) : x(x), y(y) {}
+
+    template<typename U>
+    explicit constexpr TVector2(const TVector2<U>& other)
+        :   x(static_cast<T>(other.x))
+        ,   y(static_cast<T>(other.y))
     {}
 
-    template<typename TVec2>
-    constexpr Vec2f& operator=(const TVec2& v)
+    constexpr TVector2 operator+(const TVector2& r) const {return {x + r.x, y + r.y}; }
+    constexpr TVector2  operator- (const TVector2& r) const { return {x-r.x, y-r.y}; }
+    constexpr TVector2  operator* (T s)              const { return {x*s,   y*s};   }
+    constexpr TVector2& operator+=(const TVector2& r)       { x+=r.x; y+=r.y; return *this; }
+    constexpr TVector2& operator-=(const TVector2& r)       { x-=r.x; y-=r.y; return *this; }
+    constexpr TVector2& operator*=(T s)                    { x*=s;   y*=s;   return *this;  }
+    constexpr TVector2  operator- ()                 const { return {-x, -y}; }
+    constexpr bool     operator==(const TVector2& r) const { return x==r.x && y==r.y; }
+    constexpr bool     operator!=(const TVector2& r) const { return !(*this == r); }
+
+    constexpr TVector2 operator /(T r) const
+        requires std::floating_point<T>
     {
-        x = static_cast<float>(v.x);
-        y = static_cast<float>(v.y);
+        return {x / r, y / r};
+    }
+
+    constexpr TVector2& operator /=(T r)
+        requires std::floating_point<T>
+    {
+        x /= r; y /= r;
         return *this;
     }
 };
 
-struct Vec3f
+template<typename T>
+struct TVector
 {
-    float x{0.0f};
-    float y{0.0f};
-    float z{0.0f};
+    T x{}, y{}, z{};
 
-    constexpr Vec3f() = default;
-    constexpr Vec3f(float inX, float inY, float inZ) : x(inX), y(inY), z(inZ) {}
+    constexpr TVector() = default;
+    constexpr TVector(T x, T y, T z) : x(x), y(y), z(z) {}
 
-    template<typename TVec3>
-    explicit constexpr Vec3f(const TVec3& v)
-        : x(static_cast<float>(v.x)), y(static_cast<float>(v.y)), z(static_cast<float>(v.z))
+    template<typename U>
+    explicit constexpr TVector(const TVector<U>& other)
+        :   x(static_cast<T>(other.x))
+        ,   y(static_cast<T>(other.y))
+        ,   z(static_cast<T>(other.z))
     {}
 
-    template<typename TVec3>
-    constexpr Vec3f& operator=(const TVec3& v)
+    constexpr TVector operator+(const TVector& r) const {return {x + r.x, y + r.y, z + r.z}; }
+    constexpr TVector  operator- (const TVector& r) const { return {x-r.x, y-r.y, z-r.z}; }
+    constexpr TVector  operator* (T s)              const { return {x*s,   y*s,   z*s};   }
+    constexpr TVector& operator+=(const TVector& r)       { x+=r.x; y+=r.y; z+=r.z; return *this; }
+    constexpr TVector& operator-=(const TVector& r)       { x-=r.x; y-=r.y; z-=r.z; return *this; }
+    constexpr TVector& operator*=(T s)                    { x*=s;   y*=s;   z*=s;   return *this; }
+    constexpr TVector  operator- ()                 const { return {-x, -y, -z}; }
+    constexpr bool     operator==(const TVector& r) const { return x==r.x && y==r.y && z==r.z; }
+    constexpr bool     operator!=(const TVector& r) const { return !(*this == r); }
+
+    constexpr TVector operator /(T r) const
+        requires std::floating_point<T>
     {
-        x = static_cast<float>(v.x);
-        y = static_cast<float>(v.y);
-        z = static_cast<float>(v.z);
+        return {x / r, y / r, z / r};
+    }
+
+    constexpr TVector& operator /=(T r) 
+        requires std::floating_point<T>
+    {
+        x /= r; y /= r; z /= r;
         return *this;
     }
+
+    constexpr TVector2<T> XY() const { return {x, y}; }
 };
 
-struct Vec4f
+template<typename T>
+struct TVector4
 {
-    float x{0.0f};
-    float y{0.0f};
-    float z{0.0f};
-    float w{0.0f};
+    T x{}, y{}, z{}, w{};
 
-    constexpr Vec4f() = default;
-    constexpr Vec4f(float inX, float inY, float inZ, float inW)
-        : x(inX), y(inY), z(inZ), w(inW)
+    constexpr TVector4() = default;
+    constexpr TVector4(T x, T y, T z, T w) : x(x), y(y), z(z), w(w) {}
+    constexpr TVector4(TVector<T> v, T w) : x(v.x), y(v.y), z(v.z), w(w) {}
+
+    template<typename U>
+    explicit constexpr TVector4(const TVector4<U>& other)
+        :   x(static_cast<T>(other.x))
+        ,   y(static_cast<T>(other.y))
+        ,   z(static_cast<T>(other.z))
+        ,   w(static_cast<T>(other.w))
     {}
 
-    template<typename TVec4>
-    explicit constexpr Vec4f(const TVec4& v)
-        : x(static_cast<float>(v.x)), y(static_cast<float>(v.y)), z(static_cast<float>(v.z)), w(static_cast<float>(v.w))
-    {}
+    constexpr TVector4 operator+(const TVector4& r) const {return {x+r.x, y+r.y, z+r.z, w+r.w}; }
+    constexpr TVector4  operator- (const TVector4& r) const { return {x-r.x, y-r.y, z-r.z, w-r.w};              }
+    constexpr TVector4  operator* (T s)              const { return {x*s,   y*s,   z*s, w*s};                   }
+    constexpr TVector4& operator+=(const TVector4& r)       { x+=r.x; y+=r.y; z+=r.z; w += r.w; return *this;   }
+    constexpr TVector4& operator-=(const TVector4& r)       { x-=r.x; y-=r.y; z-=r.z; w -= r.w; return *this;   }
+    constexpr TVector4& operator*=(T s)                    { x*=s;   y*=s;   z*=s;   w*=s;     return *this;    }
+    constexpr TVector4  operator- ()                 const { return {-x, -y, -z, -w}; }
+    constexpr bool     operator==(const TVector4& r) const { return x==r.x && y==r.y && z==r.z && w==r.w; }
+    constexpr bool     operator!=(const TVector4& r) const { return !(*this == r); }
 
-    template<typename TVec4>
-    constexpr Vec4f& operator=(const TVec4& v)
+    constexpr TVector4 operator /(T r) const
+        requires std::floating_point<T>
     {
-        x = static_cast<float>(v.x);
-        y = static_cast<float>(v.y);
-        z = static_cast<float>(v.z);
-        w = static_cast<float>(v.w);
+        return {x / r, y / r, z / r, w / r};
+    }
+
+    constexpr TVector4& operator /=(T r)
+        requires std::floating_point<T>
+    {
+        x /= r; y /= r; z /= r; w /= r;
         return *this;
     }
+
+    constexpr TVector<T> XYZ() const { return {x, y, z}; }
+    constexpr TVector2<T> XY() const { return {x, y}; }
 };
+
+template<typename T>
+constexpr TVector2<T> operator*(T s, const TVector2<T>& v) { return v * s; }
+
+template<typename T>
+constexpr TVector<T> operator*(T s, const TVector<T>& v) { return v * s; }
+
+template<typename T>
+constexpr TVector4<T> operator*(T s, const TVector4<T>& v) { return v * s; }
+
+using FVector = TVector<double>;
+using FVectorF = TVector<float>;
+using FVectorI = TVector<int>;
+
+using FVector2F = TVector2<float>;
+using FVector2D = TVector2<double>;
+using FVector2I = TVector2<int>;
+
+using FVector4F = TVector4<float>;
+using FVector4D = TVector4<double>;
+using FVector4I = TVector4<int>;
+
+
+template<typename T>
+inline T Lerp     (T a, T b, float t)  { return a + (b - a) * t; }
+
+
+template<typename T>
+constexpr T Dot(TVector2<T> a, TVector2<T> b){ return a.x*b.x + a.y*b.y; }
+template<typename T>
+constexpr T Dot(TVector<T> a, TVector<T> b){ return a.x*b.x + a.y*b.y + a.z*b.z; }
+template<typename T>
+constexpr T Dot(TVector4<T> a, TVector4<T> b){ return a.x*b.x + a.y*b.y + a.z*b.z + a.w*b.w; }
+
+template<typename T>
+constexpr TVector<T> Cross(TVector<T> a, TVector<T> b)
+{
+    return {
+        a.y*b.z - a.z*b.y,
+        a.z*b.x - a.x*b.z,
+        a.x*b.y - a.y*b.x
+    };
+}
+
+inline float    Length   (FVector2F v)                      { return std::sqrt(Dot(v, v)); }
+inline double   Length   (FVector2D v)                      { return std::sqrt(Dot(v, v)); }
+inline FVector2F Normalize(FVector2F v)                     { return v / Length(v); }
+inline FVector2D Normalize(FVector2D v)                     { return v / Length(v); }
+
+inline float    Length   (FVectorF v)                       { return std::sqrt(Dot(v, v)); }
+inline double   Length   (FVector v)                        { return std::sqrt(Dot(v, v)); }
+inline FVectorF Normalize(FVectorF v)                       { return v / Length(v); }
+inline FVector Normalize(FVector v)                         { return v / Length(v); }
+
+inline float    Length   (FVector4F v)  { return std::sqrt(Dot(v, v)); }
+inline double   Length   (FVector4D v)  { return std::sqrt(Dot(v, v)); }
+inline FVector4F Normalize(FVector4F v) { return v / Length(v); }
+inline FVector4D Normalize(FVector4D v) { return v / Length(v); }
+
+template<typename T>
+constexpr bool NearlyEqual(TVector<T> a, TVector<T> b, T tolerance)
+{
+    return std::abs(a.x - b.x) < tolerance
+        && std::abs(a.y - b.y) < tolerance
+        && std::abs(a.z - b.z) < tolerance;
+}
+
+}

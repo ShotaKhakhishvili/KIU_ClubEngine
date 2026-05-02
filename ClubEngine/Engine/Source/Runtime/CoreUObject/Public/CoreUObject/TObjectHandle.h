@@ -2,6 +2,9 @@
 
 #include <CoreUObject/UObjectHandle.h>
 
+namespace CE
+{
+
 template<typename T>
 class TObjectHandle
 {
@@ -25,3 +28,5 @@ private:
 
     UObjectHandle handle{};
 };
+
+}

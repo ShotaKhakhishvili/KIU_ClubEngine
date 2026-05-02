@@ -1,19 +1,20 @@
 #include <Asset/IAssetResolver.h>
 
-namespace
+namespace CE
 {
-    IAssetResolver* GAssetResolver = nullptr;
+    namespace
+    {
+        IAssetResolver* GAssetResolver = nullptr;
+    }
+
+IAssetResolver* GetCurrentAssetResolver() noexcept
+{
+    return GAssetResolver;
 }
 
-namespace Asset
+void SetCurrentAssetResolver(IAssetResolver* resolver) noexcept
 {
-    IAssetResolver* GetCurrentAssetResolver() noexcept
-    {
-        return GAssetResolver;
-    }
+    GAssetResolver = resolver;
+}
 
-    void SetCurrentAssetResolver(IAssetResolver* resolver) noexcept
-    {
-        GAssetResolver = resolver;
-    }
 }

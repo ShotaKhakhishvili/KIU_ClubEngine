@@ -7,6 +7,9 @@
 #include <Engine/EngineTypes.h>
 #include <Engine/ISystem.h>
 
+namespace CE
+{
+
 class RenderSystem final : public ISystem
 {
 public:
@@ -27,3 +30,5 @@ private:
     std::vector<UStaticMesh*> meshesToRender;   // testing purposes
     std::unique_ptr<Renderer> renderer;
 };
+
+}

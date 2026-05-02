@@ -1,5 +1,8 @@
 #pragma once
 
+namespace CE
+{
+
 class ISystem
 {
 public:
@@ -11,3 +14,5 @@ public:
     virtual void Shutdown();
     virtual int Update(float dt) = 0;
 };
+
+}

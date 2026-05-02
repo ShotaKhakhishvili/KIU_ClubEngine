@@ -1,51 +1,18 @@
 cmake_minimum_required(VERSION 3.20)
-
+cmake_policy(SET CMP0144 NEW)
 project([PROJ_NAME] LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-if(NOT DEFINED ENV{CLUBENGINE_ROOT})
-    message(FATAL_ERROR "CLUBENGINE_ROOT is not set. Run club-init first.")
-endif()
-
-add_subdirectory(
-    "$ENV{CLUBENGINE_ROOT}"
-    "${CMAKE_BINARY_DIR}/ClubEngine"
+find_package(ClubEngine REQUIRED
+    PATHS "${CLUBENGINE_ROOT}/Binaries/${CE_PLATFORM_NAME}/${CMAKE_BUILD_TYPE}/${CE_ENGINE_VERSION}"
+    NO_DEFAULT_PATH
 )
 
-if(WIN32)
-    set(CE_PLATFORM_NAME "Win64")
-elseif(UNIX)
-    set(CE_PLATFORM_NAME "Linux64")
-else()
-    set(CE_PLATFORM_NAME "UnknownPlatform")
-endif()
-
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type" FORCE)
-endif()
-
-set(PROJECT_OUTPUT_ROOT
-    "${CMAKE_SOURCE_DIR}/Binaries/${CE_PLATFORM_NAME}/${CMAKE_BUILD_TYPE}/${CLUBENGINE_VERSION}"
-)
-
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_OUTPUT_ROOT}")
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_OUTPUT_ROOT}")
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY
-    "${CMAKE_SOURCE_DIR}/Intermediate/${CE_PLATFORM_NAME}/${CMAKE_BUILD_TYPE}/${CLUBENGINE_VERSION}"
-)
-
-file(GLOB_RECURSE [PROJ_NAME]_PUBLIC CONFIGURE_DEPENDS
-    "${CMAKE_CURRENT_SOURCE_DIR}/Source/[PROJ_NAME]/Public/*.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/Source/[PROJ_NAME]/Public/*.hpp"
-)
-
-file(GLOB_RECURSE [PROJ_NAME]_PRIVATE CONFIGURE_DEPENDS
-    "${CMAKE_CURRENT_SOURCE_DIR}/Source/[PROJ_NAME]/Private/*.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/Source/[PROJ_NAME]/Private/*.c"
-)
+file(GLOB_RECURSE [PROJ_NAME]_PUBLIC  CONFIGURE_DEPENDS "Source/[PROJ_NAME]/Public/*.h")
+file(GLOB_RECURSE [PROJ_NAME]_PRIVATE CONFIGURE_DEPENDS "Source/[PROJ_NAME]/Private/*.cpp")
 
 add_executable([PROJ_NAME]
     Source/Entry.cpp
@@ -53,15 +20,17 @@ add_executable([PROJ_NAME]
     ${[PROJ_NAME]_PRIVATE}
 )
 
-target_include_directories([PROJ_NAME]
-    PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/Source/[PROJ_NAME]/Public
-        ${CMAKE_CURRENT_SOURCE_DIR}/Source/[PROJ_NAME]/Private
+target_include_directories([PROJ_NAME] PRIVATE
+    Source/[PROJ_NAME]/Public
+    Source/[PROJ_NAME]/Private
 )
 
-target_link_libraries([PROJ_NAME]
-    PRIVATE
-        ClubEngine::Launch
+target_link_libraries([PROJ_NAME] PRIVATE
+    ClubEngine::Launch
 )
 
-ce_apply_warnings([PROJ_NAME])
+add_custom_command(TARGET [PROJ_NAME] POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CLUBENGINE_ROOT}/Binaries/${CE_PLATFORM_NAME}/${CMAKE_BUILD_TYPE}/${CE_ENGINE_VERSION}"
+        "$<TARGET_FILE_DIR:[PROJ_NAME]>"
+)

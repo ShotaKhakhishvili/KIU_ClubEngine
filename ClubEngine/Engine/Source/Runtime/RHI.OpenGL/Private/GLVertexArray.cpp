@@ -6,6 +6,9 @@
 #include <glad/glad.h>
 #include <cassert>
 
+namespace CE::RHI
+{
+
 GLVertexArray::GLVertexArray()
 {
     glGenVertexArrays(1, &ID);
@@ -70,4 +73,6 @@ GLVertexArray& GLVertexArray::operator=(GLVertexArray&& other) noexcept
         other.ID = 0;
     }
     return *this;
+}
+
 }

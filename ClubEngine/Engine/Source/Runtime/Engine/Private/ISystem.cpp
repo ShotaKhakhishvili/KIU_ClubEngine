@@ -1,5 +1,8 @@
 #include <Engine/ISystem.h>
 
+namespace CE
+{
+
 bool ISystem::Initialize()
 {
     return true;
@@ -7,5 +10,7 @@ bool ISystem::Initialize()
 
 void ISystem::Shutdown()
 {
+
+}
 
 }

@@ -6,6 +6,9 @@
 
 #include <string>
 
+namespace CE::RHI
+{
+
 namespace ShaderUtils
 {
     enum class ShaderType
@@ -231,4 +234,6 @@ void GLShader::SetTexture(const std::string& name, uint32_t slot)
         return;
 
     glUniform1i(location, slot);
+}
+
 }

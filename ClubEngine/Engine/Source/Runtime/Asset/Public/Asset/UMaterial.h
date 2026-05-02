@@ -1,6 +1,5 @@
 #pragma once
 
-#include <Core/Types/RenderTypes.h>
 #include <Core/Math/Vector.h>
 
 #include <CoreUObject/TObjectHandle.h>
@@ -10,6 +9,9 @@
 
 #include <string>
 #include <unordered_map>
+
+namespace CE
+{
 
 class UMaterial : public UObject
 {
@@ -43,9 +45,9 @@ private:
     std::unordered_map<std::string, bool> bools;
     std::unordered_map<std::string, int32_t> ints;
     std::unordered_map<std::string, float> floats;
-    std::unordered_map<std::string, Vec2f> vectors_2;
-    std::unordered_map<std::string, Vec3f> vectors_3;
-    std::unordered_map<std::string, Vec4f> vectors_4;
+    std::unordered_map<std::string, FVector2F> vectors_2;
+    std::unordered_map<std::string, FVectorF> vectors_3;
+    std::unordered_map<std::string, FVector4F> vectors_4;
     std::unordered_map<std::string, TObjectHandle<UTexture>> textures;
 
     RHI::BlendMode blendMode = RHI::BlendMode::Opaque;
@@ -53,3 +55,5 @@ private:
     bool depthWrite = true;
     bool depthTest = true;
 };
+
+}

@@ -13,25 +13,26 @@
 
 namespace CE
 {
-    class AssetContext;
+class AssetContext;
 
-    AssetContext* GetCurrentAssetContext() noexcept;
-    const AssetContext* GetCurrentAssetContextConst() noexcept;
-    void SetCurrentAssetContext(AssetContext* context) noexcept;
+AssetContext* GetCurrentAssetContext() noexcept;
+const AssetContext* GetCurrentAssetContextConst() noexcept;
+void SetCurrentAssetContext(AssetContext* context) noexcept;
 
-    template<typename T, typename... Args>
-    TObjectHandle<T> NewObject(Args&&... args)
+template<typename T, typename... Args>
+TObjectHandle<T> NewObject(Args&&... args)
+{
+    AssetContext* context = GetCurrentAssetContext();
+
+    if(context == nullptr)
     {
-        AssetContext* context = GetCurrentAssetContext();
-
-        if(context == nullptr)
-        {
-            CE_LOG(Error, "NewObject called without an active AssetContext");
-            return {};
-        }
-
-        return context->Create<T>(std::forward<Args>(args)...);
+        CE_LOG(Error, "NewObject called without an active AssetContext");
+        return {};
     }
 
-    void DestroyAsset(UObjectHandle handle);
+    return context->Create<T>(std::forward<Args>(args)...);
+}
+
+void DestroyAsset(UObjectHandle handle);
+
 }

@@ -1,5 +1,7 @@
 #include <Engine/Systems/FpsSystem.h>
 
+namespace CE
+{
 
 const char* FpsSystem::GetName() const noexcept
 {
@@ -31,4 +33,6 @@ float FpsSystem::GetFPS() const
         return 0.0f;
 
     return static_cast<float>(deltas.size()) / acc;
+}
+
 }

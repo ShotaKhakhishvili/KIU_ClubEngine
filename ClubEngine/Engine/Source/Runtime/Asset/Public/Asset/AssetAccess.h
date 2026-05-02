@@ -3,19 +3,21 @@
 #include <CoreUObject/TObjectHandle.h>
 #include <Asset/IAssetResolver.h>
 
+namespace CE
+{
+
 class UShader;
 class UTexture;
 
-namespace CE
+template<typename T>
+T* Resolve(TObjectHandle<T> handle) noexcept
 {
-    template<typename T>
-    T* Resolve(TObjectHandle<T> handle) noexcept
-    {
-        IAssetResolver* resolver = Asset::GetCurrentAssetResolver();
+    IAssetResolver* resolver = GetCurrentAssetResolver();
 
-        if(resolver == nullptr)
-            return nullptr;
+    if(resolver == nullptr)
+        return nullptr;
 
-        return resolver->Resolve(handle);  
-    }
+    return resolver->Resolve(handle);  
+}
+
 }

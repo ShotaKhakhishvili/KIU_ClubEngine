@@ -9,6 +9,9 @@
 #include <string>
 #include <utility>
 
+namespace CE
+{
+
 UShader::UShader(const RHI::ShaderDesc& inShaderDesc, std::string inName)
 	: UObject(std::move(inName)), shaderDesc(inShaderDesc)
 {
@@ -115,3 +118,4 @@ void UShader::SetVec4(const std::string& name, float x, float y, float z, float 
 	RHI::Get().SetUniformVec4(name, {x,y,z,w});
 }
 
+}

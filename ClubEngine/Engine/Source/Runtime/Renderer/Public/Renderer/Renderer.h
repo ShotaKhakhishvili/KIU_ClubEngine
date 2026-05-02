@@ -4,6 +4,9 @@
 
 #include <Asset/UStaticMesh.h>
 
+namespace CE
+{
+
 class Renderer
 {
 public:
@@ -21,3 +24,5 @@ public:
 private:
     RHI::Backend backend;
 };
+
+}

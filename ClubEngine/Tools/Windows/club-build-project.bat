@@ -80,12 +80,15 @@ echo EngineVersion:     %ENGINE_VERSION%
 echo Build:             %BUILD_DIR%
 echo.
 
-cmake -S "%PROJECT_ROOT%" -B "%BUILD_DIR%" -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=%CONFIG%
+cmake -S "%PROJECT_ROOT%" -B "%BUILD_DIR%" -G "MinGW Makefiles" ^
+    -DCMAKE_BUILD_TYPE=%CONFIG% ^
+    -DCLUBENGINE_ROOT="%CLUBENGINE_ROOT%" ^
+    -DCE_ENGINE_VERSION="%ENGINE_VERSION%" ^
+    -DCE_PLATFORM_NAME="%PLATFORM%"
 if errorlevel 1 exit /b 1
 
 cmake --build "%BUILD_DIR%" --target "%PROJECT_NAME%"
 if errorlevel 1 exit /b 1
-
 echo.
 echo Project build complete.
 echo Output:

@@ -11,6 +11,9 @@
 #include <glad/glad.h>
 #include <cassert>
 
+namespace CE::RHI
+{
+
 GLRHI::GLRHI() = default;
 GLRHI::~GLRHI() = default;
 
@@ -399,19 +402,19 @@ void GLRHI::SetUniformFloat(const std::string& name, float value)
     shaders[currentShader.id]->SetFloat(name, value);
 }
 
-void GLRHI::SetUniformVec2(const std::string& name, const Vec2f& value)
+void GLRHI::SetUniformVec2(const std::string& name, const FVector2F& value)
 {
     assert(currentShader.IsValid());
     shaders[currentShader.id]->SetVec2(name, value.x, value.y);
 }
 
-void GLRHI::SetUniformVec3(const std::string& name, const Vec3f& value)
+void GLRHI::SetUniformVec3(const std::string& name, const FVectorF& value)
 {
     assert(currentShader.IsValid());
     shaders[currentShader.id]->SetVec3(name, value.x, value.y, value.z);
 }
 
-void GLRHI::SetUniformVec4(const std::string& name, const Vec4f& value)
+void GLRHI::SetUniformVec4(const std::string& name, const FVector4F& value)
 {
     assert(currentShader.IsValid());
     shaders[currentShader.id]->SetVec4(name, value.x, value.y, value.z, value.w);
@@ -454,4 +457,6 @@ void GLRHI::DrawIndexed(const RHI::DrawIndexedDesc& desc)
             static_cast<uintptr_t>(byteOffset)
         )
     );
+}
+
 }

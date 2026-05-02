@@ -1,5 +1,8 @@
 #include "CEConvert.h"
 
+namespace CE
+{
+
 RHI::Backend ToRHI(CE::RenderBackend renderBackend)
 {
     switch(renderBackend)
@@ -9,4 +12,6 @@ RHI::Backend ToRHI(CE::RenderBackend renderBackend)
         default:
             return RHI::Backend::OpenGL;
     }
+}
+
 }

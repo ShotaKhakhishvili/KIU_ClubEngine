@@ -1,7 +1,6 @@
 #pragma once
 #include <Launch/Launch.h>
 #include <Engine/Application.h>
-#include <iostream>
 
 namespace CE
 {

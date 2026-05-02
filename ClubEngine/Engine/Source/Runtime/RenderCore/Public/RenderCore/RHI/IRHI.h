@@ -9,7 +9,7 @@
 #include <string>
 #include <memory>
 
-namespace RHI
+namespace CE::RHI
 {
     class IRHI
     {
@@ -81,9 +81,9 @@ namespace RHI
         virtual void SetUniformBool(const std::string& name, bool value) = 0;
         virtual void SetUniformInt(const std::string& name, int32_t value) = 0;
         virtual void SetUniformFloat(const std::string& name, float value) = 0;
-        virtual void SetUniformVec2(const std::string& name, const Vec2f& value) = 0;
-        virtual void SetUniformVec3(const std::string& name, const Vec3f& value) = 0;
-        virtual void SetUniformVec4(const std::string& name, const Vec4f& value) = 0;
+        virtual void SetUniformVec2(const std::string& name, const CE::FVector2F& value) = 0;
+        virtual void SetUniformVec3(const std::string& name, const CE::FVectorF& value) = 0;
+        virtual void SetUniformVec4(const std::string& name, const CE::FVector4F& value) = 0;
         virtual void SetTexture(const std::string& name, TextureHandle texture, uint32_t slot) = 0;
 
         // ------------ Draw ------------

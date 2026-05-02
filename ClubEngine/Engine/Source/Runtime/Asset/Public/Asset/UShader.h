@@ -10,6 +10,9 @@
 #include <memory>
 #include <string>
 
+namespace CE
+{
+
 class UShader final : public UObject
 {
 public:
@@ -40,3 +43,5 @@ private:
     RHI::ShaderDesc shaderDesc;
     RHI::ShaderHandle handle;    
 };
+
+}

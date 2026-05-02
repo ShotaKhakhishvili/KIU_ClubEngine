@@ -5,287 +5,290 @@
 #include <string>
 #include <unordered_map>
 
-struct ObjVertexKey
+namespace CE
 {
-    int positionIndex = -1;
-    int texCoordIndex = -1;
-    int normalIndex   = -1;
-
-    bool operator==(const ObjVertexKey& other) const
+    struct ObjVertexKey
     {
-        return positionIndex == other.positionIndex &&
-               texCoordIndex == other.texCoordIndex &&
-               normalIndex == other.normalIndex;
-    }
-};
+        int positionIndex = -1;
+        int texCoordIndex = -1;
+        int normalIndex   = -1;
 
-struct ObjVertexKeyHash
-{
-    std::size_t operator()(const ObjVertexKey& key) const
-    {
-        const std::size_t h1 = std::hash<int>{}(key.positionIndex);
-        const std::size_t h2 = std::hash<int>{}(key.texCoordIndex);
-        const std::size_t h3 = std::hash<int>{}(key.normalIndex);
-
-        return h1 ^ (h2 << 1) ^ (h3 << 2);
-    }
-};
-
-ObjMeshImporter::ObjMeshImporter(ObjImportSettings inSettings)
-    : settings(inSettings)
-{
-}
-
-std::optional<MeshImportResult> ObjMeshImporter::Import(const std::filesystem::path& path)
-{
-    ClearMessages();
-
-    std::ifstream file(path);
-
-    if (!file.is_open())
-    {
-        AddError("Failed to open OBJ file: " + path.string());
-        return std::nullopt;
-    }
-
-    MeshImportResult result;
-
-    std::vector<Vec3f> positions;
-    std::vector<Vec2f> texCoords;
-    std::vector<Vec3f> normals;
-
-    std::unordered_map<ObjVertexKey, uint32_t, ObjVertexKeyHash> vertexCache;
-
-    MeshImportSection currentSection;
-    currentSection.name = "Default";
-    currentSection.materialName = "Default";
-    currentSection.indexStart = 0;
-
-    auto FinishCurrentSection = [&]()
-    {
-        currentSection.indexCount =
-            static_cast<uint32_t>(result.indices.size()) - currentSection.indexStart;
-
-        if (currentSection.indexCount > 0)
+        bool operator==(const ObjVertexKey& other) const
         {
-            result.sections.push_back(currentSection);
+            return positionIndex == other.positionIndex &&
+                texCoordIndex == other.texCoordIndex &&
+                normalIndex == other.normalIndex;
         }
     };
 
-    auto ParseFaceVertex = [](const std::string& text) -> ObjVertexKey
+    struct ObjVertexKeyHash
     {
-        ObjVertexKey key;
-
-        std::stringstream ss(text);
-        std::string part;
-
-        if (std::getline(ss, part, '/') && !part.empty())
+        std::size_t operator()(const ObjVertexKey& key) const
         {
-            key.positionIndex = std::stoi(part) - 1;
-        }
+            const std::size_t h1 = std::hash<int>{}(key.positionIndex);
+            const std::size_t h2 = std::hash<int>{}(key.texCoordIndex);
+            const std::size_t h3 = std::hash<int>{}(key.normalIndex);
 
-        if (std::getline(ss, part, '/') && !part.empty())
-        {
-            key.texCoordIndex = std::stoi(part) - 1;
+            return h1 ^ (h2 << 1) ^ (h3 << 2);
         }
-
-        if (std::getline(ss, part, '/') && !part.empty())
-        {
-            key.normalIndex = std::stoi(part) - 1;
-        }
-
-        return key;
     };
 
-    auto BuildVertex = [&](const ObjVertexKey& key) -> Vertex
+    ObjMeshImporter::ObjMeshImporter(ObjImportSettings inSettings)
+        : settings(inSettings)
     {
-        Vertex vertex;
+    }
 
-        if (key.positionIndex >= 0 && key.positionIndex < static_cast<int>(positions.size()))
-        {
-            vertex.coord = positions[key.positionIndex];
-
-            vertex.coord.x *= settings.scale;
-            vertex.coord.y *= settings.scale;
-            vertex.coord.z *= settings.scale;
-        }
-
-        if (key.normalIndex >= 0 && key.normalIndex < static_cast<int>(normals.size()))
-        {
-            vertex.normal = normals[key.normalIndex];
-        }
-
-        if (key.texCoordIndex >= 0 && key.texCoordIndex < static_cast<int>(texCoords.size()))
-        {
-            vertex.texUV = texCoords[key.texCoordIndex];
-
-            if (settings.flipV)
-            {
-                vertex.texUV.y = 1.0f - vertex.texUV.y;
-            }
-        }
-
-        vertex.color = Vec3f{1.0f, 1.0f, 1.0f};
-
-        return vertex;
-    };
-
-    std::string line;
-    uint32_t lineNumber = 0;
-
-    while (std::getline(file, line))
+    std::optional<MeshImportResult> ObjMeshImporter::Import(const std::filesystem::path& path)
     {
-        ++lineNumber;
+        ClearMessages();
 
-        if (line.empty() || line[0] == '#')
+        std::ifstream file(path);
+
+        if (!file.is_open())
         {
-            continue;
+            AddError("Failed to open OBJ file: " + path.string());
+            return std::nullopt;
         }
 
-        std::stringstream ss(line);
+        MeshImportResult result;
 
-        std::string type;
-        ss >> type;
+        std::vector<FVectorF> positions;
+        std::vector<FVector2F> texCoords;
+        std::vector<FVectorF> normals;
 
-        if (type == "v")
-        {
-            Vec3f position;
-            ss >> position.x >> position.y >> position.z;
-            positions.push_back(position);
-        }
-        else if (type == "vt")
-        {
-            Vec2f texCoord;
-            ss >> texCoord.x >> texCoord.y;
-            texCoords.push_back(texCoord);
-        }
-        else if (type == "vn")
-        {
-            Vec3f normal;
-            ss >> normal.x >> normal.y >> normal.z;
-            normals.push_back(normal);
-        }
-        else if (type == "o" || type == "g")
-        {
-            FinishCurrentSection();
+        std::unordered_map<ObjVertexKey, uint32_t, ObjVertexKeyHash> vertexCache;
 
-            currentSection = {};
-            ss >> currentSection.name;
+        MeshImportSection currentSection;
+        currentSection.name = "Default";
+        currentSection.materialName = "Default";
+        currentSection.indexStart = 0;
 
-            if (currentSection.name.empty())
+        auto FinishCurrentSection = [&]()
+        {
+            currentSection.indexCount =
+                static_cast<uint32_t>(result.indices.size()) - currentSection.indexStart;
+
+            if (currentSection.indexCount > 0)
             {
-                currentSection.name = "Unnamed";
+                result.sections.push_back(currentSection);
+            }
+        };
+
+        auto ParseFaceVertex = [](const std::string& text) -> ObjVertexKey
+        {
+            ObjVertexKey key;
+
+            std::stringstream ss(text);
+            std::string part;
+
+            if (std::getline(ss, part, '/') && !part.empty())
+            {
+                key.positionIndex = std::stoi(part) - 1;
             }
 
-            currentSection.materialName = "Default";
-            currentSection.indexStart = static_cast<uint32_t>(result.indices.size());
-        }
-        else if (type == "usemtl")
-        {
-            FinishCurrentSection();
-
-            currentSection = {};
-            currentSection.name = "Section";
-            ss >> currentSection.materialName;
-
-            if (currentSection.materialName.empty())
+            if (std::getline(ss, part, '/') && !part.empty())
             {
-                currentSection.materialName = "Default";
+                key.texCoordIndex = std::stoi(part) - 1;
             }
 
-            currentSection.indexStart = static_cast<uint32_t>(result.indices.size());
-        }
-        else if (type == "f")
-        {
-            std::vector<uint32_t> faceIndices;
-            std::string vertexText;
-
-            while (ss >> vertexText)
+            if (std::getline(ss, part, '/') && !part.empty())
             {
-                ObjVertexKey key;
+                key.normalIndex = std::stoi(part) - 1;
+            }
 
-                try
+            return key;
+        };
+
+        auto BuildVertex = [&](const ObjVertexKey& key) -> Vertex
+        {
+            Vertex vertex;
+
+            if (key.positionIndex >= 0 && key.positionIndex < static_cast<int>(positions.size()))
+            {
+                vertex.coord = positions[key.positionIndex];
+
+                vertex.coord.x *= settings.scale;
+                vertex.coord.y *= settings.scale;
+                vertex.coord.z *= settings.scale;
+            }
+
+            if (key.normalIndex >= 0 && key.normalIndex < static_cast<int>(normals.size()))
+            {
+                vertex.normal = normals[key.normalIndex];
+            }
+
+            if (key.texCoordIndex >= 0 && key.texCoordIndex < static_cast<int>(texCoords.size()))
+            {
+                vertex.texUV = texCoords[key.texCoordIndex];
+
+                if (settings.flipV)
                 {
-                    key = ParseFaceVertex(vertexText);
+                    vertex.texUV.y = 1.0f - vertex.texUV.y;
                 }
-                catch (...)
+            }
+
+            vertex.color = FVectorF{1.0f, 1.0f, 1.0f};
+
+            return vertex;
+        };
+
+        std::string line;
+        uint32_t lineNumber = 0;
+
+        while (std::getline(file, line))
+        {
+            ++lineNumber;
+
+            if (line.empty() || line[0] == '#')
+            {
+                continue;
+            }
+
+            std::stringstream ss(line);
+
+            std::string type;
+            ss >> type;
+
+            if (type == "v")
+            {
+                FVectorF position;
+                ss >> position.x >> position.y >> position.z;
+                positions.push_back(position);
+            }
+            else if (type == "vt")
+            {
+                FVector2F texCoord;
+                ss >> texCoord.x >> texCoord.y;
+                texCoords.push_back(texCoord);
+            }
+            else if (type == "vn")
+            {
+                FVectorF normal;
+                ss >> normal.x >> normal.y >> normal.z;
+                normals.push_back(normal);
+            }
+            else if (type == "o" || type == "g")
+            {
+                FinishCurrentSection();
+
+                currentSection = {};
+                ss >> currentSection.name;
+
+                if (currentSection.name.empty())
                 {
-                    AddWarning("Invalid face vertex at line " + std::to_string(lineNumber));
+                    currentSection.name = "Unnamed";
+                }
+
+                currentSection.materialName = "Default";
+                currentSection.indexStart = static_cast<uint32_t>(result.indices.size());
+            }
+            else if (type == "usemtl")
+            {
+                FinishCurrentSection();
+
+                currentSection = {};
+                currentSection.name = "Section";
+                ss >> currentSection.materialName;
+
+                if (currentSection.materialName.empty())
+                {
+                    currentSection.materialName = "Default";
+                }
+
+                currentSection.indexStart = static_cast<uint32_t>(result.indices.size());
+            }
+            else if (type == "f")
+            {
+                std::vector<uint32_t> faceIndices;
+                std::string vertexText;
+
+                while (ss >> vertexText)
+                {
+                    ObjVertexKey key;
+
+                    try
+                    {
+                        key = ParseFaceVertex(vertexText);
+                    }
+                    catch (...)
+                    {
+                        AddWarning("Invalid face vertex at line " + std::to_string(lineNumber));
+                        continue;
+                    }
+
+                    auto it = vertexCache.find(key);
+
+                    if (it != vertexCache.end())
+                    {
+                        faceIndices.push_back(it->second);
+                    }
+                    else
+                    {
+                        Vertex vertex = BuildVertex(key);
+
+                        const uint32_t newIndex = static_cast<uint32_t>(result.vertices.size());
+
+                        result.vertices.push_back(vertex);
+                        vertexCache[key] = newIndex;
+                        faceIndices.push_back(newIndex);
+                    }
+                }
+
+                if (faceIndices.size() < 3)
+                {
+                    AddWarning("Face with less than 3 vertices at line " + std::to_string(lineNumber));
                     continue;
                 }
 
-                auto it = vertexCache.find(key);
-
-                if (it != vertexCache.end())
+                if (!settings.triangulate && faceIndices.size() != 3)
                 {
-                    faceIndices.push_back(it->second);
+                    AddWarning("Non-triangle face skipped at line " + std::to_string(lineNumber));
+                    continue;
                 }
-                else
+
+                for (size_t i = 1; i + 1 < faceIndices.size(); ++i)
                 {
-                    Vertex vertex = BuildVertex(key);
-
-                    const uint32_t newIndex = static_cast<uint32_t>(result.vertices.size());
-
-                    result.vertices.push_back(vertex);
-                    vertexCache[key] = newIndex;
-                    faceIndices.push_back(newIndex);
+                    result.indices.push_back(faceIndices[0]);
+                    result.indices.push_back(faceIndices[i]);
+                    result.indices.push_back(faceIndices[i + 1]);
                 }
-            }
-
-            if (faceIndices.size() < 3)
-            {
-                AddWarning("Face with less than 3 vertices at line " + std::to_string(lineNumber));
-                continue;
-            }
-
-            if (!settings.triangulate && faceIndices.size() != 3)
-            {
-                AddWarning("Non-triangle face skipped at line " + std::to_string(lineNumber));
-                continue;
-            }
-
-            for (size_t i = 1; i + 1 < faceIndices.size(); ++i)
-            {
-                result.indices.push_back(faceIndices[0]);
-                result.indices.push_back(faceIndices[i]);
-                result.indices.push_back(faceIndices[i + 1]);
             }
         }
+
+        FinishCurrentSection();
+
+        if (!result.IsValid())
+        {
+            AddError("OBJ file did not contain valid mesh data: " + path.string());
+            return std::nullopt;
+        }
+
+        return result;
     }
 
-    FinishCurrentSection();
-
-    if (!result.IsValid())
+    const std::vector<std::string>& ObjMeshImporter::GetErrors() const
     {
-        AddError("OBJ file did not contain valid mesh data: " + path.string());
-        return std::nullopt;
+        return errors;
     }
 
-    return result;
-}
+    const std::vector<std::string>& ObjMeshImporter::GetWarnings() const
+    {
+        return warnings;
+    }
 
-const std::vector<std::string>& ObjMeshImporter::GetErrors() const
-{
-    return errors;
-}
+    void ObjMeshImporter::ClearMessages()
+    {
+        errors.clear();
+        warnings.clear();
+    }
 
-const std::vector<std::string>& ObjMeshImporter::GetWarnings() const
-{
-    return warnings;
-}
+    void ObjMeshImporter::AddError(std::string message)
+    {
+        errors.push_back(std::move(message));
+    }
 
-void ObjMeshImporter::ClearMessages()
-{
-    errors.clear();
-    warnings.clear();
-}
-
-void ObjMeshImporter::AddError(std::string message)
-{
-    errors.push_back(std::move(message));
-}
-
-void ObjMeshImporter::AddWarning(std::string message)
-{
-    warnings.push_back(std::move(message));
+    void ObjMeshImporter::AddWarning(std::string message)
+    {
+        warnings.push_back(std::move(message));
+    }
 }

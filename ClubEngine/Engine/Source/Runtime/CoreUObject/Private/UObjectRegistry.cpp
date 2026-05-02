@@ -1,6 +1,9 @@
 #include <CoreUObject/UObjectRegistry.h>
 #include <Core/ClubCore.h>
 
+namespace CE
+{
+
 void UObjectRegistry::Destroy(const UObjectHandle& handle)
 {
     Slot* slot = GetSlotFromHandle(handle);
@@ -55,4 +58,6 @@ UObjectRegistry::Slot* UObjectRegistry::GetSlotFromHandle(const UObjectHandle& h
     }
 
     return &slot;
+}
+
 }

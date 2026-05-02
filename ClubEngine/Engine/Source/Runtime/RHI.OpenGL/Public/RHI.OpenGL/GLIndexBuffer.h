@@ -1,10 +1,13 @@
 #pragma once
 
-#include <Core/Types/RenderTypes.h>
+#include <Core/Types/RHITypes.h>
 
 #include <cstdint>
 #include <cstddef>
 #include <vector>
+
+namespace CE::RHI
+{
 
 class GLIndexBuffer
 {
@@ -29,3 +32,5 @@ private:
     
     void Delete();
 };
+
+}

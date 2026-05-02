@@ -2,6 +2,9 @@
 
 #include "../CEConvert.h"
 
+namespace CE
+{
+
 RenderSystem::RenderSystem(CE::RenderBackend backend)
 {
     renderer = std::make_unique<Renderer>(ToRHI(backend));
@@ -47,4 +50,6 @@ void RenderSystem::SetBackend(CE::RenderBackend backend)
 void RenderSystem::AddMesh(UStaticMesh* newMesh)
 {
     meshesToRender.push_back(newMesh);
+}
+
 }

@@ -8,6 +8,9 @@
 
 #include <Renderer/Renderer.h>
 
+namespace CE
+{
+
 Renderer::Renderer(RHI::Backend backend)
 {
     SetBackend(backend);
@@ -45,7 +48,7 @@ void Renderer::DrawStaticMesh(const UStaticMesh& staticMesh) const
             continue;
         }
 
-        const auto resolver = Asset::GetCurrentAssetResolver();
+        const auto resolver = GetCurrentAssetResolver();
 
         UMaterial* material = resolver->Resolve(materialHandle);
         material->Bind();
@@ -63,7 +66,7 @@ void Renderer::SetBackend(RHI::Backend backend)
     {
         case RHI::Backend::OpenGL:
         {
-            std::unique_ptr<GLRHI> glrhi = std::make_unique<GLRHI>();
+            std::unique_ptr<RHI::GLRHI> glrhi = std::make_unique<RHI::GLRHI>();
             glrhi->Init();
             RHI::Set(std::move(glrhi));
             return;
@@ -86,4 +89,6 @@ void Renderer::BeginFrame(const RHI::ViewportDesc& viewportDesc)
 void Renderer::EndFrame()
 {
     // Empty for now lol
+}
+
 }

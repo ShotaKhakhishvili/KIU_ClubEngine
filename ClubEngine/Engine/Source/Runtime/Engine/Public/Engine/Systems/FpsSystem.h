@@ -4,6 +4,9 @@
 
 #include <queue>
 
+namespace CE
+{
+
 class FpsSystem : public ISystem
 {
 public:
@@ -16,3 +19,5 @@ private:
     std::queue<float> deltas{};
     float acc = 0;
 };
+
+}

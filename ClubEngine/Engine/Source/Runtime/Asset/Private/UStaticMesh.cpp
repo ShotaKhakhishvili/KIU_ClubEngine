@@ -2,6 +2,9 @@
 
 #include <Asset/UStaticMesh.h>
 
+namespace CE
+{
+
 UStaticMesh::UStaticMesh(std::string inName)
     : UObject(std::move(inName))
 {
@@ -29,4 +32,6 @@ void UStaticMesh::AddMaterial (TObjectHandle<UMaterial> material)
         return;
     }
     materials.push_back(material); 
+}
+
 }

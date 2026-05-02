@@ -1,9 +1,12 @@
 #pragma once
 
-#include <Core/Types/RenderTypes.h>
+#include <Core/Types/RHITypes.h>
 
 #include <filesystem>
 #include <array>
+
+namespace CE::RHI
+{
 
 class GLTexture
 {
@@ -64,3 +67,5 @@ private:
     void ResetToDefault();
     void Delete();
 };
+
+}

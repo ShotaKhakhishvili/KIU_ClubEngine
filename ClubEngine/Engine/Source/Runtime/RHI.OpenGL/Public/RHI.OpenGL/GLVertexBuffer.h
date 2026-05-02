@@ -1,10 +1,13 @@
 #pragma once
 
 #include <Core/Types/Vertex.h>
-#include <Core/Types/RenderTypes.h>
+#include <Core/Types/RHITypes.h>
 
 #include <cstddef>
 #include <vector>
+
+namespace CE::RHI
+{
 
 class GLVertexBuffer
 {
@@ -30,3 +33,5 @@ private:
     
     void Delete();
 };
+
+}

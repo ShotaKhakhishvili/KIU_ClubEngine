@@ -6,6 +6,9 @@
 
 #include <cstdint>
 
+namespace CE
+{
+
 struct SubMesh
 {
     RHI::VertexArrayHandle vertexArray;
@@ -13,3 +16,5 @@ struct SubMesh
 
     uint32_t materialIndex = 0;
 };
+
+}

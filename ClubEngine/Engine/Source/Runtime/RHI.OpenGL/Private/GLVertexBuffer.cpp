@@ -5,6 +5,9 @@
 #include <glad/glad.h>
 #include <cassert>
 
+namespace CE::RHI
+{
+
 GLVertexBuffer::GLVertexBuffer(const std::vector<Vertex>& vertices, BufferUsage usage)
     : GLVertexBuffer(vertices.data(), vertices.size() * sizeof(Vertex), usage)
 {
@@ -66,4 +69,6 @@ GLVertexBuffer& GLVertexBuffer::operator=(GLVertexBuffer&& other) noexcept
         other.ID = 0;
     }
     return *this;
+}
+
 }

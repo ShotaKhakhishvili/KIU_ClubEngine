@@ -9,12 +9,12 @@ namespace CE
     int LaunchRun(Application* app)
     {
         SetCurrentAssetContext(&app->GetAssetContext());
-        Asset::SetCurrentAssetResolver(&app->GetAssetContext());
+        SetCurrentAssetResolver(&app->GetAssetContext());
 
         const int result = app->Run();
 
         SetCurrentAssetContext(nullptr);
-        Asset::SetCurrentAssetResolver(nullptr);
+        SetCurrentAssetResolver(nullptr);
 
         return result;
     }

@@ -1,11 +1,14 @@
 #pragma once
 
-#include <Core/Types/RenderTypes.h>
+#include <Core/Types/RHITypes.h>
 
 #include <RHI.OpenGL/GLTexture.h>
 
 #include <string>
 #include <unordered_map>
+
+namespace CE::RHI
+{
 
 class GLShader
 {
@@ -40,3 +43,5 @@ private:
 
     void Delete();
 };
+
+}

@@ -3,6 +3,9 @@
 #include <cstdint>
 #include <limits>
 
+namespace CE
+{
+
 class UObjectHandle
 {
 public:
@@ -15,3 +18,5 @@ private:
     uint32_t index = std::numeric_limits<uint32_t>::max();
     uint32_t generation = 0;
 };
+
+}

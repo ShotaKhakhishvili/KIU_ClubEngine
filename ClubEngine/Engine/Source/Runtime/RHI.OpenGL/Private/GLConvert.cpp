@@ -2,6 +2,9 @@
 
 #include <cassert>
 
+namespace CE::RHI
+{
+
 GLenum ToGL(ShaderDataType v) noexcept
 {
     switch (v)
@@ -146,4 +149,6 @@ GLenum ToGL(RHI::IndexType type) noexcept
     }
     assert(false && "Unhandled IndexType");
     return GL_UNSIGNED_INT;
+}
+
 }

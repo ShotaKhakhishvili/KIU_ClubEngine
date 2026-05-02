@@ -8,6 +8,9 @@
 #include <memory>
 #include <type_traits>
 
+namespace CE
+{
+
 class UObjectRegistry
 {
 public:
@@ -67,3 +70,5 @@ private:
     std::vector<Slot> slots;
     uint64_t nextID = 0;
 };
+
+}

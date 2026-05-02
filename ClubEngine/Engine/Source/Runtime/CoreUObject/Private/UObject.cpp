@@ -1,5 +1,8 @@
 #include <CoreUObject/UObject.h>
 
+namespace CE
+{
+
 UObject::UObject(std::string inName)
     : name(std::move(inName))
     {
@@ -8,3 +11,5 @@ UObject::UObject(std::string inName)
 
 uint64_t UObject::GetID() const noexcept { return id; }
 const std::string& UObject::GetName() const noexcept { return name; }
+
+}

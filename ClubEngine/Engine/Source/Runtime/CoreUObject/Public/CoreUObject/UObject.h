@@ -3,6 +3,9 @@
 #include <string>
 #include <cstdint>
 
+namespace CE
+{
+
 class UObject
 {
 public:
@@ -22,3 +25,5 @@ private:
     uint64_t id = 0;
     std::string name;
 };
+
+}

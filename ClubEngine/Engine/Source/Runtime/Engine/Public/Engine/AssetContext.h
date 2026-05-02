@@ -12,25 +12,26 @@
 
 namespace CE
 {
-    class AssetContext final : public IAssetResolver
+class AssetContext final : public IAssetResolver
+{
+public:
+    AssetContext() = default;
+    ~AssetContext() override = default;
+
+    template<typename T, typename... Args>
+    TObjectHandle<T> Create(Args&&... args)
     {
-    public:
-        AssetContext() = default;
-        ~AssetContext() override = default;
+        return registry.Create<T>(std::forward<Args>(args)...);
+    }
 
-        template<typename T, typename... Args>
-        TObjectHandle<T> Create(Args&&... args)
-        {
-            return registry.Create<T>(std::forward<Args>(args)...);
-        }
+    void Destroy(UObjectHandle handle);
 
-        void Destroy(UObjectHandle handle);
+    UShader* Resolve(TObjectHandle<UShader> handle) const override;
+    UTexture* Resolve(TObjectHandle<UTexture> handle) const override;
+    UMaterial* Resolve(TObjectHandle<UMaterial> handle) const override;
 
-        UShader* Resolve(TObjectHandle<UShader> handle) const override;
-        UTexture* Resolve(TObjectHandle<UTexture> handle) const override;
-        UMaterial* Resolve(TObjectHandle<UMaterial> handle) const override;
+private:
+    mutable UObjectRegistry registry;
+};
 
-    private:
-        mutable UObjectRegistry registry;
-    };
 }

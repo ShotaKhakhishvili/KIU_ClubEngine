@@ -2,7 +2,7 @@
 
 #include <cassert>
 
-namespace RHI
+namespace CE::RHI
 {
     static std::unique_ptr<IRHI> GCurrentRHI;
 

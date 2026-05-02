@@ -1,6 +1,5 @@
 #pragma once
 
-#include <Core/Types/RenderTypes.h>
 #include <Core/Types/RHITypes.h>
 
 #include <CoreUObject/UObject.h>
@@ -11,6 +10,9 @@
 #include <memory>
 #include <string>
 #include <cstdint>
+
+namespace CE
+{
 
 class UTexture final : public UObject
 {
@@ -41,3 +43,5 @@ private:
     RHI::TextureDesc desc;
     RHI::TextureHandle handle;    
 };
+
+}

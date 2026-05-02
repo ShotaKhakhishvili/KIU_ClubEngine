@@ -2,10 +2,13 @@
 
 #include <Core/Math/Vector.h>
 
-struct Vertex
+namespace CE
 {
-    Vec3f coord{};
-    Vec3f normal{};
-    Vec3f color{};
-    Vec2f texUV{};
-};
+    struct Vertex
+    {
+        FVectorF coord{};
+        FVectorF normal{};
+        FVectorF color{};
+        FVector2F texUV{};
+    };
+}

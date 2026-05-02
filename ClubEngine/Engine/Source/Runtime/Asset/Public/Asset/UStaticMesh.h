@@ -9,6 +9,9 @@
 #include <vector>
 #include <string>
 
+namespace CE
+{
+
 class UStaticMesh : public UObject
 {
 public:
@@ -24,3 +27,5 @@ private:
     std::vector<SubMesh> subMeshes;
     std::vector<TObjectHandle<UMaterial>> materials;
 };
+
+}

@@ -2,6 +2,9 @@
 
 #include <CoreUObject/TObjectHandle.h>
 
+namespace CE
+{
+
 class UShader;
 class UTexture;
 class UMaterial;
@@ -16,8 +19,7 @@ public:
     virtual UMaterial* Resolve(TObjectHandle<UMaterial> handle) const = 0;
 };
 
-namespace Asset
-{
     IAssetResolver* GetCurrentAssetResolver() noexcept;
     void SetCurrentAssetResolver(IAssetResolver* resolver) noexcept;
+
 }

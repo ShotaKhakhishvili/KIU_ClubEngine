@@ -12,6 +12,9 @@
 #include <string>
 #include <utility>
 
+namespace CE
+{
+
 UTexture::UTexture(std::filesystem::path inSourcePath,
 				   const RHI::TextureDesc& inDesc,
 				   std::string inName)
@@ -92,4 +95,6 @@ uint32_t UTexture::GetHeight() const noexcept
 		return 0;
 
 	return desc.height;
+}
+
 }

@@ -3,6 +3,9 @@
 
 #include <Core/ClubCore.h>
 
+namespace CE
+{
+
 const char* UMaterial::GetClassName() const noexcept { return "UMaterial";}
 
 UMaterial::UMaterial(TObjectHandle<UShader> inShader)
@@ -136,3 +139,5 @@ void UMaterial::SetTexture (const std::string& name, TObjectHandle<UTexture>    
 void UMaterial::SetVec2    (const std::string& name, const float   x,      const float y)                                { vectors_2[name] = {x,y};      }
 void UMaterial::SetVec3    (const std::string& name, const float   x,      const float y, const float z)                 { vectors_3[name] = {x,y,z};    }
 void UMaterial::SetVec4    (const std::string& name, const float   x,      const float y, const float z, const float w)  { vectors_4[name] = {x,y,z,w};  }
+
+}

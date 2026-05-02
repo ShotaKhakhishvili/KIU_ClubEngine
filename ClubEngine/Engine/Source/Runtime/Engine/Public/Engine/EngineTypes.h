@@ -2,8 +2,10 @@
 
 namespace CE
 {
-    enum class RenderBackend
-    {
-        OpenGL
-    };
+    
+enum class RenderBackend
+{
+    OpenGL
+};
+
 }

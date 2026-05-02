@@ -5,13 +5,16 @@
 #include <memory>
 #include <unordered_map>
 
+namespace CE::RHI
+{
+
 class GLShader;
 class GLTexture;
 class GLVertexArray;
 class GLVertexBuffer;
 class GLIndexBuffer;
 
-class GLRHI final : public RHI::IRHI
+class GLRHI final : public IRHI
 {
 public:
     GLRHI();
@@ -20,46 +23,46 @@ public:
     void Init() override;
     void Shutdown() override;
 
-    RHI::ShaderHandle CreateShader(const RHI::ShaderDesc& desc) override;
-    void DestroyShader(RHI::ShaderHandle shader) override;
+    ShaderHandle CreateShader(const ShaderDesc& desc) override;
+    void DestroyShader(ShaderHandle shader) override;
 
-    RHI::TextureHandle CreateTexture(const RHI::TextureDesc& desc, const void* data) override;
-    RHI::TextureHandle CreateCubemap(const RHI::TextureDesc& desc, const void* const* faceData) override;
-    void DestroyTexture(RHI::TextureHandle texture) override;
+    TextureHandle CreateTexture(const TextureDesc& desc, const void* data) override;
+    TextureHandle CreateCubemap(const TextureDesc& desc, const void* const* faceData) override;
+    void DestroyTexture(TextureHandle texture) override;
 
-    RHI::BufferHandle CreateBuffer(const RHI::BufferDesc& desc, const void* data) override;
-    void DestroyBuffer(RHI::BufferHandle buffer) override;
+    BufferHandle CreateBuffer(const BufferDesc& desc, const void* data) override;
+    void DestroyBuffer(BufferHandle buffer) override;
 
-    RHI::VertexArrayHandle CreateVertexArray(
-        RHI::BufferHandle vertexBuffer,
-        RHI::BufferHandle indexBuffer,
-        const RHI::VertexArrayDesc& desc
+    VertexArrayHandle CreateVertexArray(
+        BufferHandle vertexBuffer,
+        BufferHandle indexBuffer,
+        const VertexArrayDesc& desc
     ) override;
 
-    void DestroyVertexArray(RHI::VertexArrayHandle vertexArray) override;
+    void DestroyVertexArray(VertexArrayHandle vertexArray) override;
 
-    void SetViewport(const RHI::ViewportDesc& desc) override;
+    void SetViewport(const ViewportDesc& desc) override;
     void SetClearColor(float r, float g, float b, float a) override;
     void Clear(bool color, bool depth) override;
 
-    void SetCullMode(RHI::CullMode mode) override;
-    void SetBlendMode(RHI::BlendMode mode) override;
+    void SetCullMode(CullMode mode) override;
+    void SetBlendMode(BlendMode mode) override;
     void SetDepthTest(bool enabled) override;
     void SetDepthWrite(bool enabled) override;
 
-    void BindShader(RHI::ShaderHandle shader) override;
-    void BindVertexArray(RHI::VertexArrayHandle vertexArray) override;
-    void BindTexture(RHI::TextureHandle texture, uint32_t slot) override;
+    void BindShader(ShaderHandle shader) override;
+    void BindVertexArray(VertexArrayHandle vertexArray) override;
+    void BindTexture(TextureHandle texture, uint32_t slot) override;
 
     void SetUniformBool(const std::string& name, bool value) override;
     void SetUniformInt(const std::string& name, int32_t value) override;
     void SetUniformFloat(const std::string& name, float value) override;
-    void SetUniformVec2(const std::string& name, const Vec2f& value) override;
-    void SetUniformVec3(const std::string& name, const Vec3f& value) override;
-    void SetUniformVec4(const std::string& name, const Vec4f& value) override;
-    void SetTexture(const std::string& name, RHI::TextureHandle texture, uint32_t slot) override;
+    void SetUniformVec2(const std::string& name, const CE::FVector2F& value) override;
+    void SetUniformVec3(const std::string& name, const CE::FVectorF& value) override;
+    void SetUniformVec4(const std::string& name, const CE::FVector4F& value) override;
+    void SetTexture(const std::string& name, TextureHandle texture, uint32_t slot) override;
     
-    void DrawIndexed(const RHI::DrawIndexedDesc& desc) override;
+    void DrawIndexed(const DrawIndexedDesc& desc) override;
 
 private:
     uint32_t nextShaderHandle = 1;
@@ -76,3 +79,5 @@ private:
     std::unordered_map<uint32_t, uint32_t> uniformBuffers;
     std::unordered_map<uint32_t, std::unique_ptr<GLVertexArray>> vertexArrays;
 };
+
+}

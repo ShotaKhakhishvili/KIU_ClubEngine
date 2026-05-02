@@ -6,6 +6,9 @@
 
 #include <cassert>
 
+namespace CE::RHI
+{
+
 GLTexture::GLTexture(
         const uint32_t width, 
         const uint32_t height, 
@@ -190,3 +193,5 @@ TextureFormat GLTexture::GetReadFormat() const{return readFormat;}
 TexturePixelType GLTexture::GetPixelType() const{return pixelType;}
 uint32_t GLTexture::GetWidth() const{return width;}
 uint32_t GLTexture::GetHeight() const{return height;}
+
+}
