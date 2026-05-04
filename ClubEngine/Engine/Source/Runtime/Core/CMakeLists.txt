@@ -13,7 +13,11 @@ set_target_properties(CECore PROPERTIES OUTPUT_NAME "ClubEngine-Core")
 target_include_directories(CECore
     PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}/Public
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Private
+
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../../../ThirdParty/GLFW/include
 )
+
+target_link_libraries(CECore PRIVATE glfw)
 
 target_compile_definitions(CECore PRIVATE CECORE_BUILD)
 
