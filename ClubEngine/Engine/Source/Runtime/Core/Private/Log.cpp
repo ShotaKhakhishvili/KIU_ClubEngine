@@ -80,8 +80,8 @@ namespace CE
 
             // 2. Setup Engine Log Location:
             std::filesystem::path engineDir;
-            if (std::filesystem::exists(currentPath.parent_path().parent_path().parent_path().parent_path().parent_path() / "Engine")) {
-                engineDir = currentPath.parent_path().parent_path().parent_path().parent_path().parent_path() / "Engine";
+            if (std::filesystem::exists(currentPath.parent_path().parent_path().parent_path().parent_path().parent_path())) {
+                engineDir = currentPath.parent_path().parent_path().parent_path().parent_path().parent_path();
             }
 
             if (!engineDir.empty()) {
