@@ -24,5 +24,6 @@ namespace CE
     }
 }
 
-#define CE_LOG(Type, LogString, ...) \
-    ::CE::LogFormat(::CE::LogType::Type, LogString __VA_OPT__(,) __VA_ARGS__)
+#define CE_LOG(Type, ...) \
+    ::CE::LogFormat(::CE::LogType::Type, __VA_ARGS__)
+    
