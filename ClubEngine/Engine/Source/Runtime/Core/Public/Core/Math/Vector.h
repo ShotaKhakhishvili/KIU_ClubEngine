@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Core/Math/MathCore.h>
+
 #include <concepts>
 #include <cmath>
 
@@ -20,15 +22,19 @@ struct TVector2
         ,   y(static_cast<T>(other.y))
     {}
 
-    constexpr TVector2 operator+(const TVector2& r) const {return {x + r.x, y + r.y}; }
-    constexpr TVector2  operator- (const TVector2& r) const { return {x-r.x, y-r.y}; }
-    constexpr TVector2  operator* (T s)              const { return {x*s,   y*s};   }
-    constexpr TVector2& operator+=(const TVector2& r)       { x+=r.x; y+=r.y; return *this; }
-    constexpr TVector2& operator-=(const TVector2& r)       { x-=r.x; y-=r.y; return *this; }
-    constexpr TVector2& operator*=(T s)                    { x*=s;   y*=s;   return *this;  }
-    constexpr TVector2  operator- ()                 const { return {-x, -y}; }
-    constexpr bool     operator==(const TVector2& r) const { return x==r.x && y==r.y; }
-    constexpr bool     operator!=(const TVector2& r) const { return !(*this == r); }
+    constexpr TVector2  operator    +   (const TVector2& r)     const   { return {x + r.x, y + r.y};        }
+    constexpr TVector2  operator    -   (const TVector2& r)     const   { return {x-r.x, y-r.y};            }
+    constexpr TVector2  operator    -   ()                      const   { return {-x, -y};                  }
+    constexpr TVector2  operator    *   (const TVector2& r)     const   { return {x*r.x, y*r.y};            }
+    constexpr TVector2  operator    *   (T s)                   const   { return {x*s,   y*s};              }
+
+    constexpr bool      operator    ==  (const TVector2& r)     const   { return x==r.x && y==r.y;          }
+    constexpr bool      operator    !=  (const TVector2& r)     const   { return !(*this == r);             }
+
+    constexpr TVector2& operator    +=  (const TVector2& r)             { x+=r.x; y+=r.y; return *this;     }
+    constexpr TVector2& operator    -=  (const TVector2& r)             { x-=r.x; y-=r.y; return *this;     }
+    constexpr TVector2& operator    *=  (const TVector2& r)             { x*=r.x; y*=r.y; return *this;     } 
+    constexpr TVector2& operator    *=  (T s)                           { x*=s;   y*=s;   return *this;     }
 
     constexpr TVector2 operator /(T r) const
         requires std::floating_point<T>
@@ -59,15 +65,19 @@ struct TVector
         ,   z(static_cast<T>(other.z))
     {}
 
-    constexpr TVector operator+(const TVector& r) const {return {x + r.x, y + r.y, z + r.z}; }
-    constexpr TVector  operator- (const TVector& r) const { return {x-r.x, y-r.y, z-r.z}; }
-    constexpr TVector  operator* (T s)              const { return {x*s,   y*s,   z*s};   }
-    constexpr TVector& operator+=(const TVector& r)       { x+=r.x; y+=r.y; z+=r.z; return *this; }
-    constexpr TVector& operator-=(const TVector& r)       { x-=r.x; y-=r.y; z-=r.z; return *this; }
-    constexpr TVector& operator*=(T s)                    { x*=s;   y*=s;   z*=s;   return *this; }
-    constexpr TVector  operator- ()                 const { return {-x, -y, -z}; }
-    constexpr bool     operator==(const TVector& r) const { return x==r.x && y==r.y && z==r.z; }
-    constexpr bool     operator!=(const TVector& r) const { return !(*this == r); }
+    constexpr TVector   operator    +   (const TVector& r)      const   { return {x + r.x, y + r.y, z + r.z};   }
+    constexpr TVector   operator    -   (const TVector& r)      const   { return {x-r.x, y-r.y, z-r.z};         }
+    constexpr TVector   operator    -   ()                      const   { return {-x, -y, -z};                  }
+    constexpr TVector   operator    *   (T s)                   const   { return {x*s,   y*s,   z*s};           }
+    constexpr TVector   operator    *   (const TVector& r)      const   { return {x*r.x, y*r.y, z*r.z};         }
+
+    constexpr bool      operator    ==  (const TVector& r)      const   { return x==r.x && y==r.y && z==r.z;    }
+    constexpr bool      operator    !=  (const TVector& r)      const   { return !(*this == r);                 }
+
+    constexpr TVector&  operator    +=  (const TVector& r)              { x+=r.x; y+=r.y; z+=r.z; return *this; }
+    constexpr TVector&  operator    -=  (const TVector& r)              { x-=r.x; y-=r.y; z-=r.z; return *this; }
+    constexpr TVector&  operator    *=  (const TVector& r)              { x*=r.x; y*=r.y; z*=r.z; return *this; }     
+    constexpr TVector&  operator    *=  (T s)                           { x*=s;   y*=s;   z*=s;   return *this; }
 
     constexpr TVector operator /(T r) const
         requires std::floating_point<T>
@@ -102,15 +112,19 @@ struct TVector4
         ,   w(static_cast<T>(other.w))
     {}
 
-    constexpr TVector4 operator+(const TVector4& r) const {return {x+r.x, y+r.y, z+r.z, w+r.w}; }
-    constexpr TVector4  operator- (const TVector4& r) const { return {x-r.x, y-r.y, z-r.z, w-r.w};              }
-    constexpr TVector4  operator* (T s)              const { return {x*s,   y*s,   z*s, w*s};                   }
-    constexpr TVector4& operator+=(const TVector4& r)       { x+=r.x; y+=r.y; z+=r.z; w += r.w; return *this;   }
-    constexpr TVector4& operator-=(const TVector4& r)       { x-=r.x; y-=r.y; z-=r.z; w -= r.w; return *this;   }
-    constexpr TVector4& operator*=(T s)                    { x*=s;   y*=s;   z*=s;   w*=s;     return *this;    }
-    constexpr TVector4  operator- ()                 const { return {-x, -y, -z, -w}; }
-    constexpr bool     operator==(const TVector4& r) const { return x==r.x && y==r.y && z==r.z && w==r.w; }
-    constexpr bool     operator!=(const TVector4& r) const { return !(*this == r); }
+    constexpr TVector4  operator    +   (const TVector4& r)     const   { return {x+r.x, y+r.y, z+r.z, w+r.w};              }
+    constexpr TVector4  operator    -   (const TVector4& r)     const   { return {x-r.x, y-r.y, z-r.z, w-r.w};              }
+    constexpr TVector4  operator    -   ()                      const   { return {-x, -y, -z, -w};                          }
+    constexpr TVector4  operator    *   (T s)                   const   { return {x*s,   y*s,   z*s, w*s};                  }
+    constexpr TVector4  operator    *   (const TVector4& r)     const   { return {x*r.x, y*r.y, z*r.z, w*r.w};              }
+
+    constexpr bool      operator    ==  (const TVector4& r)     const   { return x==r.x && y==r.y && z==r.z && w==r.w;      }
+    constexpr bool      operator    !=  (const TVector4& r)     const   { return !(*this == r);                             }
+
+    constexpr TVector4& operator    +=  (const TVector4& r)             { x+=r.x; y+=r.y; z+=r.z; w += r.w; return *this;   }
+    constexpr TVector4& operator    -=  (const TVector4& r)             { x-=r.x; y-=r.y; z-=r.z; w -= r.w; return *this;   }
+    constexpr TVector4& operator    *=  (const TVector4& r)             { x*=r.x; y*=r.y; z*=r.z; w*=r.w;   return *this;   } 
+    constexpr TVector4& operator    *=  (T s)                           { x*=s;   y*=s;   z*=s;   w*=s;     return *this;   }
 
     constexpr TVector4 operator /(T r) const
         requires std::floating_point<T>
@@ -130,13 +144,11 @@ struct TVector4
 };
 
 template<typename T>
-constexpr TVector2<T> operator*(T s, const TVector2<T>& v) { return v * s; }
-
+constexpr TVector2<T>   operator    *   (T s, const TVector2<T>& v)  { return v * s; }
 template<typename T>
-constexpr TVector<T> operator*(T s, const TVector<T>& v) { return v * s; }
-
+constexpr TVector<T>    operator    *   (T s, const TVector<T>& v)   { return v * s; }
 template<typename T>
-constexpr TVector4<T> operator*(T s, const TVector4<T>& v) { return v * s; }
+constexpr TVector4<T>   operator    *   (T s, const TVector4<T>& v)  { return v * s; }
 
 using FVector = TVector<double>;
 using FVectorF = TVector<float>;
@@ -150,17 +162,12 @@ using FVector4F = TVector4<float>;
 using FVector4D = TVector4<double>;
 using FVector4I = TVector4<int>;
 
-
 template<typename T>
-inline T Lerp     (T a, T b, float t)  { return a + (b - a) * t; }
-
-
+constexpr T Dot (TVector2<T> a, TVector2<T> b)   { return a.x*b.x + a.y*b.y;                     }
 template<typename T>
-constexpr T Dot(TVector2<T> a, TVector2<T> b){ return a.x*b.x + a.y*b.y; }
+constexpr T Dot (TVector<T> a, TVector<T> b)     { return a.x*b.x + a.y*b.y + a.z*b.z;           }
 template<typename T>
-constexpr T Dot(TVector<T> a, TVector<T> b){ return a.x*b.x + a.y*b.y + a.z*b.z; }
-template<typename T>
-constexpr T Dot(TVector4<T> a, TVector4<T> b){ return a.x*b.x + a.y*b.y + a.z*b.z + a.w*b.w; }
+constexpr T Dot (TVector4<T> a, TVector4<T> b)   { return a.x*b.x + a.y*b.y + a.z*b.z + a.w*b.w; }
 
 template<typename T>
 constexpr TVector<T> Cross(TVector<T> a, TVector<T> b)
@@ -172,27 +179,49 @@ constexpr TVector<T> Cross(TVector<T> a, TVector<T> b)
     };
 }
 
-inline float    Length   (FVector2F v)                      { return std::sqrt(Dot(v, v)); }
-inline double   Length   (FVector2D v)                      { return std::sqrt(Dot(v, v)); }
-inline FVector2F Normalize(FVector2F v)                     { return v / Length(v); }
-inline FVector2D Normalize(FVector2D v)                     { return v / Length(v); }
+template<typename T>
+constexpr T LengthSq    (TVector2<T> v) { return Dot(v, v); }
+template<typename T>
+constexpr T LengthSq    (TVector<T> v)  { return Dot(v, v); }
+template<typename T>
+constexpr T LengthSq    (TVector4<T> v) { return Dot(v, v); }
 
-inline float    Length   (FVectorF v)                       { return std::sqrt(Dot(v, v)); }
-inline double   Length   (FVector v)                        { return std::sqrt(Dot(v, v)); }
-inline FVectorF Normalize(FVectorF v)                       { return v / Length(v); }
-inline FVector Normalize(FVector v)                         { return v / Length(v); }
+template<typename T>
+inline T Length   (TVector2<T> v)                           { return std::sqrt(Dot(v, v));  }
+template<typename T>
+inline T Length   (TVector<T> v)                            { return std::sqrt(Dot(v, v));  }
+template<typename T>
+inline T Length   (TVector4<T> v)                           { return std::sqrt(Dot(v, v));  }
 
-inline float    Length   (FVector4F v)  { return std::sqrt(Dot(v, v)); }
-inline double   Length   (FVector4D v)  { return std::sqrt(Dot(v, v)); }
-inline FVector4F Normalize(FVector4F v) { return v / Length(v); }
-inline FVector4D Normalize(FVector4D v) { return v / Length(v); }
+template<typename T>
+constexpr TVector2<T>   Normalize(TVector2<T> v)            { return v / Length(v);         }
+template<typename T>
+constexpr TVector<T>    Normalize(TVector<T> v)             { return v / Length(v);         }
+template<typename T>
+constexpr TVector4<T>   Normalize(TVector4<T> v)            { return v / Length(v);         }
+
+template<typename T>
+constexpr bool NearlyEqual(TVector2<T> a, TVector2<T> b, T tolerance)
+{
+    return std::abs(a.x - b.x) < tolerance
+        && std::abs(a.y - b.y) < tolerance;
+}
 
 template<typename T>
 constexpr bool NearlyEqual(TVector<T> a, TVector<T> b, T tolerance)
 {
-    return std::abs(a.x - b.x) < tolerance
-        && std::abs(a.y - b.y) < tolerance
-        && std::abs(a.z - b.z) < tolerance;
+    return std::abs(a.x-b.x) < tolerance
+        && std::abs(a.y-b.y) < tolerance
+        && std::abs(a.z-b.z) < tolerance;
+}
+ 
+template<typename T>
+constexpr bool NearlyEqual(TVector4<T> a, TVector4<T> b, T tolerance)
+{
+    return std::abs(a.x-b.x) < tolerance
+        && std::abs(a.y-b.y) < tolerance
+        && std::abs(a.z-b.z) < tolerance
+        && std::abs(a.w-b.w) < tolerance;
 }
 
 }
