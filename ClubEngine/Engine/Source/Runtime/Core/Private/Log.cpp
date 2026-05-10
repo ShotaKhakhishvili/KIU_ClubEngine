@@ -1,5 +1,6 @@
 #include <Core/Log.h>
 #include <chrono>
+#include <cstdlib>      
 #include <filesystem>
 #include <fstream>
 #include <iomanip>
@@ -72,38 +73,59 @@ namespace CE
 
             std::string fileName = "Log_" + GetFileTimestamp() + ".txt";
 
-            // 1. Setup Project Log Location:
             std::filesystem::path currentPath = std::filesystem::current_path();
             std::filesystem::path projectLogDir = currentPath / "Saved" / "Logs";
             std::filesystem::create_directories(projectLogDir);
             GProjectLogFile.open(projectLogDir / fileName, std::ios::out | std::ios::app);
 
-            // 2. Setup Engine Log Location:
             std::filesystem::path engineDir;
-            if (std::filesystem::exists(currentPath.parent_path().parent_path().parent_path().parent_path().parent_path())) {
-                engineDir = currentPath.parent_path().parent_path().parent_path().parent_path().parent_path();
-            }
 
-            if (!engineDir.empty()) {
+#ifdef _MSC_VER
+            char* envPath = nullptr;
+            size_t len;
+            _dupenv_s(&envPath, &len, "CLUBENGINE_ROOT");
+            if (envPath != nullptr) {
+                engineDir = envPath;
+                free(envPath); 
+            }
+#else
+            const char* envPath = std::getenv("CLUBENGINE_ROOT");
+            if (envPath != nullptr) {
+                engineDir = envPath;
+            }
+#endif
+
+            if (!engineDir.empty()) 
+            {
                 std::filesystem::path engineLogDir = engineDir / "Saved" / "Logs";
-                std::filesystem::create_directories(engineLogDir);
-                GEngineLogFile.open(engineLogDir / fileName, std::ios::out | std::ios::app);
+                
+                std::error_code ec;
+                std::filesystem::create_directories(engineLogDir, ec);
+
+                if (!ec) {
+                    GEngineLogFile.open(engineLogDir / fileName, std::ios::out | std::ios::app);
+                } else {
+                    std::cerr << "Failed to create Engine Log Directory: " << ec.message() << '\n';
+                }
+            }
+            else
+            {
+                std::cerr << "Warning: CLUBENGINE_ROOT environment variable is not set. Engine logs will not be saved.\n";
             }
 
             GInitialized = true;
         }
 
-        // --- Console Color Management ---
 #ifdef _WIN32
         void SetConsoleColor(LogType type)
         {
             HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
-            WORD color = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE; // White (Info)
+            WORD color = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE; 
             
             if (type == LogType::Warning)
-                color = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY; // Yellow
+                color = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY; 
             else if (type == LogType::Error)
-                color = FOREGROUND_RED | FOREGROUND_INTENSITY; // Red
+                color = FOREGROUND_RED | FOREGROUND_INTENSITY; 
 
             SetConsoleTextAttribute(h, color);
         }
@@ -114,12 +136,11 @@ namespace CE
             SetConsoleTextAttribute(h, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
         }
 #else
-        // Linux/Unix/MSYS2 ANSI Color codes
         const char* GetAnsiColor(LogType type)
         {
-            if (type == LogType::Warning) return "\033[33m"; // Yellow
-            if (type == LogType::Error)   return "\033[31m"; // Red
-            return "\033[37m"; // White (Info)
+            if (type == LogType::Warning) return "\033[33m"; 
+            if (type == LogType::Error)   return "\033[31m"; 
+            return "\033[37m"; 
         }
         const char* GetAnsiReset() { return "\033[0m"; }
 #endif
@@ -136,12 +157,10 @@ namespace CE
         std::lock_guard<std::mutex> lock(GLogMutex);
         EnsureInitializedUnlocked();
 
-        // Format: [HH:MM:SS] [LogType]: LogString
         std::ostringstream lineOss;
         lineOss << "[" << GetTimeHHMMSS() << "] [" << ToString(type) << "]: " << message;
         const std::string line = lineOss.str();
 
-        // Print to Terminal with colors
 #ifdef _WIN32
         SetConsoleColor(type);
         std::cout << line << '\n';
@@ -150,14 +169,12 @@ namespace CE
         std::cout << GetAnsiColor(type) << line << GetAnsiReset() << '\n';
 #endif
 
-        // Write to Project Log File
         if (GProjectLogFile.is_open())
         {
             GProjectLogFile << line << '\n';
             GProjectLogFile.flush();
         }
 
-        // Write to Engine Log File
         if (GEngineLogFile.is_open())
         {
             GEngineLogFile << line << '\n';
