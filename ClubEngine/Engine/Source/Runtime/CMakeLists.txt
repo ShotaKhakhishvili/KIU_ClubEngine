@@ -1,4 +1,5 @@
 add_subdirectory(Core)
+add_subdirectory(Platform)
 add_subdirectory(Project)
 add_subdirectory(CoreUObject)
 add_subdirectory(Asset)
@@ -14,6 +15,7 @@ add_library(ClubEngine::Runtime ALIAS ClubRuntime)
 
 target_link_libraries(ClubRuntime INTERFACE
   ClubEngine::Core
+  ClubEngine::Platform
   ClubEngine::Project
   ClubEngine::CoreUObject
   ClubEngine::Asset
