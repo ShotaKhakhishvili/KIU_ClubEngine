@@ -6,6 +6,7 @@
 
 #include <Engine/EngineTypes.h>
 #include <Engine/ISystem.h>
+#include <Engine/Systems/WindowSystem.h>
 
 namespace CE
 {
@@ -14,7 +15,7 @@ class RenderSystem final : public ISystem
 {
 public:
 
-    RenderSystem(CE::RenderBackend backend = CE::RenderBackend::OpenGL); // Make OpenGL a default (not like we don't have anything else)
+    RenderSystem(WindowSystem* windowSystem, CE::RenderBackend backend = CE::RenderBackend::OpenGL); // Make OpenGL a default (not like we don't have anything else)
 
     const char* GetName() const noexcept override;
 
@@ -27,8 +28,10 @@ public:
     void AddMesh(UStaticMesh* newMesh);
 
 private:
-    std::vector<UStaticMesh*> meshesToRender;   // testing purposes
-    std::unique_ptr<Renderer> renderer;
+    std::vector<UStaticMesh*>   meshesToRender;   // testing purposes
+    std::unique_ptr<Renderer>   renderer;
+    WindowSystem*               windowSystem;
+    RenderBackend               backend;
 };
 
 }

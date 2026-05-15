@@ -1,3 +1,5 @@
+#include <Core/ClubCore.h>
+
 #include <Engine/Systems/RenderSystem.h>
 
 #include "../CEConvert.h"
@@ -5,13 +7,15 @@
 namespace CE
 {
 
-RenderSystem::RenderSystem(CE::RenderBackend backend)
+RenderSystem::RenderSystem(WindowSystem* windowSystem, CE::RenderBackend backend)
 {
-    renderer = std::make_unique<Renderer>(ToRHI(backend));
+    this->backend = backend;
+    this->windowSystem = windowSystem;
 }
 
 bool RenderSystem::Initialize()
 {
+    renderer = std::make_unique<Renderer>(ToRHI(backend));
     return renderer != nullptr;
 }
 
@@ -30,7 +34,7 @@ int RenderSystem::Update(float dt)
 {
     (void)dt;
 
-    renderer->BeginFrame({400, 400, 800, 800});
+    renderer->BeginFrame({0, 0, windowSystem->GetWindow()->GetWidth(), windowSystem->GetWindow()->GetHeight()});
 
     for(auto staticMesh : meshesToRender)
     {

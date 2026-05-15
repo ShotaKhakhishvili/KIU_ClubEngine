@@ -19,6 +19,7 @@ GLRHI::~GLRHI() = default;
 
 void GLRHI::Init()
 {
+    gladLoadGL();
     glEnable(GL_DEPTH_TEST);
 }
 

@@ -13,6 +13,11 @@ struct ProjectDescriptor
         return rootPath / "Content";
     }
 
+    std::filesystem::path GetConfigPath() const
+    {
+        return rootPath / "Config";
+    }
+
     std::filesystem::path ResolveContentPath(const std::filesystem::path& relativePath) const
     {
         return GetContentPath() / relativePath;

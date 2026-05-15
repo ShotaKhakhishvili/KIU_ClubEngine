@@ -37,7 +37,7 @@ function(ce_generate_config)
     string(APPEND CFG "target_link_libraries(ClubEngine::RHIOpenGL   INTERFACE ClubEngine::RenderCore)\n")
     string(APPEND CFG "target_link_libraries(ClubEngine::Renderer    INTERFACE ClubEngine::RenderCore ClubEngine::Asset)\n")
     string(APPEND CFG "target_link_libraries(ClubEngine::Engine      INTERFACE ClubEngine::Core ClubEngine::Asset)\n")
-    string(APPEND CFG "target_link_libraries(ClubEngine::Launch      INTERFACE ClubEngine::Engine)\n")
+    string(APPEND CFG "target_link_libraries(ClubEngine::Launch      INTERFACE ClubEngine::Engine ClubEngine::Project)\n")
     string(APPEND CFG "target_link_libraries(ClubEngine::Project     INTERFACE ClubEngine::Core)\n")
 
     file(WRITE "${CE_OUTPUT_ROOT}/ClubEngineConfig.cmake" "${CFG}")

@@ -1,4 +1,8 @@
+#include <Core/ClubCore.h>
+
 #include <Platform/GLFWWindow.h>
+
+#include <glad/glad.h>
 
 #include <GLFW/glfw3.h>
 
@@ -90,20 +94,21 @@ void*   GLFWWindow::GetNativeHandle     ()      const   {   return handle;      
 void GLFWWindow::InitGL(const WindowConfig& config)
 {
     glfwWindowHint(GLFW_CLIENT_API,   GLFW_OPENGL_API);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     handle = glfwCreateWindow(
         static_cast<int>(config.width),
         static_cast<int>(config.height),
-        config.title,
+        config.title.c_str(),
         nullptr, nullptr
     );
 
     if (handle)
     {
         glfwMakeContextCurrent(handle);
+        gladLoadGL();
         glfwSwapInterval(config.vSync ? 1 : 0);
     }
 }
@@ -115,7 +120,7 @@ void GLFWWindow::InitNoAPI(const WindowConfig& config)
     handle = glfwCreateWindow(
         static_cast<int>(config.width),
         static_cast<int>(config.height),
-        config.title,
+        config.title.c_str(),
         nullptr, nullptr
     );
 }

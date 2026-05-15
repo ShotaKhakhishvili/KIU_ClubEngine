@@ -20,6 +20,7 @@ target_link_libraries(CEPlatform
         ClubEngine::Core
     PRIVATE
         ThirdParty::glfw
+        ThirdParty::glad
 )
 
 target_compile_definitions(CEPlatform PRIVATE CEPLATFORM_BUILD)

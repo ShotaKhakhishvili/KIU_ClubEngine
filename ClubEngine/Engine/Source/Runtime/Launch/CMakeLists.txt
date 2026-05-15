@@ -18,6 +18,8 @@ target_include_directories(CELaunch
 target_link_libraries(CELaunch
   PUBLIC
     ClubEngine::Engine
+  PRIVATE
+    ClubEngine::Project
 )
 
 target_compile_definitions(CELaunch PRIVATE CELAUNCH_BUILD)

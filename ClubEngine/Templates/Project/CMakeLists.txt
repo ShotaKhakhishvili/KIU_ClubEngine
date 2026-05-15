@@ -20,6 +20,11 @@ add_executable([PROJ_NAME]
     ${[PROJ_NAME]_PRIVATE}
 )
 
+target_compile_definitions([PROJ_NAME] PRIVATE
+    CE_ENGINE_ROOT="${CLUBENGINE_ROOT}"
+    CE_PROJECT_ROOT="${CMAKE_CURRENT_SOURCE_DIR}"
+)
+
 target_include_directories([PROJ_NAME] PRIVATE
     Source/[PROJ_NAME]/Public
     Source/[PROJ_NAME]/Private

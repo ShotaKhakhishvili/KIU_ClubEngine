@@ -3,12 +3,14 @@
 #include <Core/ClubCore.h>
 #include <Core/Types/RHITypes.h>
 
+#include <string>
+
 namespace CE
 {
 
 struct WindowConfig
 {
-    const char*     title       = "ClubeEngine";
+    std::string     title       = "ClubeEngine";
     uint32          width       = 1280;
     uint32          height      = 720;
     bool            vSync       = true;
