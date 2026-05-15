@@ -43,6 +43,8 @@ int RenderSystem::Update(float dt)
 
     renderer->EndFrame();
 
+    windowSystem->GetWindow()->SwapBuffers();
+
     return 0;
 }
 

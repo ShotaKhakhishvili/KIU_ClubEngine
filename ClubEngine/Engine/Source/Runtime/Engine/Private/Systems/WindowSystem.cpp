@@ -36,6 +36,6 @@ void WindowSystem::Shutdown()
 
 const char* WindowSystem::GetName() const noexcept      {   return "WindowSystem";                          }
 IWindow* WindowSystem::GetWindow() const                {   return window.get();                            }
-bool WindowSystem::ShouldClose() const                  {   return window && window->ShouldClose();     }
+bool WindowSystem::ShouldClose() const                  {   return window && window->ShouldClose();         }
 
 }
