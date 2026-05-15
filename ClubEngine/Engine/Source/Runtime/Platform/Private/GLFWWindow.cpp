@@ -39,7 +39,7 @@ bool GLFWWindow::Init(const WindowConfig& config)
         return false;
     }
 
-    glfwSetWindowUserPointer(static_cast<GLFWwindow*>(handle), this);
+    glfwSetWindowUserPointer(handle, this);
 
     glfwSetFramebufferSizeCallback(handle, [](GLFWwindow* win, int W, int H)
     {
