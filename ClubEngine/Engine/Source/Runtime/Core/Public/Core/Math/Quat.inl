@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include <Core/Math/Matrix.h>  // full definition needed for ToMatrix / FromMatrix
 #include <cmath>
 
 namespace CE

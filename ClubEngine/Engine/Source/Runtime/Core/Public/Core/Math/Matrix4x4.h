@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include <Core/Math/MathCore.h>
 #include <Core/Math/Vector.h>
 
 #include <concepts>
