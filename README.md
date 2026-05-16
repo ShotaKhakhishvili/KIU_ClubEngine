@@ -2,6 +2,74 @@
 
 ClubEngine is a small C++ game/engine framework. The engine source lives in this repository, while game projects can live anywhere on disk. Projects are connected to the engine through `CLUBENGINE_ROOT`, a `.clubproject` file, and the ClubEngine tool scripts.
 
+## Architecture
+
+```mermaid
+graph TD
+    Launch(["Launch<br/>EntryPoint · LaunchRun"])
+
+    subgraph EngineModule["  Engine Module  "]
+        Application(["Application<br/>Run · AddSystem"])
+        FpsSystem(["FpsSystem<br/>Frame delta"])
+        RenderSystem(["RenderSystem<br/>Frame rendering"])
+        WindowSystem(["WindowSystem<br/>Window lifecycle"])
+        AssetContext(["AssetContext<br/>Asset ownership"])
+        AssetLibrary(["AssetLibrary<br/>NewObject helper"])
+
+        Application  ~~~ FpsSystem
+        Application  ~~~ RenderSystem
+        RenderSystem ~~~ WindowSystem
+        AssetContext ~~~ AssetLibrary
+    end
+
+    CoreUObject(["CoreUObject<br/>UObject · Registry"])
+    Renderer(["Renderer<br/>BeginFrame · Draw"])
+    Platform(["Platform<br/>IWindow · GLFWWindow"])
+    Asset(["Asset<br/>Mesh · Material · Shader · Tex"])
+    AssetImport(["AssetImport<br/>OBJ · image loader"])
+    RenderCore(["RenderCore<br/>IRHI interface"])
+    RHI_OpenGL(["RHI.OpenGL<br/>GLRHI · GL objects"])
+
+    subgraph CoreFoundation["  Core Foundation  "]
+        Core(["Math · Config · Delegates · Log · FileIO · Types"])
+    end
+
+    subgraph ThirdParty["  Third-party  "]
+        direction LR
+        GLFW(["GLFW"])
+        glad(["glad"])
+    end
+
+    Launch        -->  Application
+    AssetContext  -.-  AssetLibrary
+    AssetContext  -->  CoreUObject
+    RenderSystem  -->  Renderer
+    WindowSystem  -->  Platform
+    CoreUObject   -->  Asset
+    AssetImport   -->|imports into| Asset
+    Renderer      -->  RenderCore
+    RenderCore    -->  RHI_OpenGL
+
+    linkStyle 0,2,3,4,5,6,7,8 stroke:#909090,stroke-width:1.8px
+    linkStyle 1 stroke:#505050,stroke-width:1.2px,stroke-dasharray:5 3
+
+    style EngineModule   fill:#1c1b2e,stroke:#4a4880,stroke-width:1.5px,stroke-dasharray:5 3,color:#9890b8
+    style CoreFoundation fill:#1c1c1c,stroke:#424242,stroke-width:1.5px,color:#787878
+    style ThirdParty     fill:#181818,stroke:#383838,stroke-width:1px,color:#606060
+
+    classDef orchestration fill:#272450,stroke:#504c90,stroke-width:1.5px,color:#c0bce0
+    classDef runtime       fill:#152a24,stroke:#2c5e52,stroke-width:1.5px,color:#90b8b0
+    classDef asset         fill:#2c1810,stroke:#5c3828,stroke-width:1.5px,color:#c09888
+    classDef foundation    fill:#202020,stroke:#444444,stroke-width:1px,color:#a8a8a8
+
+    class Launch,Application,FpsSystem orchestration
+    class RenderSystem,WindowSystem,Renderer,Platform,RenderCore,RHI_OpenGL runtime
+    class AssetContext,AssetLibrary,CoreUObject,Asset,AssetImport asset
+    class Core,GLFW,glad foundation
+```
+
+## Getting Started
+
 ---
 
 ## Dependencies
