@@ -41,6 +41,10 @@ ClubEngine on Windows uses **MSYS2 UCRT64 / MinGW** for its compiler and build t
 
 **Step 1 — Install MSYS2**
 
+> **Note:** MSVC and Visual Studio are not supported. The build system requires
+> MinGW via MSYS2 specifically — even if you already have Visual Studio installed,
+> you still need to complete this step.
+
 Download and install MSYS2 from [https://www.msys2.org](https://www.msys2.org).
 
 **Step 2 — Open the MSYS2 UCRT64 terminal** (not the default MSYS2 terminal — specifically the UCRT64 one) and run:
