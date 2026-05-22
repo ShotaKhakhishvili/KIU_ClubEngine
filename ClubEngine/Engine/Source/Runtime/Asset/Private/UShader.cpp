@@ -22,11 +22,6 @@ UShader::~UShader()
 	Unload();
 }
 
-const char* UShader::GetClassName() const noexcept
-{
-	return "UShader";
-}
-
 bool UShader::Load()
 {
 	Unload();

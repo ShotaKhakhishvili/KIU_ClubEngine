@@ -14,6 +14,8 @@ namespace CE
 
 class UStaticMesh : public UObject
 {
+    GENERATED_BODY(UStaticMesh, UObject)
+
 public:
     explicit UStaticMesh(std::string inName = "UStaticMesh");
 

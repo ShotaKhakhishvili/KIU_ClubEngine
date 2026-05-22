@@ -17,11 +17,11 @@ public:
 
     RenderSystem(WindowSystem* windowSystem, CE::RenderBackend backend = CE::RenderBackend::OpenGL); // Make OpenGL a default (not like we don't have anything else)
 
-    const char* GetName() const noexcept override;
+    const char* GetName() const noexcept    override;
 
-    bool Initialize() override;
-    void Shutdown() override;
-    int Update(float dt) override;
+    bool    Initialize  ()                      override;
+    void    Shutdown    ()                      override;
+    int     Update      (float dt)              override;
 
     void SetBackend(CE::RenderBackend backend);
 

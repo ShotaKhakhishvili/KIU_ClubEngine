@@ -16,6 +16,8 @@ namespace CE
 
 class UTexture final : public UObject
 {
+    GENERATED_BODY(UTexture, UObject)
+
 public:
     UTexture(std::filesystem::path inSourcePath,
              const RHI::TextureDesc& inDesc,
@@ -26,8 +28,6 @@ public:
     UTexture& operator=(const UTexture&) = delete;
     UTexture(UTexture&&) noexcept = default;
     UTexture& operator=(UTexture&&) noexcept = default;
-
-    const char* GetClassName() const noexcept override;
 
     bool Load();
     void Unload();

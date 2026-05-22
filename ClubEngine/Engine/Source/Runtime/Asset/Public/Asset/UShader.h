@@ -15,6 +15,8 @@ namespace CE
 
 class UShader final : public UObject
 {
+    GENERATED_BODY(UShader, UObject)
+
 public:
 
     UShader(const RHI::ShaderDesc& shaderDesc, std::string inName = "UShader");
@@ -24,8 +26,6 @@ public:
     UShader& operator=(const UShader&) = delete;
     UShader(UShader&&) noexcept = default;
     UShader& operator=(UShader&&) noexcept = default;
-
-    const char* GetClassName() const noexcept override;
 
     bool Load();
     void Unload();

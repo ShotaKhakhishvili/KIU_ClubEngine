@@ -15,8 +15,9 @@ namespace CE
 
 class UMaterial : public UObject
 {
+    GENERATED_BODY(UMaterial, UObject)
+
 public:
-    const char* GetClassName() const noexcept override;
     
     UMaterial(TObjectHandle<UShader> shader);
     ~UMaterial();

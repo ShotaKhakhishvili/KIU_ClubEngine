@@ -29,11 +29,6 @@ UTexture::~UTexture()
 	Unload();
 }
 
-const char* UTexture::GetClassName() const noexcept
-{
-	return "UTexture";
-}
-
 bool UTexture::Load()
 {
 	Unload();

@@ -50,6 +50,7 @@ bool GLFWWindow::Init(const WindowConfig& config)
         auto* self = static_cast<GLFWWindow*>(glfwGetWindowUserPointer(win));
         self->width = static_cast<uint32>(W);
         self->height = static_cast<uint32>(H);
+        CE_LOG(Info, "width: {}, height: {}", W, H);
     });
 
     return true;
