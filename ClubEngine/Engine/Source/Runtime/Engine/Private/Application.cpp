@@ -6,6 +6,7 @@
 #include <Project/ActiveProject.h>
 
 #include <Engine/Application.h>
+#include <Engine/AssetContext.h>
 #include <Engine/Systems/RenderSystem.h>
 #include <Engine/Systems/WindowSystem.h>
 

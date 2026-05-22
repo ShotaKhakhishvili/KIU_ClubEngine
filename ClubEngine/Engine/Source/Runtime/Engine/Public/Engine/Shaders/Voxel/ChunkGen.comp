@@ -1,4 +1,0 @@
-#version 430
-
-#include "Common/noise/simplex3D.glsl"
-#include "Common/noise/fbm.glsl"

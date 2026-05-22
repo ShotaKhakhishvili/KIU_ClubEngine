@@ -49,6 +49,10 @@ function(ce_apply_warnings target)
     endif()
 endfunction()
 
+add_compile_definitions(
+    CE_ENGINE_ROOT="${CMAKE_SOURCE_DIR}"
+)
+
 add_subdirectory(Engine)
 
 include(cmake/GenerateConfig.cmake)
