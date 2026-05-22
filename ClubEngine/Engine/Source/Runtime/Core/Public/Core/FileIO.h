@@ -6,12 +6,9 @@
 #include <filesystem>
 #include <cstddef>
 
+
 namespace CE::FileIO
 {
-    /**
-     * @brief Reads an entire text file into a string.
-     * @param path Path to the file.
-     * @return File contents as std::string.
-     */
-    std::string ReadTextFile(const std::filesystem::path& path);
+    std::string ReadFile(const std::filesystem::path& path);
+    std::string ReadFileWithIncludes(const std::filesystem::path& path);
 }

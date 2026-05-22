@@ -23,6 +23,7 @@ target_link_libraries(CEEngine
   PRIVATE
     ClubEngine::Renderer
     ClubEngine::Project
+    ThirdParty::glad
 )
 
 target_compile_definitions(CEEngine PRIVATE CEENGINE_BUILD)

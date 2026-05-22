@@ -92,8 +92,8 @@ namespace ShaderUtils
 
 GLShader::GLShader(const char* vertexPath, const char* fragmentPath)
 {
-    const std::string vertexCode   = CE::FileIO::ReadTextFile(vertexPath);
-    const std::string fragmentCode = CE::FileIO::ReadTextFile(fragmentPath);
+    const std::string vertexCode   = CE::FileIO::ReadFile(vertexPath);
+    const std::string fragmentCode = CE::FileIO::ReadFile(fragmentPath);
 
     const GLuint vertexShader =
         ShaderUtils::CompileShader(vertexCode.c_str(), GL_VERTEX_SHADER, ShaderUtils::ShaderType::Vertex);
