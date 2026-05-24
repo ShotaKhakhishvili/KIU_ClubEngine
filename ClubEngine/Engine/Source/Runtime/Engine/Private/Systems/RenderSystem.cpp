@@ -13,7 +13,7 @@ RenderSystem::RenderSystem(WindowSystem* windowSystem, CE::RenderBackend backend
     this->windowSystem = windowSystem;
 }
 
-bool RenderSystem::Initialize()
+bool RenderSystem::Init()
 {
     renderer = std::make_unique<Renderer>(ToRHI(backend));
     return renderer != nullptr;

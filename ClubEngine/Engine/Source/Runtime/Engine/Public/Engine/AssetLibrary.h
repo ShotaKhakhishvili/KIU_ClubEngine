@@ -37,14 +37,4 @@ TObjectHandle<T> NewObject(Args&&... args)
 
 void DestroyAsset(UObjectHandle handle);
 
-template<typename T>
-T* SpawnActor(const FTransform& transform)
-{
-    static_assert(std::is_base_of_v<AActor, T>, "T must derive from AActor");
-
-    T* actor = new T(transform);
-
-    return actor;
-}
-
 }

@@ -55,13 +55,28 @@ RHI::ShaderHandle GLRHI::CreateShader(const RHI::ShaderDesc& desc)
             case RHI::ShaderStage::Fragment:
                 fragmentShader = src.source;
                 break;
+            case RHI::ShaderStage::Compute:
+                auto shader = std::make_unique<GLShader>(
+                    RHI::ShaderDesc{ 
+                        .stages = {{RHI::ShaderStage::Compute, src.source}}
+                    });
+                const uint32_t id = nextShaderHandle++;
+                shaders[id] = std::move(shader);
+                break;
         }
     }
 
     assert(!vertexShader.empty());
     assert(!fragmentShader.empty());
 
-    auto shader = std::make_unique<GLShader>(vertexShader.c_str(), fragmentShader.c_str());
+    RHI::ShaderDesc shaderDesc{
+        .stages = {
+            {RHI::ShaderStage::Vertex, vertexShader},
+            {RHI::ShaderStage::Fragment, fragmentShader}
+        }
+	};
+
+    auto shader = std::make_unique<GLShader>(shaderDesc);
 
     const uint32_t id = nextShaderHandle++;
 

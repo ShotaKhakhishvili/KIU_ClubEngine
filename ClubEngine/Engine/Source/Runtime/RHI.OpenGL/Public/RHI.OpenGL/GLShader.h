@@ -5,6 +5,7 @@
 #include <RHI.OpenGL/GLTexture.h>
 
 #include <string>
+#include <vector>
 #include <unordered_map>
 
 namespace CE::RHI
@@ -13,7 +14,7 @@ namespace CE::RHI
 class GLShader
 {
 public:
-    GLShader(const char* vertexPath, const char* fragmentPath);
+    GLShader(const RHI::ShaderDesc& shaderDesc);
     ~GLShader();
 
     void Bind() const;

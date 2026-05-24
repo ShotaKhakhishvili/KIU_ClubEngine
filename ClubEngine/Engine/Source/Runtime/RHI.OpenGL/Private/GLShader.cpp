@@ -1,5 +1,6 @@
 #include <Core/ClubCore.h>
 
+#include "GLConvert.h"
 #include <RHI.OpenGL/GLShader.h>
 
 #include <glad/glad.h>
@@ -13,8 +14,7 @@ namespace ShaderUtils
 {
     enum class ShaderType
     {
-        Vertex,
-        Fragment,
+        NonProgram,
         Program
     };
 
@@ -22,8 +22,7 @@ namespace ShaderUtils
     {
         switch (type)
         {
-            case ShaderType::Vertex:   return "VERTEX";
-            case ShaderType::Fragment: return "FRAGMENT";
+            case ShaderType::NonProgram:   return "NONPROGRAM";
             case ShaderType::Program:  return "PROGRAM";
             default:                   return "UNKNOWN";
         }
@@ -58,13 +57,13 @@ namespace ShaderUtils
         return true;
     }
 
-    GLuint CompileShader(const char* source, GLenum glType, ShaderType debugType)
+    GLuint CompileShader(const char* source, ShaderStage stage, ShaderType type)
     {
-        GLuint shader = glCreateShader(glType);
+        GLuint shader = glCreateShader(ToGL(stage));
         glShaderSource(shader, 1, &source, nullptr);
         glCompileShader(shader);
 
-        if (!CheckCompileErrors(shader, debugType))
+        if (!CheckCompileErrors(shader, type))
         {
             glDeleteShader(shader);
             return 0;
@@ -73,11 +72,13 @@ namespace ShaderUtils
         return shader;
     }
 
-    GLuint LinkProgram(GLuint vertexShader, GLuint fragmentShader)
+    GLuint LinkProgram(std::vector<GLuint> shaders)
     {
         GLuint programID = glCreateProgram();
-        glAttachShader(programID, vertexShader);
-        glAttachShader(programID, fragmentShader);
+        for (auto shader : shaders)
+        {
+			glAttachShader(programID, shader);
+        }
         glLinkProgram(programID);
 
         if (!CheckCompileErrors(programID, ShaderType::Program))
@@ -90,21 +91,24 @@ namespace ShaderUtils
     }
 }
 
-GLShader::GLShader(const char* vertexPath, const char* fragmentPath)
+GLShader::GLShader(const ShaderDesc& shaderDesc)
 {
-    const std::string vertexCode   = CE::FileIO::ReadFile(vertexPath);
-    const std::string fragmentCode = CE::FileIO::ReadFile(fragmentPath);
+    std::vector<GLuint> shaders;
 
-    const GLuint vertexShader =
-        ShaderUtils::CompileShader(vertexCode.c_str(), GL_VERTEX_SHADER, ShaderUtils::ShaderType::Vertex);
+    for (auto stage : shaderDesc.stages)
+    {
+        const std::string code = CE::FileIO::ReadFile(stage.source);
+		const GLuint shader = ShaderUtils::CompileShader(code.c_str(), stage.stage, ShaderUtils::ShaderType::NonProgram);
+        
+        shaders.push_back(shader);
+    }
 
-    const GLuint fragmentShader =
-        ShaderUtils::CompileShader(fragmentCode.c_str(), GL_FRAGMENT_SHADER, ShaderUtils::ShaderType::Fragment);
+    ID = ShaderUtils::LinkProgram(shaders);
 
-    ID = ShaderUtils::LinkProgram(vertexShader, fragmentShader);
-
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
+    for(auto shader : shaders)
+    {
+        glDeleteShader(shader);
+	}
 }
 
 void GLShader::Bind() const

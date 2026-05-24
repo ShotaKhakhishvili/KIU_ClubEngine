@@ -45,13 +45,17 @@ const AssetContext& Application::GetAssetContext() const noexcept
     
 int Application::Run()
 {
+    this->PreInit();
+
     this->running = true;
 
     for(auto& s : systems)
     {
-        if(!s->Initialize())
+        if(!s->Init())
             return 1;
     }
+
+	this->PostInit();
 
     using Clock = std::chrono::steady_clock;
     auto previous = Clock::now();
@@ -75,10 +79,19 @@ int Application::Run()
             return code;
     }
 
-    for(auto it = systems.begin(); it != systems.end(); ++it)
+    for(auto it = systems.rbegin(); it != systems.rend(); ++it)
         (*it)->Shutdown();
 
     return 0;
 }
 
+void Application::PostInit()
+{
+
+}
+
+void Application::PreInit()
+{
+
+}
 }

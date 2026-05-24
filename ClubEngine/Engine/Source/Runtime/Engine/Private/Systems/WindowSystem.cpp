@@ -8,7 +8,7 @@ WindowSystem::WindowSystem(WindowConfig config)
 {
 }
 
-bool WindowSystem::Initialize()
+bool WindowSystem::Init()
 {
     window = IWindow::Create();
 

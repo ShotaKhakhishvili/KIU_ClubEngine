@@ -28,6 +28,10 @@ public:
     AssetContext& GetAssetContext() noexcept;
     const AssetContext& GetAssetContext() const noexcept;
 
+protected:
+    virtual void PreInit();
+	virtual void PostInit();
+        
 private:
     std::vector<std::unique_ptr<ISystem>> systems;
     bool running{false};

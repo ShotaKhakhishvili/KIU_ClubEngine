@@ -54,3 +54,5 @@ ClubEngine/Saved/
 ClubEngine/Build/
 ClubEngine/Binaries/
 ClubEngine/Intermediate/
+
+.vs/

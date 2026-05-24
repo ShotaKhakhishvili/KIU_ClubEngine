@@ -14,8 +14,9 @@ GLenum ToGL(TextureSlot v) noexcept;
 GLenum ToGL(TextureInternalFormat v) noexcept;
 GLenum ToGL(TextureFormat v) noexcept;
 GLenum ToGL(TexturePixelType v) noexcept;
-GLenum ToGL(RHI::BufferType type) noexcept;
-GLenum ToGL(RHI::PrimitiveType primitive )noexcept;
-GLenum ToGL(RHI::IndexType type) noexcept;
+GLuint ToGL(ShaderStage v) noexcept;
+GLenum ToGL(BufferType type) noexcept;
+GLenum ToGL(PrimitiveType primitive )noexcept;
+GLenum ToGL(IndexType type) noexcept;
 
 }

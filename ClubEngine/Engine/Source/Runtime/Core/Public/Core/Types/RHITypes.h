@@ -142,7 +142,8 @@ enum class TextureDimension
 enum class ShaderStage
 {
     Vertex,
-    Fragment
+    Fragment,
+    Compute
 };
 
 enum class UniformType

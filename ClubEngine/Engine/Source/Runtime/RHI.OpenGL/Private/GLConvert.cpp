@@ -151,4 +151,16 @@ GLenum ToGL(RHI::IndexType type) noexcept
     return GL_UNSIGNED_INT;
 }
 
+GLuint ToGL(ShaderStage v) noexcept
+{
+    switch (v)
+    {
+        case ShaderStage::Vertex:   return GL_VERTEX_SHADER;
+        case ShaderStage::Fragment: return GL_FRAGMENT_SHADER;
+        case ShaderStage::Compute:  return GL_COMPUTE_SHADER;
+    }
+    assert(false && "Unhandled ShaderStage");
+	return GL_VERTEX_SHADER;
+}
+
 }

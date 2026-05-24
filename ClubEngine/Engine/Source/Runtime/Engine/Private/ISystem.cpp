@@ -3,7 +3,7 @@
 namespace CE
 {
 
-bool ISystem::Initialize()
+bool ISystem::Init()
 {
     return true;
 }

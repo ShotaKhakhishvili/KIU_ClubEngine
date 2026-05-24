@@ -19,7 +19,7 @@ public:
 
     const char* GetName() const noexcept    override;
 
-    bool    Initialize  ()                      override;
+    bool    Init        ()                      override;
     void    Shutdown    ()                      override;
     int     Update      (float dt)              override;
 
