@@ -35,6 +35,9 @@ public:
     void SetBool(const std::string& name, bool value);
     void SetInt(const std::string& name, int32_t value);
     void SetFloat(const std::string& name, float value);
+	void SetIVec2(const std::string& name, int x, int y);
+	void SetIVec3(const std::string& name, int x, int y, int z);
+	void SetIVec4(const std::string& name, int x, int y, int z, int w);
     void SetVec2(const std::string& name, float x, float y);
     void SetVec3(const std::string& name, float x, float y, float z);
     void SetVec4(const std::string& name, float x, float y, float z, float w);

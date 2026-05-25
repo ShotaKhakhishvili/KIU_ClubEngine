@@ -81,6 +81,9 @@ namespace CE::RHI
         virtual void SetUniformBool(const std::string& name, bool value) = 0;
         virtual void SetUniformInt(const std::string& name, int32_t value) = 0;
         virtual void SetUniformFloat(const std::string& name, float value) = 0;
+		virtual void SetUniformIVec2(const std::string& name, int x, int y) = 0;
+		virtual void SetUniformIVec3(const std::string& name, int x, int y, int z) = 0;
+		virtual void SetUniformIVec4(const std::string& name, int x, int y, int z, int w) = 0;
         virtual void SetUniformVec2(const std::string& name, const CE::FVector2F& value) = 0;
         virtual void SetUniformVec3(const std::string& name, const CE::FVectorF& value) = 0;
         virtual void SetUniformVec4(const std::string& name, const CE::FVector4F& value) = 0;

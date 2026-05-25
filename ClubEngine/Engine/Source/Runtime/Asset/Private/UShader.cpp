@@ -86,6 +86,30 @@ void UShader::SetFloat(const std::string& name, float value)
 	RHI::Get().SetUniformFloat(name, value);
 }
 
+void UShader::SetIVec2(const std::string& name, int x, int y)
+{
+	if(!handle.IsValid())
+		return;
+	RHI::Get().BindShader(handle);
+	RHI::Get().SetUniformIVec2(name, x, y);
+}
+
+void UShader::SetIVec3(const std::string& name, int x, int y, int z)
+{
+	if(!handle.IsValid())
+		return;
+	RHI::Get().BindShader(handle);
+	RHI::Get().SetUniformIVec3(name, x, y, z);
+}
+
+void UShader::SetIVec4(const std::string& name, int x, int y, int z, int w)
+{
+	if(!handle.IsValid())
+		return;
+	RHI::Get().BindShader(handle);
+	RHI::Get().SetUniformIVec4(name, x, y, z, w);
+}
+
 void UShader::SetVec2(const std::string& name, float x, float y)
 {
 	if(!handle.IsValid())

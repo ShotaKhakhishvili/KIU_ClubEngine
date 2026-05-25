@@ -8,7 +8,7 @@
 namespace CE::RHI
 {
 
-class GLShader;
+class GLShaderBase;
 class GLTexture;
 class GLVertexArray;
 class GLVertexBuffer;
@@ -57,6 +57,9 @@ public:
     void SetUniformBool(const std::string& name, bool value) override;
     void SetUniformInt(const std::string& name, int32_t value) override;
     void SetUniformFloat(const std::string& name, float value) override;
+	void SetUniformIVec2(const std::string& name, int x, int y) override;
+	void SetUniformIVec3(const std::string& name, int x, int y, int z) override;
+	void SetUniformIVec4(const std::string& name, int x, int y, int z, int w) override;
     void SetUniformVec2(const std::string& name, const CE::FVector2F& value) override;
     void SetUniformVec3(const std::string& name, const CE::FVectorF& value) override;
     void SetUniformVec4(const std::string& name, const CE::FVector4F& value) override;
@@ -72,7 +75,7 @@ private:
 
     RHI::ShaderHandle currentShader{};
 
-    std::unordered_map<uint32_t, std::unique_ptr<GLShader>> shaders;
+    std::unordered_map<uint32_t, std::unique_ptr<GLShaderBase>> shaders;
     std::unordered_map<uint32_t, std::unique_ptr<GLTexture>> textures;
     std::unordered_map<uint32_t, std::unique_ptr<GLVertexBuffer>> vertexBuffers;
     std::unordered_map<uint32_t, std::unique_ptr<GLIndexBuffer>> indexBuffers;

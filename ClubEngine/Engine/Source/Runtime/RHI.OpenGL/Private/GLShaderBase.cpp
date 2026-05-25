@@ -1,7 +1,7 @@
 #include <Core/ClubCore.h>
 
 #include "GLConvert.h"
-#include <RHI.OpenGL/GLShader.h>
+#include <RHI.OpenGL/GLShaderBase.h>
 
 #include <glad/glad.h>
 
@@ -10,36 +10,22 @@
 namespace CE::RHI
 {
 
+
 namespace ShaderUtils
 {
-    enum class ShaderType
-    {
-        NonProgram,
-        Program
-    };
 
-    const char* ToString(ShaderType type)
-    {
-        switch (type)
-        {
-            case ShaderType::NonProgram:   return "NONPROGRAM";
-            case ShaderType::Program:  return "PROGRAM";
-            default:                   return "UNKNOWN";
-        }
-    }
-
-    bool CheckCompileErrors(GLuint shader, ShaderType type)
+    bool CheckCompileErrors(GLuint shader, bool shaderProgram)
     {
         GLint success = GL_FALSE;
         char infoLog[512];
 
-        if (type != ShaderType::Program)
+        if (!shaderProgram)
         {
             glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
             if (success == GL_FALSE)
             {
                 glGetShaderInfoLog(shader, 512, nullptr, infoLog);
-                CE_LOG(Error, "[Shader][Type : {}] SHADER ERROR:\n{}", ToString(type), infoLog);
+                CE_LOG(Error, "[Shader][Type : {}] SHADER ERROR:\n{}", shaderProgram, infoLog);
                 return false;
             }
         }
@@ -49,7 +35,7 @@ namespace ShaderUtils
             if (success == GL_FALSE)
             {
                 glGetProgramInfoLog(shader, 512, nullptr, infoLog);
-                CE_LOG(Error, "[Shader][Type : {}] PROGRAM LINK ERROR:\n{}", ToString(ShaderType::Program), infoLog);
+                CE_LOG(Error, "[Shader][Type : {}] PROGRAM LINK ERROR:\n{}", shaderProgram, infoLog);
                 return false;
             }
         }
@@ -57,13 +43,13 @@ namespace ShaderUtils
         return true;
     }
 
-    GLuint CompileShader(const char* source, ShaderStage stage, ShaderType type)
+    GLuint CompileShader(const char* source, ShaderStage stage, bool shaderProgram)
     {
         GLuint shader = glCreateShader(ToGL(stage));
         glShaderSource(shader, 1, &source, nullptr);
         glCompileShader(shader);
 
-        if (!CheckCompileErrors(shader, type))
+        if (!CheckCompileErrors(shader, shaderProgram))
         {
             glDeleteShader(shader);
             return 0;
@@ -77,11 +63,11 @@ namespace ShaderUtils
         GLuint programID = glCreateProgram();
         for (auto shader : shaders)
         {
-			glAttachShader(programID, shader);
+            glAttachShader(programID, shader);
         }
         glLinkProgram(programID);
 
-        if (!CheckCompileErrors(programID, ShaderType::Program))
+        if (!CheckCompileErrors(programID, true))
         {
             glDeleteProgram(programID);
             return 0;
@@ -91,32 +77,43 @@ namespace ShaderUtils
     }
 }
 
-GLShader::GLShader(const ShaderDesc& shaderDesc)
+GLShaderBase::GLShaderBase(const ShaderFileDesc& shaderFileDesc)
+{
+    ShaderDesc shaderDesc = { .stages{shaderFileDesc.stages.size() } };
+
+	for (uint32 i = 0; i < shaderFileDesc.stages.size(); i++)
+    {
+        shaderDesc.stages[i] = ShaderSource{ shaderFileDesc.stages[i].stage, CE::FileIO::ReadFile(shaderFileDesc.stages[i].source) };
+    }
+
+	*this = GLShaderBase(shaderDesc);
+}
+
+GLShaderBase::GLShaderBase(const ShaderDesc& shaderDesc)
 {
     std::vector<GLuint> shaders;
 
     for (auto stage : shaderDesc.stages)
     {
-        const std::string code = CE::FileIO::ReadFile(stage.source);
-		const GLuint shader = ShaderUtils::CompileShader(code.c_str(), stage.stage, ShaderUtils::ShaderType::NonProgram);
-        
+        const GLuint shader = ShaderUtils::CompileShader(stage.source.c_str(), stage.stage, false);
+
         shaders.push_back(shader);
     }
 
     ID = ShaderUtils::LinkProgram(shaders);
 
-    for(auto shader : shaders)
+    for (auto shader : shaders)
     {
         glDeleteShader(shader);
-	}
+    }
 }
 
-void GLShader::Bind() const
+void GLShaderBase::Bind() const
 {
     glUseProgram(ID);
 }
 
-void GLShader::Delete()
+void GLShaderBase::Delete()
 {
     if (ID != 0)
     {
@@ -125,17 +122,17 @@ void GLShader::Delete()
     }
 }
 
-ShaderID GLShader::GetID() const noexcept
+ShaderID GLShaderBase::GetID() const noexcept
 {
     return ID;
 }
 
-GLShader::~GLShader()
+GLShaderBase::~GLShaderBase()
 {
     Delete();
 }
 
-GLShader::GLShader(GLShader&& other) noexcept
+GLShaderBase::GLShaderBase(GLShaderBase&& other) noexcept
     : ID(other.ID)
 {
     this->uniformLocations = std::move(other.uniformLocations);
@@ -145,7 +142,7 @@ GLShader::GLShader(GLShader&& other) noexcept
     other.ID = 0;
 }
 
-GLShader& GLShader::operator=(GLShader&& other) noexcept
+GLShaderBase& GLShaderBase::operator=(GLShaderBase&& other) noexcept
 {
     if (this != &other)
     {
@@ -161,7 +158,7 @@ GLShader& GLShader::operator=(GLShader&& other) noexcept
     return *this;
 }
 
-int32_t GLShader::GetUniformLocation(const std::string& name)
+int32_t GLShaderBase::GetUniformLocation(const std::string& name)
 {
     auto it = uniformLocations.find(name);
     if(it != uniformLocations.end())
@@ -169,7 +166,7 @@ int32_t GLShader::GetUniformLocation(const std::string& name)
 
     const int32_t loc = glGetUniformLocation(ID, name.c_str());
     if(loc == -1){
-        CE_LOG(Warning, "Uniform \"{}\" not found in GLShader", name); 
+        CE_LOG(Warning, "Uniform \"{}\" not found in GLShaderBase", name); 
     }
 
     uniformLocations[name] = loc;
@@ -177,7 +174,7 @@ int32_t GLShader::GetUniformLocation(const std::string& name)
     return loc;
 }
 
-void GLShader::SetFloat(const std::string& name, const float value)
+void GLShaderBase::SetFloat(const std::string& name, const float value)
 {
     const int32_t location = GetUniformLocation(name);
     if (location == -1)
@@ -186,7 +183,7 @@ void GLShader::SetFloat(const std::string& name, const float value)
     glUniform1f(location, value);
 }
 
-void GLShader::SetInt(const std::string& name, const int32_t value)
+void GLShaderBase::SetInt(const std::string& name, const int32_t value)
 {
     const int32_t location = GetUniformLocation(name);
     if (location == -1)
@@ -195,7 +192,7 @@ void GLShader::SetInt(const std::string& name, const int32_t value)
     glUniform1i(location, value);
 }
 
-void GLShader::SetBool(const std::string& name, const bool value)
+void GLShaderBase::SetBool(const std::string& name, const bool value)
 {
     const int32_t location = GetUniformLocation(name);
     if (location == -1)
@@ -204,7 +201,7 @@ void GLShader::SetBool(const std::string& name, const bool value)
     glUniform1i(location, value ? 1 : 0);
 }
 
-void GLShader::SetVec2(const std::string& name, const float x, const float y)
+void GLShaderBase::SetVec2(const std::string& name, const float x, const float y)
 {
     const int32_t location = GetUniformLocation(name);
     if (location == -1)
@@ -213,7 +210,7 @@ void GLShader::SetVec2(const std::string& name, const float x, const float y)
     glUniform2f(location, x,y);
 }
 
-void GLShader::SetVec3(const std::string& name, const float x, const float y, const float z)
+void GLShaderBase::SetVec3(const std::string& name, const float x, const float y, const float z)
 {
     const int32_t location = GetUniformLocation(name);
     if (location == -1)
@@ -222,7 +219,7 @@ void GLShader::SetVec3(const std::string& name, const float x, const float y, co
     glUniform3f(location, x,y,z);
 }
 
-void GLShader::SetVec4(const std::string& name, const float x, const float y, const float z, const float w)
+void GLShaderBase::SetVec4(const std::string& name, const float x, const float y, const float z, const float w)
 {
     const int32_t location = GetUniformLocation(name);
     if (location == -1)
@@ -231,7 +228,34 @@ void GLShader::SetVec4(const std::string& name, const float x, const float y, co
     glUniform4f(location, x,y,z,w);
 }
 
-void GLShader::SetTexture(const std::string& name, uint32_t slot)
+void GLShaderBase::SetIVec2(const std::string& name, const int x, const int y)
+{
+    const int32_t location = GetUniformLocation(name);
+    if (location == -1)
+        return;
+
+    glUniform2i(location, x, y);
+}
+
+void GLShaderBase::SetIVec3(const std::string& name, const int x, const int y, const int z)
+{
+    const int32_t location = GetUniformLocation(name);
+    if (location == -1)
+        return;
+
+    glUniform3i(location, x, y, z);
+}
+
+void GLShaderBase::SetIVec4(const std::string& name, const int x, const int y, const int z, const int w)
+{
+    const int32_t location = GetUniformLocation(name);
+    if (location == -1)
+        return;
+
+    glUniform4i(location, x, y, z, w);
+}
+
+void GLShaderBase::SetTexture(const std::string& name, uint32_t slot)
 {
     const int32_t location = GetUniformLocation(name);
     if (location == -1)

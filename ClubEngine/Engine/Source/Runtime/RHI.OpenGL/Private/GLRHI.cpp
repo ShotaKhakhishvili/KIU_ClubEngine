@@ -2,7 +2,7 @@
 
 #include "GLConvert.h"
 #include <RHI.OpenGL/GLRHI.h>
-#include <RHI.OpenGL/GLShader.h>
+#include <RHI.OpenGL/GLShaderBase.h>
 #include <RHI.OpenGL/GLTexture.h>
 #include <RHI.OpenGL/GLVertexArray.h>
 #include <RHI.OpenGL/GLVertexBuffer.h>
@@ -56,7 +56,7 @@ RHI::ShaderHandle GLRHI::CreateShader(const RHI::ShaderDesc& desc)
                 fragmentShader = src.source;
                 break;
             case RHI::ShaderStage::Compute:
-                auto shader = std::make_unique<GLShader>(
+                auto shader = std::make_unique<GLShaderBase>(
                     RHI::ShaderDesc{ 
                         .stages = {{RHI::ShaderStage::Compute, src.source}}
                     });
@@ -76,7 +76,7 @@ RHI::ShaderHandle GLRHI::CreateShader(const RHI::ShaderDesc& desc)
         }
 	};
 
-    auto shader = std::make_unique<GLShader>(shaderDesc);
+    auto shader = std::make_unique<GLShaderBase>(shaderDesc);
 
     const uint32_t id = nextShaderHandle++;
 
@@ -416,6 +416,24 @@ void GLRHI::SetUniformFloat(const std::string& name, float value)
 {
     assert(currentShader.IsValid());
     shaders[currentShader.id]->SetFloat(name, value);
+}
+
+void GLRHI::SetUniformIVec2(const std::string& name, int x, int y)
+{
+    assert(currentShader.IsValid());
+    shaders[currentShader.id]->SetIVec2(name, x, y);
+}
+
+void GLRHI::SetUniformIVec3(const std::string& name, int x, int y, int z)
+{
+    assert(currentShader.IsValid());
+    shaders[currentShader.id]->SetIVec3(name, x, y, z);
+}
+
+void GLRHI::SetUniformIVec4(const std::string& name, int x, int y, int z, int w)
+{
+    assert(currentShader.IsValid());
+    shaders[currentShader.id]->SetIVec4(name, x, y, z, w);
 }
 
 void GLRHI::SetUniformVec2(const std::string& name, const FVector2F& value)

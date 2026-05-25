@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include <filesystem>
 
 namespace CE::RHI
 {
@@ -184,9 +185,20 @@ struct ShaderSource
     std::string source;
 };
 
+struct ShaderFileSource
+{
+    ShaderStage stage = ShaderStage::Vertex;
+    std::filesystem::path source;
+};
+
 struct ShaderDesc
 {
     std::vector<ShaderSource> stages;
+};
+
+struct ShaderFileDesc
+{
+    std::vector<ShaderFileSource> stages;
 };
 
 struct VertexAttributeDesc
