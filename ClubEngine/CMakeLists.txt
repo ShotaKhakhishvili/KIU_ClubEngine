@@ -49,8 +49,9 @@ function(ce_apply_warnings target)
     endif()
 endfunction()
 
+file(TO_CMAKE_PATH "${CMAKE_SOURCE_DIR}" CE_ENGINE_ROOT_CLEAN)
 add_compile_definitions(
-    CE_ENGINE_ROOT="${CMAKE_SOURCE_DIR}"
+    CE_ENGINE_ROOT="${CE_ENGINE_ROOT_CLEAN}"
 )
 
 add_subdirectory(Engine)
