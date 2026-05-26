@@ -8,6 +8,16 @@ struct ProjectDescriptor
     std::string name;
     std::filesystem::path rootPath;
 
+    std::filesystem::path GetEnginePath() const
+    {
+        return std::filesystem::path(CE_ENGINE_ROOT);
+	}
+
+    std::filesystem::path GetProjectPath() const
+    {
+        return rootPath;
+	}
+
     std::filesystem::path GetContentPath() const
     {
         return rootPath / "Content";

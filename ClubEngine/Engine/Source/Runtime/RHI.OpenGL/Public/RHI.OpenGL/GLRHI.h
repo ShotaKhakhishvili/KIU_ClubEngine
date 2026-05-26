@@ -63,6 +63,7 @@ public:
     void SetUniformVec2(const std::string& name, const CE::FVector2F& value) override;
     void SetUniformVec3(const std::string& name, const CE::FVectorF& value) override;
     void SetUniformVec4(const std::string& name, const CE::FVector4F& value) override;
+	void SetUniformMat4(const std::string& name, const CE::FMatrix4x4F& value) override;
     void SetTexture(const std::string& name, TextureHandle texture, uint32_t slot) override;
     
     void DrawIndexed(const DrawIndexedDesc& desc) override;

@@ -30,6 +30,12 @@ public:
     UTexture*           Resolve(TObjectHandle<UTexture>         handle) const override;
     UMaterial*          Resolve(TObjectHandle<UMaterial>        handle) const override;
 
+    template<typename T>
+    T* Resolve(TObjectHandle<T> handle) const
+    {
+        return registry.Resolve(handle);
+    }
+
 private:
     mutable UObjectRegistry registry;
 };

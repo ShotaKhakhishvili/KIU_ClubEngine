@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Core/Types/RHITypes.h>
+#include <Core/Math/Matrix4x4.h>
 
 #include <CoreUObject/UObject.h>
 
@@ -41,6 +42,7 @@ public:
     void SetVec2(const std::string& name, float x, float y);
     void SetVec3(const std::string& name, float x, float y, float z);
     void SetVec4(const std::string& name, float x, float y, float z, float w);
+    void SetMat4(const std::string& name, const FMatrix4x4F& value);
 
 private:
     RHI::ShaderDesc shaderDesc;

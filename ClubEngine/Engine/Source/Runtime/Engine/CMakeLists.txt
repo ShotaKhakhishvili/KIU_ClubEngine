@@ -21,6 +21,7 @@ target_link_libraries(CEEngine
     ClubEngine::Platform
     ClubEngine::Asset
   PRIVATE
+    ClubEngine::AssetImport
     ClubEngine::Renderer
     ClubEngine::Project
     ThirdParty::glad

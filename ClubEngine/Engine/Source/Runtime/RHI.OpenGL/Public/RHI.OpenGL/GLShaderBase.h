@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Core/Types/RHITypes.h>
+#include <Core/Math/Matrix4x4.h>
 
 #include <RHI.OpenGL/GLTexture.h>
 
@@ -37,6 +38,7 @@ public:
     void SetIVec2(const std::string& name, const int   x, const int y);
     void SetIVec3(const std::string& name, const int   x, const int y, const int z);
     void SetIVec4(const std::string& name, const int   x, const int y, const int z, const int w);
+	void SetMat4(const std::string& name, const FMatrix4x4F& value);
     void SetTexture(const std::string& name, uint32_t slot);
 
     int32_t GetUniformLocation(const std::string& name);

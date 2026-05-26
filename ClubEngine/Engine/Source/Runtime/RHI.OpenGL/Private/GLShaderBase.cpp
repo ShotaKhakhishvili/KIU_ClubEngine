@@ -255,6 +255,14 @@ void GLShaderBase::SetIVec4(const std::string& name, const int x, const int y, c
     glUniform4i(location, x, y, z, w);
 }
 
+void GLShaderBase::SetMat4(const std::string& name, const FMatrix4x4F& value)
+{
+    const int32_t location = GetUniformLocation(name);
+    if (location == -1)
+        return;
+    glUniformMatrix4fv(location, 1, GL_FALSE, &value.cols[0].x);
+}
+
 void GLShaderBase::SetTexture(const std::string& name, uint32_t slot)
 {
     const int32_t location = GetUniformLocation(name);

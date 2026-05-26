@@ -454,6 +454,12 @@ void GLRHI::SetUniformVec4(const std::string& name, const FVector4F& value)
     shaders[currentShader.id]->SetVec4(name, value.x, value.y, value.z, value.w);
 }
 
+void GLRHI::SetUniformMat4(const std::string& name, const FMatrix4x4F& value)
+{
+    assert(currentShader.IsValid());
+    shaders[currentShader.id]->SetMat4(name, value);
+}
+
 void GLRHI::SetTexture(const std::string& name, RHI::TextureHandle texture, uint32_t slot)
 {
     auto shaderIt = shaders.find(currentShader.id);

@@ -137,4 +137,11 @@ void UShader::SetVec4(const std::string& name, float x, float y, float z, float 
 	RHI::Get().SetUniformVec4(name, {x,y,z,w});
 }
 
+void UShader::SetMat4(const std::string& name, const FMatrix4x4F& value)
+{
+	if (!handle.IsValid()) return;
+	RHI::Get().BindShader(handle);
+	RHI::Get().SetUniformMat4(name, value);
+}
+
 }

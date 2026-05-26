@@ -2,6 +2,7 @@
 
 #include <Core/Types/RHITypes.h>
 #include <Core/Math/Vector.h>
+#include <Core/Math/Matrix4x4.h>
 
 #include <RenderCore/RHI/RHIHandle.h>
 
@@ -87,6 +88,7 @@ namespace CE::RHI
         virtual void SetUniformVec2(const std::string& name, const CE::FVector2F& value) = 0;
         virtual void SetUniformVec3(const std::string& name, const CE::FVectorF& value) = 0;
         virtual void SetUniformVec4(const std::string& name, const CE::FVector4F& value) = 0;
+		virtual void SetUniformMat4(const std::string& name, const CE::FMatrix4x4F& value) = 0;
         virtual void SetTexture(const std::string& name, TextureHandle texture, uint32_t slot) = 0;
 
         // ------------ Draw ------------
