@@ -53,6 +53,27 @@ bool GLFWWindow::Init(const WindowConfig& config)
         CE_LOG(Info, "width: {}, height: {}", W, H);
     });
 
+    glfwSetKeyCallback(handle, [](GLFWwindow* window, int key, int, int action, int)
+    {
+        auto* engineWindow = static_cast<GLFWWindow*>(glfwGetWindowUserPointer(window));
+        if (engineWindow)
+            engineWindow->OnKey.Broadcast(static_cast<EKeyCode>(key), static_cast<EInputAction>(action));
+    });
+
+    glfwSetMouseButtonCallback(handle, [](GLFWwindow* window, int button, int action, int)
+    {
+        auto* engineWindow = static_cast<GLFWWindow*>(glfwGetWindowUserPointer(window));
+        if (engineWindow)
+            engineWindow->OnMouseButton.Broadcast(static_cast<EMouseButton>(button), static_cast<EInputAction>(action));
+    });
+
+    glfwSetCursorPosCallback(handle, [](GLFWwindow* window, double xpos, double ypos)
+    {
+        auto* engineWindow = static_cast<GLFWWindow*>(glfwGetWindowUserPointer(window));
+        if (engineWindow)
+            engineWindow->OnMouseMove.Broadcast(static_cast<float>(xpos), static_cast<float>(ypos));
+    });
+
     return true;
 }
 

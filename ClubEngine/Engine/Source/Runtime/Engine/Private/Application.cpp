@@ -18,6 +18,7 @@
 #include <Engine/AssetLibrary.h>
 #include <Engine/Systems/RenderSystem.h>
 #include <Engine/Systems/WindowSystem.h>
+#include <Engine/Systems/InputSystem.h>
 
 #include <filesystem>
 #include <string>
@@ -39,7 +40,9 @@ Application::Application()
     windowConfig.vSync  = config.Get<bool>("Render", "VSync", true);
 
     auto& windowSystem = AddSystem<CE::WindowSystem>(windowConfig);
+
     AddSystem<CE::RenderSystem>(&windowSystem, CE::RenderBackend::OpenGL);
+    AddSystem<CE::InputSystem>(&windowSystem);
 }
 
 Application::~Application() = default;
@@ -122,7 +125,7 @@ void Application::PostInit()
         material->SetBool("u_UseTexture", false);
     }
 
-    // MVP — sword sits around x:0-10, z:8-14, so pull camera back
+    // MVP ï¿½ sword sits around x:0-10, z:8-14, so pull camera back
     const FMatrix4x4F model = FMatrix4x4F::Identity();
     const FMatrix4x4F view = FMatrix4x4F::LookAt({ 5.0f, 3.0f, 30.0f }, { 5.0f, 0.0f, 11.0f }, { 0.0f, 1.0f, 0.0f });
     const FMatrix4x4F projection = FMatrix4x4F::Perspective(0.9f, 16.0f / 9.0f, 0.1f, 100.0f);

@@ -1,6 +1,8 @@
 #pragma once
 
 #include <Core/ClubCore.h>
+#include <Core/Delegate/MulticastDelegate.h>
+#include <Core/Types/InputTypes.h>
 
 #include <Platform/WindowConfig.h>
 
@@ -8,6 +10,10 @@
 
 namespace CE
 {
+
+using FOnKeyEvent = MulticastDelegate<EKeyCode, EInputAction>;
+using FOnMouseEvent = MulticastDelegate<EMouseButton, EInputAction>;
+using FOnMouseMoveEvent = MulticastDelegate<float, float>;
 
 class IWindow
 {
@@ -24,6 +30,10 @@ public:
     virtual uint32 GetHeight()                const = 0;
     virtual float GetAspectRatio()            const = 0;
     virtual void* GetNativeHandle()           const = 0;
+
+    FOnKeyEvent OnKey;
+    FOnMouseEvent OnMouseButton;
+    FOnMouseMoveEvent OnMouseMove;
 
     static std::unique_ptr<IWindow> Create();
 };
