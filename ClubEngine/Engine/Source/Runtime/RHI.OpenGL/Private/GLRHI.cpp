@@ -237,6 +237,32 @@ void GLRHI::DestroyBuffer(RHI::BufferHandle handle)
     }
 }
 
+void GLRHI::BindBufferBase(BufferHandle handle, uint32 bindingSlot) 
+{
+
+}
+void GLRHI::ReadBuffer(BufferHandle handle, void* dest, uint32 size)
+{
+
+}
+void GLRHI::DispatchCompute(uint32_t groupCountX, uint32_t groupCountY, uint32_t groupCountZ)
+{
+
+}
+	
+SyncFenceHandle GLRHI::CreateFence()                                                                  
+{
+
+}
+bool GLRHI::PollFence(SyncFenceHandle handle)                                                
+{
+    
+}
+void GLRHI::DestroyFence(SyncFenceHandle handle)                                                
+{
+
+}
+
 RHI::VertexArrayHandle GLRHI::CreateVertexArray(
     RHI::BufferHandle vertexBufferHandle,
     RHI::BufferHandle indexBufferHandle,

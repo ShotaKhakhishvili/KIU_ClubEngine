@@ -20,18 +20,26 @@ public:
     GLRHI();
     ~GLRHI() override;
 
-    void Init() override;
-    void Shutdown() override;
+    void                Init                        ()                                                                  override;
+    void                Shutdown                    ()                                                                  override;
 
-    ShaderHandle CreateShader(const ShaderDesc& desc) override;
-    void DestroyShader(ShaderHandle shader) override;
+    ShaderHandle        CreateShader                (const ShaderDesc& desc)                                            override;
+    void                DestroyShader               (ShaderHandle shader)                                               override;
 
-    TextureHandle CreateTexture(const TextureDesc& desc, const void* data) override;
-    TextureHandle CreateCubemap(const TextureDesc& desc, const void* const* faceData) override;
-    void DestroyTexture(TextureHandle texture) override;
+    TextureHandle       CreateTexture               (const TextureDesc& desc, const void* data)                         override;
+    TextureHandle       CreateCubemap               (const TextureDesc& desc, const void* const* faceData)              override;
+    void                DestroyTexture              (TextureHandle texture)                                             override;
 
-    BufferHandle CreateBuffer(const BufferDesc& desc, const void* data) override;
-    void DestroyBuffer(BufferHandle buffer) override;
+    BufferHandle        CreateBuffer                (const BufferDesc& desc, const void* data)                          override;
+    void                DestroyBuffer               (BufferHandle buffer)                                               override;
+
+    void                BindBufferBase              (BufferHandle handle, uint32 bindingSlot)                           override;
+    void                ReadBuffer                  (BufferHandle handle, void* dest, uint32 size)                      override;
+    void                DispatchCompute             (uint32_t groupCountX, uint32_t groupCountY, uint32_t groupCountZ)  override;
+		
+    SyncFenceHandle     CreateFence                 ()                                                                  override;
+    bool                PollFence                   (SyncFenceHandle handle)                                            override;
+	void                DestroyFence                (SyncFenceHandle handle)                                            override;
 
     VertexArrayHandle CreateVertexArray(
         BufferHandle vertexBuffer,

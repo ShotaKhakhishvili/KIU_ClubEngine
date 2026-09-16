@@ -118,6 +118,7 @@ enum class BufferType
 {
     Vertex,
     Index,
+    ShaderStorage,
     Uniform
 };
 

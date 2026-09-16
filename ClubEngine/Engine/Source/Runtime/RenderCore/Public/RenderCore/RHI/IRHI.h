@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Core/ClubCore.h>
+
 #include <Core/Types/RHITypes.h>
 #include <Core/Math/Vector.h>
 #include <Core/Math/Matrix4x4.h>
@@ -24,31 +26,42 @@ namespace CE::RHI
 
         // ------------ Shader ------------
 
-        virtual ShaderHandle CreateShader(const ShaderDesc& desc) = 0;
-        virtual void DestroyShader(ShaderHandle handle) = 0;
+        virtual ShaderHandle        CreateShader            (const ShaderDesc& desc) = 0;
+        virtual void                DestroyShader           (ShaderHandle handle) = 0;
 
         // ------------ Textures ------------
 
-        virtual TextureHandle CreateTexture(
+        virtual TextureHandle       CreateTexture(
             const TextureDesc& desc,
             const void* data
         ) = 0;
 
-        virtual TextureHandle CreateCubemap(
+        virtual TextureHandle       CreateCubemap(
             const TextureDesc& desc,
             const void* const*  faceData
         ) = 0;
 
-        virtual void DestroyTexture(TextureHandle handle) = 0;
+        virtual void                DestroyTexture          (TextureHandle handle) = 0;
     
         // ------------  Buffers ------------
 
-        virtual BufferHandle CreateBuffer(
+        virtual BufferHandle        CreateBuffer(
             const BufferDesc& desc,
             const void* data
         ) = 0;
 
-        virtual void DestroyBuffer(BufferHandle handle) = 0;
+        virtual void                DestroyBuffer           (BufferHandle handle) = 0;
+
+		// ------------ Compute ------------
+
+        virtual void                BindBufferBase          (BufferHandle handle, uint32 bindingSlot) = 0;
+        virtual void                ReadBuffer              (BufferHandle handle, void* dest, uint32 size) = 0;
+		virtual void                DispatchCompute         (uint32_t groupCountX, uint32_t groupCountY, uint32_t groupCountZ) = 0;
+		
+        virtual SyncFenceHandle     CreateFence             () = 0;
+		virtual bool                PollFence               (SyncFenceHandle handle) = 0;
+		virtual void                DestroyFence            (SyncFenceHandle handle) = 0;   
+
 
         // ------------ Vertex Array ------------
 
