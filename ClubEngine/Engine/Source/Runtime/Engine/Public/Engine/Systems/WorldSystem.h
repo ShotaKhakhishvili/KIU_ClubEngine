@@ -1,23 +1,20 @@
 #pragma once
 
 #include <Engine/ISystem.h>
-
-#include <queue>
+#include <Engine/World/UWorld.h>
 
 namespace CE
 {
 
-class FpsSystem : public ISystem
+class WorldSystem : public ISystem
 {
 public:
     const char*         GetName     ()              const       noexcept        override;
+    bool                Init        ()                                          override;
     int                 Update      (float dt)                                  override;
 
-    float GetFPS()const;
-
 private:
-    std::queue<float> deltas{};
-    float acc = 0;
+    UWorld world;
 };
 
 }

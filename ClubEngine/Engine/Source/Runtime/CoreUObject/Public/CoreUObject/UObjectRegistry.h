@@ -55,6 +55,16 @@ public:
         return static_cast<T*>(ResolveRaw(handle.handle));
     }
 
+    template<typename F>
+    void ForEach(F&& fn)
+    {
+        for(Slot& slot : slots)
+        {
+            if(slot.alive)
+                fn(*slot.object);
+        }
+    }
+
 private:
     struct Slot
     {
