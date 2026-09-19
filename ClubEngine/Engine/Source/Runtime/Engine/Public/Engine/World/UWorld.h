@@ -5,6 +5,7 @@
 #include <CoreUObject/UObjectRegistry.h>
 
 #include <Engine/World/AActor.h>
+#include <Engine/World/UActorComponent.h>
 
 #include <vector>
 #include <type_traits>
@@ -20,15 +21,28 @@ class UWorld : public UObject
 
 public:
 
-    template<typename T> requires std::is_base_of_v<AActor, T>
-    TObjectHandle<T> SpawnActor(const FTransform& transform)
+    template<typename T, typename... Args> requires std::is_base_of_v<AActor, T>
+    TObjectHandle<T> SpawnActor(Args&&... args)
     {
-        return actorRegistry.Create<T>(transform);
+        TObjectHandle<T> newActorHandle = actorRegistry.Create<T>(std::forward<Args>(args)...);
+
+        AActor* newActor = actorRegistry.Resolve(newActorHandle);
+        newActor->SetOwnerWorld(this);
+
+        return newActorHandle;
     }
     void Destroy(TObjectHandle<AActor>);
 
+    template<typename T, typename... Args> requires std::is_base_of_v<UActorComponent, T>
+    TObjectHandle<T> CreateComponent(Args&&... args)
+    {
+        return componentRegistry.Create<T>(std::forward<Args>(args)...);
+    }
+    void DestroyComponent(TObjectHandle<UActorComponent>);
+
 private:
     UObjectRegistry actorRegistry;
+    UObjectRegistry componentRegistry;
 
     friend class WorldSystem;
 

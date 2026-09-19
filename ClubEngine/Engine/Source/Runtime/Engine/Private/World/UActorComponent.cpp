@@ -3,12 +3,12 @@
 namespace CE
 {
 
-void UActorComponent::Update(float dt)
+void UActorComponent::Tick(float dt)
 {
     (void)dt;
 }
 
-void UActorComponent::SetOwner(AActor* owner)
+void UActorComponent::SetOwner(TObjectHandle<AActor> owner)
 {
     this->owner = owner;
 }

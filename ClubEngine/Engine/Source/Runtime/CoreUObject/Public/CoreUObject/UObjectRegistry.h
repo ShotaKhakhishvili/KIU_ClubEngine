@@ -15,8 +15,8 @@ class UObjectRegistry
 {
 public:
 
-    UObject* Resolve(const UObjectHandle& handle);
-    void Destroy(const UObjectHandle& handle);
+    UObject* Resolve(UObjectHandle handle);
+    void Destroy(UObjectHandle handle);
 
     template<typename T, typename... Args>
     TObjectHandle<T> Create(Args&&... args)
@@ -50,7 +50,7 @@ public:
     }
     
     template<typename T>
-    T* Resolve(const TObjectHandle<T>& handle)
+    T* Resolve(TObjectHandle<T> handle)
     {
         return static_cast<T*>(ResolveRaw(handle.handle));
     }
@@ -73,8 +73,8 @@ private:
         bool alive = false;
     };
 
-    UObject* ResolveRaw(const UObjectHandle& handle);
-    Slot* GetSlotFromHandle(const UObjectHandle& handle);
+    UObject* ResolveRaw(UObjectHandle handle);
+    Slot* GetSlotFromHandle(UObjectHandle handle);
 
     std::vector<uint32_t> freeList;
     std::vector<Slot> slots;

@@ -3,6 +3,7 @@
 #include <Core/ClubCore.h>
 
 #include <CoreUObject/UObject.h>
+#include <CoreUObject/TObjectHandle.h>
 
 namespace CE
 {
@@ -14,12 +15,12 @@ class UActorComponent : public UObject
     GENERATED_BODY(UActorComponent, UObject)
 
 public:
-    virtual void Update(float dt);
+    virtual void Tick(float dt);
 
-    void SetOwner(AActor* owner);
+    void SetOwner(TObjectHandle<AActor> owner);
 
 private:
-    AActor* owner;
+    TObjectHandle<AActor> owner;
 };
 
 }

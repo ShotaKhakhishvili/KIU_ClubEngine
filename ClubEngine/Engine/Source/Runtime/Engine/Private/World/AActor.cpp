@@ -1,4 +1,5 @@
 #include <Engine/World/AActor.h>
+#include <Engine/World/UWorld.h>
 
 namespace CE
 {
@@ -6,9 +7,22 @@ namespace CE
 AActor::AActor(const FTransform& transform)
     : AActor()
 {
-    root = new USceneComponent(transform);
+    root = ownerWorld->CreateComponent<USceneComponent>(transform);
 }
 
-USceneComponent* AActor::GetRootComponent() const {return root;}
+TObjectHandle<USceneComponent> AActor::GetRootComponent() const 
+{
+    return root;
+}
+
+void AActor::SetOwnerWorld(UWorld* newOwnerWorld)
+{
+    this->ownerWorld = newOwnerWorld;
+}
+
+void AActor::Tick(float dt)
+{
+    (void)dt;
+}
 
 }

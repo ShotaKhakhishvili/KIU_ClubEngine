@@ -3,11 +3,14 @@
 #include <Core/ClubCore.h>
 
 #include <CoreUObject/UObject.h>
+#include <CoreUObject/TObjectHandle.h>
 
 #include <Engine/World/USceneComponent.h>
 
 namespace CE
 {
+
+class UWorld;
 
 class AActor : public UObject
 {
@@ -17,10 +20,18 @@ public:
     explicit AActor(const FTransform& transform);
     ~AActor() override = default;
 
-    USceneComponent* GetRootComponent() const;
+    virtual void Tick(float dt);
+
+    TObjectHandle<USceneComponent> GetRootComponent() const;
 
 private:
-    USceneComponent* root;
+    TObjectHandle<USceneComponent> root;
+
+    UWorld* ownerWorld;
+
+    void SetOwnerWorld(UWorld* newOwnerWorld);
+
+    friend class UWorld;
 };
 
 }

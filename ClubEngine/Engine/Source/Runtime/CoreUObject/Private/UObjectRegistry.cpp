@@ -4,7 +4,7 @@
 namespace CE
 {
 
-void UObjectRegistry::Destroy(const UObjectHandle& handle)
+void UObjectRegistry::Destroy(UObjectHandle handle)
 {
     Slot* slot = GetSlotFromHandle(handle);
     
@@ -18,12 +18,12 @@ void UObjectRegistry::Destroy(const UObjectHandle& handle)
     freeList.push_back(handle.index);
 }
 
-UObject* UObjectRegistry::Resolve(const UObjectHandle& handle)
+UObject* UObjectRegistry::Resolve(UObjectHandle handle)
 {
     return ResolveRaw(handle);
 }
 
-UObject* UObjectRegistry::ResolveRaw(const UObjectHandle& handle) 
+UObject* UObjectRegistry::ResolveRaw(UObjectHandle handle) 
 {
     const Slot* slot = GetSlotFromHandle(handle);
 
@@ -33,7 +33,7 @@ UObject* UObjectRegistry::ResolveRaw(const UObjectHandle& handle)
     return slot->object.get();
 }
 
-UObjectRegistry::Slot* UObjectRegistry::GetSlotFromHandle(const UObjectHandle& handle)
+UObjectRegistry::Slot* UObjectRegistry::GetSlotFromHandle(UObjectHandle handle)
 {
     if(static_cast<uint32_t>(slots.size()) <= handle.index)
     {

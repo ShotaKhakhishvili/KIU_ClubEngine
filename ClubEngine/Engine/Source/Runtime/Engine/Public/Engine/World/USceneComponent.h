@@ -3,7 +3,11 @@
 #include <Core/ClubCore.h>
 #include <Core/Math/Transform.h>
 
+#include <CoreUObject/TObjectHandle.h>
+
 #include <Engine/World/UActorComponent.h>
+
+#include <vector>
 
 namespace CE
 {
@@ -19,6 +23,9 @@ public:
 
 private:
     FTransform transform;
+
+    TObjectHandle<USceneComponent> parentComponent;
+    std::vector<TObjectHandle<USceneComponent>> childComponents;
 };
 
 }
