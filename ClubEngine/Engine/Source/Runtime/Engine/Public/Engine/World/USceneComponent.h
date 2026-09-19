@@ -19,7 +19,7 @@ class USceneComponent : public UActorComponent
 public:
     explicit USceneComponent(const FTransform& transform);
 
-    void SetComponentTransform(const FTransform& transform);
+    void SetWorldTransform(const FTransform& transform);
 
 private:
     FTransform transform;

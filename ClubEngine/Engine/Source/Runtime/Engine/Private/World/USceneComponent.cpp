@@ -9,7 +9,7 @@ USceneComponent::USceneComponent(const FTransform& transform)
     
 }
 
-void USceneComponent::SetComponentTransform(const FTransform& transform)
+void USceneComponent::SetWorldTransform(const FTransform& transform)
 {
     this->transform = transform;
 }

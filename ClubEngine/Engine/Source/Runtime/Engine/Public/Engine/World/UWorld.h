@@ -1,3 +1,5 @@
+#pragma once
+
 #include <Core/ClubCore.h>
 
 #include <CoreUObject/UObject.h>
@@ -6,6 +8,7 @@
 
 #include <Engine/World/AActor.h>
 #include <Engine/World/UActorComponent.h>
+#include <Engine/World/FObjectInitializer.h>
 
 #include <vector>
 #include <type_traits>
@@ -22,31 +25,36 @@ class UWorld : public UObject
 public:
 
     template<typename T, typename... Args> requires std::is_base_of_v<AActor, T>
-    TObjectHandle<T> SpawnActor(Args&&... args)
+    TObjectHandle<T> SpawnActor(const FTransform& transform, Args&&... args)
     {
-        TObjectHandle<T> newActorHandle = actorRegistry.Create<T>(std::forward<Args>(args)...);
+        FObjectInitializer initializer(persistentLevel);
 
-        AActor* newActor = actorRegistry.Resolve(newActorHandle);
-        newActor->SetOwnerWorld(this);
+        TObjectHandle<AActor> handle = persistentLevel.actorRegistry->Create(std::forward<Args>(args)...);
+        AActor* actor = persistentLevel.actorRegistry->Resolve<AActor>(handle);
 
-        return newActorHandle;
+        if(!actor->rootComponent.IsValid())
+        {
+            actor->CreateDefaultSubobject<USceneComponent>();
+        }
+
+        for(auto& component : actor->ownedComponents)
+        {
+            persistentLevel.ResolveComponent<UActorComponent>(component)->SetOwner(handle);
+        }
+
+        persistentLevel.ResolveComponent(actor->rootComponent)->SetWorldTransform(transform);
+        actor->OnSpawned();
+
+        return handle;
     }
     void Destroy(TObjectHandle<AActor>);
 
-    template<typename T, typename... Args> requires std::is_base_of_v<UActorComponent, T>
-    TObjectHandle<T> CreateComponent(Args&&... args)
-    {
-        return componentRegistry.Create<T>(std::forward<Args>(args)...);
-    }
-    void DestroyComponent(TObjectHandle<UActorComponent>);
-
 private:
-    UObjectRegistry actorRegistry;
-    UObjectRegistry componentRegistry;
-
     friend class WorldSystem;
 
     void TickWorld(float dt);
+
+    ULevel persistentLevel;
 };
 
 }

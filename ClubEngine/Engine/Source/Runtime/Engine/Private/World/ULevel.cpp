@@ -6,7 +6,7 @@ namespace CE
 
 UWorld* ULevel::GetWorld() const
 {
-    return ownerWorld;
+    return world;
 }
 
 }

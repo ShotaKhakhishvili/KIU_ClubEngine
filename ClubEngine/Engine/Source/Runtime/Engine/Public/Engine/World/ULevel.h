@@ -1,3 +1,5 @@
+#pragma once 
+
 #include <CoreUObject/UObject.h>
 #include <CoreUObject/UObjectRegistry.h>
 
@@ -35,7 +37,7 @@ public:
 private:
     friend class UWorld;
 
-    UWorld* ownerWorld = nullptr;
+    UWorld* world = nullptr;
     UObjectRegistry* componentRegistry;
     UObjectRegistry* actorRegistry;
 };

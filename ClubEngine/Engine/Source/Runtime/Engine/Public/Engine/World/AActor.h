@@ -6,6 +6,10 @@
 #include <CoreUObject/TObjectHandle.h>
 
 #include <Engine/World/USceneComponent.h>
+#include <Engine/World/FObjectInitializer.h>
+#include <Engine/World/ULevel.h>
+
+#include <type_traits>
 
 namespace CE
 {
@@ -24,14 +28,30 @@ public:
 
     TObjectHandle<USceneComponent> GetRootComponent() const;
 
+    UWorld* GetWorld() const;
+    ULevel* GetLevel() const;
+
+protected:
+
+    virtual void OnSpawned();
+
+    template<typename T, typename... Args>
+        requires std::is_base_of_v<UActorComponent,T>
+    TObjectHandle<T> CreateDefaultSubobject(Args&&... args)
+    {
+        TObjectHandle<T> newSubobject = level->CreateComponent<T>(std::forward<Args>(args)...);
+        ownedComponents.push_back(newSubobject);
+
+        return newSubobject;
+    }
+
+    TObjectHandle<USceneComponent> rootComponent;
+
 private:
-    TObjectHandle<USceneComponent> root;
-
-    UWorld* ownerWorld;
-
-    void SetOwnerWorld(UWorld* newOwnerWorld);
-
     friend class UWorld;
+
+    std::vector<TObjectHandle<UActorComponent>> ownedComponents;
+    ULevel* level = FObjectInitializer::GetCurrent();
 };
 
 }
