@@ -22,4 +22,14 @@ bool WorldSystem::Init()
     return true;
 }
 
+const UWorld& WorldSystem::GetWorld() const
+{
+    return world;
+}   
+
+UWorld& WorldSystem::GetWorld()
+{
+    return world;
+}   
+
 }

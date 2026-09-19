@@ -27,14 +27,14 @@ public:
     template<typename T, typename... Args> requires std::is_base_of_v<AActor, T>
     TObjectHandle<T> SpawnActor(const FTransform& transform, Args&&... args)
     {
-        FObjectInitializer initializer(persistentLevel);
+        FObjectInitializer initializer(&persistentLevel);
 
-        TObjectHandle<AActor> handle = persistentLevel.actorRegistry->Create(std::forward<Args>(args)...);
-        AActor* actor = persistentLevel.actorRegistry->Resolve<AActor>(handle);
+        TObjectHandle<AActor> handle = persistentLevel.actorRegistry.Create<T>(std::forward<Args>(args)...);
+        AActor* actor = persistentLevel.actorRegistry.Resolve<AActor>(handle);
 
         if(!actor->rootComponent.IsValid())
         {
-            actor->CreateDefaultSubobject<USceneComponent>();
+            actor->rootComponent = actor->CreateDefaultSubobject<USceneComponent>();
         }
 
         for(auto& component : actor->ownedComponents)

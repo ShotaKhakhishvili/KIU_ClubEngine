@@ -5,7 +5,7 @@ namespace CE
 
 void UWorld::TickWorld(float dt)
 {
-    persistentLevel.actorRegistry->ForEach([dt](UObject& object)
+    persistentLevel.actorRegistry.ForEach([dt](UObject& object)
     {
         AActor& actor = static_cast<AActor&>(object);
         actor.Tick(dt);
@@ -16,7 +16,7 @@ void UWorld::TickWorld(float dt)
 void UWorld::Destroy(TObjectHandle<AActor> Handle)
 {
     if(Handle.IsValid())
-        persistentLevel.actorRegistry->Destroy(Handle.GetRaw());
+        persistentLevel.actorRegistry.Destroy(Handle.GetRaw());
 }
 
 }

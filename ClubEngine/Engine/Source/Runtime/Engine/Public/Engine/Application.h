@@ -32,8 +32,8 @@ protected:
     virtual void PreInit();
 	virtual void PostInit();
         
-private:
     std::vector<std::unique_ptr<ISystem>> systems;
+private:
     bool running{false};
         
     AssetContext assetContext{};

@@ -13,6 +13,9 @@ public:
     bool                Init        ()                                          override;
     int                 Update      (float dt)                                  override;
 
+    const UWorld&       GetWorld    ()              const                               ;
+    UWorld&             GetWorld    ()                                                  ;
+
 private:
     UWorld world;
 };

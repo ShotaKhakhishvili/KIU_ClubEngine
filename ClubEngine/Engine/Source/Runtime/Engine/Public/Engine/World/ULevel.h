@@ -24,22 +24,22 @@ public:
         requires std::is_base_of_v<UActorComponent, T>
     TObjectHandle<T> CreateComponent(Args&&... args)
     {
-        return componentRegistry->Create<T>(std::forward<Args>(args)...);
+        return componentRegistry.Create<T>(std::forward<Args>(args)...);
     }
 
     template<typename T> 
         requires std::is_base_of_v<UActorComponent, T>
     T* ResolveComponent(TObjectHandle<T> componentHandle)
     {
-        return componentRegistry->Resolve<T>(componentHandle);
+        return componentRegistry.Resolve<T>(componentHandle);
     }
 
 private:
     friend class UWorld;
 
     UWorld* world = nullptr;
-    UObjectRegistry* componentRegistry;
-    UObjectRegistry* actorRegistry;
+    UObjectRegistry componentRegistry;
+    UObjectRegistry actorRegistry;
 };
 
 }
