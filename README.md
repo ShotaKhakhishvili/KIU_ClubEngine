@@ -12,24 +12,29 @@ graph TD
 
     subgraph EngineModule["  Engine Module  "]
         Application(["Application<br/>Run · AddSystem"])
-        FpsSystem(["FpsSystem<br/>Frame delta"])
-        RenderSystem(["RenderSystem<br/>Frame rendering"])
-        WindowSystem(["WindowSystem<br/>Window lifecycle"])
-        AssetContext(["AssetContext<br/>Asset ownership"])
         AssetLibrary(["AssetLibrary<br/>NewObject helper"])
+        WorldSystem(["WorldSystem<br/>World tick"])
+        WindowSystem(["WindowSystem<br/>Window lifecycle"])
+        FpsSystem(["FpsSystem<br/>Frame delta"])
+        AssetContext(["AssetContext<br/>Asset ownership"])
+        RenderSystem(["RenderSystem<br/>Frame rendering"])
 
-        Application  ~~~ FpsSystem
-        Application  ~~~ RenderSystem
-        RenderSystem ~~~ WindowSystem
-        AssetContext ~~~ AssetLibrary
     end
 
-    CoreUObject(["CoreUObject<br/>UObject · Registry"])
+    subgraph WorldLayer["  World · Engine Module  "]
+        UWorld(["UWorld<br/>SpawnActor · Destroy · Tick"])
+        ULevel(["ULevel<br/>Actor & component registries"])
+        AActor(["AActor<br/>Tick · CreateDefaultSubobject"])
+        UActorComponent(["UActorComponent<br/>Tick · Owner"])
+        USceneComponent(["USceneComponent<br/>Transform · Attachment"])
+    end
+
+    CoreUObject(["CoreUObject<br/>UObject · Registry · TObjectHandle"])
     Renderer(["Renderer<br/>BeginFrame · Draw"])
     Platform(["Platform<br/>IWindow · GLFWWindow"])
     Asset(["Asset<br/>Mesh · Material · Shader · Tex"])
     AssetImport(["AssetImport<br/>OBJ · image loader"])
-    RenderCore(["RenderCore<br/>IRHI interface"])
+    RenderCore(["RenderCore<br/>IRHI interface · Handles"])
     RHI_OpenGL(["RHI.OpenGL<br/>GLRHI · GL objects"])
 
     subgraph CoreFoundation["  Core Foundation  "]
@@ -42,31 +47,53 @@ graph TD
         glad(["glad"])
     end
 
-    Launch        -->  Application
-    AssetContext  -.-  AssetLibrary
-    AssetContext  -->  CoreUObject
-    RenderSystem  -->  Renderer
-    WindowSystem  -->  Platform
-    CoreUObject   -->  Asset
-    AssetImport   -->|imports into| Asset
-    Renderer      -->  RenderCore
-    RenderCore    -->  RHI_OpenGL
+    Launch --> Application
+    Launch -->|sets asset context| AssetLibrary
+    Application --> WorldSystem
+    Application --> WindowSystem
+    Application -.->|optional| FpsSystem
+    Application --> AssetContext
+    Application --> RenderSystem
+    AssetLibrary -.- AssetContext
 
-    linkStyle 0,2,3,4,5,6,7,8 stroke:#909090,stroke-width:1.8px
-    linkStyle 1 stroke:#505050,stroke-width:1.2px,stroke-dasharray:5 3
+    WindowSystem --> Platform
+    RenderSystem --> Renderer
+    WorldSystem --> UWorld
+
+    UWorld -->|persistent level| ULevel
+    ULevel --> AActor
+    ULevel --> UActorComponent
+    AActor -->|owns| UActorComponent
+    AActor -->|root| USceneComponent
+    USceneComponent -.->|extends| UActorComponent
+
+    ULevel --> CoreUObject
+    AssetContext --> CoreUObject
+    Asset --> CoreUObject
+    AssetImport -->|imports into| Asset
+    Renderer --> Asset
+    Renderer --> RenderCore
+    Renderer -->|creates backend| RHI_OpenGL
+    RHI_OpenGL -->|implements| RenderCore
+
+    linkStyle default stroke:#909090,stroke-width:1.8px
+    linkStyle 4,7,16 stroke:#505050,stroke-width:1.2px,stroke-dasharray:5 3
 
     style EngineModule   fill:#1c1b2e,stroke:#4a4880,stroke-width:1.5px,stroke-dasharray:5 3,color:#9890b8
+    style WorldLayer     fill:#1f1c12,stroke:#6a5a28,stroke-width:1.5px,stroke-dasharray:5 3,color:#b8a878
     style CoreFoundation fill:#1c1c1c,stroke:#424242,stroke-width:1.5px,color:#787878
     style ThirdParty     fill:#181818,stroke:#383838,stroke-width:1px,color:#606060
 
     classDef orchestration fill:#272450,stroke:#504c90,stroke-width:1.5px,color:#c0bce0
     classDef runtime       fill:#152a24,stroke:#2c5e52,stroke-width:1.5px,color:#90b8b0
     classDef asset         fill:#2c1810,stroke:#5c3828,stroke-width:1.5px,color:#c09888
+    classDef world         fill:#2e2610,stroke:#6a5a28,stroke-width:1.5px,color:#d8c898
     classDef foundation    fill:#202020,stroke:#444444,stroke-width:1px,color:#a8a8a8
 
-    class Launch,Application,FpsSystem orchestration
+    class Launch,Application,FpsSystem,WorldSystem orchestration
     class RenderSystem,WindowSystem,Renderer,Platform,RenderCore,RHI_OpenGL runtime
     class AssetContext,AssetLibrary,CoreUObject,Asset,AssetImport asset
+    class UWorld,ULevel,AActor,UActorComponent,USceneComponent world
     class Core,GLFW,glad foundation
 ```
 
