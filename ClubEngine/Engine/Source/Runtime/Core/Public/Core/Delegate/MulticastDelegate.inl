@@ -1,5 +1,6 @@
 #pragma once
 #include <algorithm>
+#include <cassert>
 
 namespace CE
 {
@@ -23,13 +24,14 @@ namespace CE
     template<typename T>
     DelegateHandle MulticastDelegate<Args...>::Add(T* instance, void(T::*fn)(Args...))
     {
+        static_assert(sizeof(&fn) <= sizeof(Entry::fnBytes), "Member function pointer too large");
+
         Entry e;
 
         e.handle = DelegateHandle::Generate();
         e.fn = [instance, fn](Args... args){ (instance->*fn)(args...);};
-
         e.instance = static_cast<void*>(instance);
-        std::memcpy(&e.fnPtr, &fn, sizeof(void*));
+        std::memcpy(e.fnBytes, &fn, sizeof(void*));
 
         handlers.push_back(std::move(e));
         return handlers.back().handle;
@@ -54,20 +56,20 @@ namespace CE
     template<typename T>
     void MulticastDelegate<Args...>::Remove(T* instance, void(T::*fn)(Args...))
     {
-        void* fnPtr = nullptr;
-        std::memcpy(&fnPtr, &fn, sizeof(void*));
+        unsigned char key[sizeof(Entry::fnBytes)]{};
+        std::memcpy(&key, &fn, sizeof(void*));
 
-        auto it = std::find(handlers.begin(), handlers.end(),
-            [instance, fnPtr](const Entry e){
+        auto it = std::find_if(handlers.begin(), handlers.end(),
+            [&](const Entry& e){
                 return e.instance == static_cast<void*>(instance) &&
-                        fnPtr == e.fnPtr;
+                        std::memcmp(e.fnBytes, key, sizeof(key)) == 0;
         });
 
         if(it == handlers.end()) 
             return;
         
         if(broadcasting)
-            pendingRemoves.push_back(*it.handle);
+            pendingRemoves.push_back(it->handle);
         else
             handlers.erase(it);
     }

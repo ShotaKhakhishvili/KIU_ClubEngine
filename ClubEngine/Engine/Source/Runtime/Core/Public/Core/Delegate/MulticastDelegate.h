@@ -27,10 +27,10 @@ namespace CE
     private:
         struct Entry
         {
-            DelegateHandle               handle;
-            std::function<void(Args...)> fn;
-            void*                        instance = nullptr;
-            void*                        fnPtr    = nullptr;
+            DelegateHandle                  handle;
+            std::function<void(Args...)>    fn;
+            void*                           instance = nullptr;
+            alignas(void*) unsigned char    fnBytes[32]{};
         };
 
         mutable std::vector<Entry>          handlers;
