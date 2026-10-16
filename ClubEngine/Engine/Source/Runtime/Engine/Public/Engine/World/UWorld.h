@@ -29,7 +29,7 @@ public:
     {
         FObjectInitializer initializer(&persistentLevel);
 
-        TObjectHandle<AActor> handle = persistentLevel.actorRegistry.Create<T>(std::forward<Args>(args)...);
+        TObjectHandle<T> handle = persistentLevel.actorRegistry.Create<T>(std::forward<Args>(args)...);
         AActor* actor = persistentLevel.actorRegistry.Resolve<AActor>(handle);
 
         if(!actor->rootComponent.IsValid())

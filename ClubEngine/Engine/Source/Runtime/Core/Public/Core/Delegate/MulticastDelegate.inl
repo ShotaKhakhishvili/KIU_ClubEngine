@@ -13,11 +13,16 @@ namespace CE
         e.fn = std::move(fn);
 
         e.instance  = nullptr;
-        e.fnPtr     = nullptr;
 
-        handlers.push_back(std::move(e));
+        const DelegateHandle handle = e.handle;
 
-        return handlers.back().handle;
+        if(broadcastDepth > 0)
+            pendingAdds.push_back(std::move(e));
+
+        else
+            handlers.push_back(std::move(e));
+
+        return handle;
     }
 
     template<typename... Args>
@@ -33,8 +38,15 @@ namespace CE
         e.instance = static_cast<void*>(instance);
         std::memcpy(e.fnBytes, &fn, sizeof(void*));
 
-        handlers.push_back(std::move(e));
-        return handlers.back().handle;
+        const DelegateHandle handle = e.handle;
+
+        if(broadcastDepth > 0)
+            pendingAdds.push_back(std::move(e));
+
+        else
+            handlers.push_back(std::move(e));
+
+        return handle;
     }
 
     template<typename... Args>
@@ -43,13 +55,21 @@ namespace CE
         if(!handle.IsValid())
             return;
 
-        if(broadcasting)
-        {
-            pendingRemoves.push_back(handle);
-            return;
-        }
+        auto it = std::find_if(handlers.begin(), handlers.end(),
+            [&](const Entry& e){
+                return e.handle == handle;
+        });
 
-        FlushRemove(handle);
+        if(it == handlers.end())
+            return;
+
+        if(broadcastDepth > 0)
+        {
+            it->removed = true;
+            pendingRemoves = true;
+        }
+        else
+            handlers.erase(it);
     }
 
     template<typename... Args>
@@ -68,8 +88,11 @@ namespace CE
         if(it == handlers.end()) 
             return;
         
-        if(broadcasting)
-            pendingRemoves.push_back(it->handle);
+        if(broadcastDepth > 0)
+        {
+            it->removed = true;
+            pendingRemoves = true;
+        }
         else
             handlers.erase(it);
     }
@@ -77,25 +100,27 @@ namespace CE
     template<typename... Args>
     void MulticastDelegate<Args...>::Broadcast(Args... args) const
     {
-        broadcasting = true;
+        ++broadcastDepth;
 
-        for(const Entry& entry : handlers)
+        for(size_t i = 0; i < handlers.size(); i++)
         {
-            if(entry.handle.IsValid())
-                entry.fn(args...);
+            if(!handlers[i].removed)
+                handlers[i].fn(args...);
         }
 
-        broadcasting = false;
-        FlushPendingRemoves();
+        if(--broadcastDepth == 0)
+            Flush();
     }
 
     template<typename... Args>
     void MulticastDelegate<Args...>::Clear()
     {
-        if(broadcasting)
+        pendingAdds.clear();
+
+        if(broadcastDepth > 0)
         {
-            for(const Entry& entry : handlers)
-                pendingRemoves.push_back(entry.handle);
+            for(Entry& e : handlers) e.removed = true;
+            pendingRemoves = !handlers.empty();
             return;
         }
 
@@ -105,27 +130,41 @@ namespace CE
     template<typename... Args>
     bool MulticastDelegate<Args...>::IsBound() const
     {
-        return !handlers.empty();
+        return !pendingAdds.empty() || 
+                std::any_of(handlers.begin(), handlers.end(), 
+                    [](const Entry& e)
+                    {
+                        return !e.removed;
+                    }
+                );
     }
 
     template<typename... Args>
-    void MulticastDelegate<Args...>::FlushRemove(DelegateHandle handle)
+    void MulticastDelegate<Args...>::AddEntry(Entry&& entry)
     {
-        auto it = std::find_if(handlers.begin(), handlers.end(),
-            [handle](const Entry& e){ 
-                return e.handle == handle; 
-        });
-
-        if (it != handlers.end())
-            handlers.erase(it);
+        if(broadcastDepth > 0)
+            pendingAdds.push_back(std::move(entry));
+        else
+            handlers.push_back(std::move(entry));
     }
 
     template<typename... Args>
-    void MulticastDelegate<Args...>::FlushPendingRemoves() const
+    void MulticastDelegate<Args...>::Flush() const
     {
-        for(DelegateHandle& handle : pendingRemoves)
-            const_cast<MulticastDelegate*>(this)->FlushRemove(handle);
-     
-        pendingRemoves.clear(); 
+        if(pendingRemoves)
+        {
+            std::erase_if(handlers,
+                [](const Entry& e)
+                {
+                    return e.removed;
+                }
+            );
+            pendingRemoves = false;
+        }
+
+        for(Entry& e : pendingAdds)
+            handlers.push_back(std::move(e));
+
+        pendingAdds.clear();
     }
 }
