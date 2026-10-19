@@ -10,6 +10,11 @@
 
 #pragma once
 
+#include "Transform.h"
+#include "Matrix4x4.h"
+#include "Quat.h"
+#include "Vector.h"
+
 #include <cmath>
 #include <concepts>
 #include <type_traits>
