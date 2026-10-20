@@ -1,6 +1,9 @@
 #pragma once
 
 #include <Core/ClubCore.h>
+
+#include <CoreUObject/TObjectHandle.h>
+
 #include <Asset/UStaticMesh.h>
 
 namespace CE
@@ -9,7 +12,8 @@ namespace CE
 struct FPrimitiveSceneProxy
 {
     TObjectHandle<UStaticMesh> staticMesh;
-    FTransform transform;
+    FMatrix4x4F localToWorld = FMatrix4x4F::Identity();
+    bool isVisible = true;
 };
 
 }

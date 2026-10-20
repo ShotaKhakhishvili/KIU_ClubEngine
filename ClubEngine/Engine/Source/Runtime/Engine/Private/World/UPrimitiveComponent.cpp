@@ -3,7 +3,7 @@
 namespace CE
 {
 
-UPrimitiveComponent::UPrimitiveComponent(FObjectHandle<FPrimitiveSceneProxy> InPrimitiveSceneProxy)
+UPrimitiveComponent::UPrimitiveComponent(FPrimitiveSceneProxyHandle inPrimitiveSceneProxy)
     : primitiveSceneProxy(inPrimitiveSceneProxy)
 {}
 

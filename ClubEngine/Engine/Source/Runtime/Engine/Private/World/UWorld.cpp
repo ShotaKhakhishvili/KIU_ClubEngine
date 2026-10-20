@@ -19,4 +19,9 @@ void UWorld::Destroy(TObjectHandle<AActor> Handle)
         persistentLevel.actorRegistry.Destroy(Handle.GetRaw());
 }
 
+FScene& UWorld::GetScene()
+{
+    return scene;
+}    
+
 }

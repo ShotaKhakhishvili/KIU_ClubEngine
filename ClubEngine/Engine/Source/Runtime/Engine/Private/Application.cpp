@@ -13,6 +13,8 @@
 
 #include <RenderCore/RHI/IRHI.h>
 
+#include <Renderer/Scene/FScene.h>
+
 #include <Engine/Application.h>
 #include <Engine/AssetContext.h>
 #include <Engine/AssetLibrary.h>
@@ -40,8 +42,8 @@ Application::Application()
     windowConfig.vSync  = config.Get<bool>("Render", "VSync", true);
 
     auto& windowSystem = AddSystem<CE::WindowSystem>(windowConfig);
-    AddSystem<CE::RenderSystem>(&windowSystem, CE::RenderBackend::OpenGL);
-    AddSystem<CE::WorldSystem>();
+    auto& worldSystem = AddSystem<CE::WorldSystem>();
+    AddSystem<CE::RenderSystem>(&windowSystem, &worldSystem, CE::RenderBackend::OpenGL);
 }
 
 Application::~Application() = default;
@@ -124,7 +126,7 @@ void Application::PostInit()
         material->SetBool("u_UseTexture", false);
     }
 
-    // MVP � sword sits around x:0-10, z:8-14, so pull camera back
+    // MVP sword sits around x:0-10, z:8-14, so pull camera back
     const FMatrix4x4F model = FMatrix4x4F::Identity();
     const FMatrix4x4F view = FMatrix4x4F::LookAt({ 5.0f, 3.0f, 30.0f }, { 5.0f, 0.0f, 11.0f }, { 0.0f, 1.0f, 0.0f });
     const FMatrix4x4F projection = FMatrix4x4F::Perspective(0.9f, 16.0f / 9.0f, 0.1f, 100.0f);
@@ -182,19 +184,16 @@ void Application::PostInit()
 
     auto meshHandle = assetContext.Create<CE::UStaticMesh>(std::string("DebugMesh"));
     CE::UStaticMesh* staticMesh = assetContext.Resolve(meshHandle);
+
     if (staticMesh)
     {
         staticMesh->AddMaterial(materialHandle);
         staticMesh->AddSubMesh(subMesh);
-    }
+        
+        FPrimitiveSceneProxy proxy = {};
+        proxy.staticMesh = meshHandle;
 
-    for (auto& s : systems)
-    {
-        if (auto* renderSys = dynamic_cast<CE::RenderSystem*>(s.get()))
-        {
-            renderSys->AddMesh(staticMesh);
-            break;
-        }
+        GetSystem<WorldSystem>()->GetWorld().GetScene().AddProxy(proxy);
     }
 }
 
@@ -202,4 +201,5 @@ void Application::PreInit()
 {
 
 }
+
 }

@@ -6,6 +6,8 @@
 #include <CoreUObject/TObjectHandle.h>
 #include <CoreUObject/UObjectRegistry.h>
 
+#include <Renderer/Scene/FScene.h>
+
 #include <Engine/World/AActor.h>
 #include <Engine/World/UActorComponent.h>
 #include <Engine/World/FObjectInitializer.h>
@@ -49,12 +51,15 @@ public:
     }
     void Destroy(TObjectHandle<AActor>);
 
+    FScene& GetScene();
+
 private:
     friend class WorldSystem;
 
     void TickWorld(float dt);
 
     ULevel persistentLevel;
+    FScene scene;
 };
 
 }

@@ -6,6 +6,7 @@
 #include <Asset/UShader.h>
 #include <Asset/UTexture.h>
 #include <Asset/UMaterial.h>
+#include <Asset/UStaticMesh.h>
 
 #include <filesystem>
 #include <utility>
@@ -29,6 +30,8 @@ public:
     UShader*            Resolve(TObjectHandle<UShader>          handle) const override;
     UTexture*           Resolve(TObjectHandle<UTexture>         handle) const override;
     UMaterial*          Resolve(TObjectHandle<UMaterial>        handle) const override;
+    UStaticMesh*        Resolve(TObjectHandle<UStaticMesh>      handle) const override;
+
 
     template<typename T>
     T* Resolve(TObjectHandle<T> handle) const

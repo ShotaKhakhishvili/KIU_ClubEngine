@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Engine/World/UStaticMeshComponent>
+#include <Engine/World/UPrimitiveComponent.h>
 
 namespace CE
 {

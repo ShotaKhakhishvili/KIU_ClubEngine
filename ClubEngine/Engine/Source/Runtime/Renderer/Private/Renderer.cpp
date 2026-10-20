@@ -21,7 +21,7 @@ Renderer::~Renderer()
     RHI::Get().Shutdown();
 }
 
-void Renderer::DrawStaticMesh(const UStaticMesh& staticMesh) const
+void Renderer::DrawStaticMesh(const UStaticMesh& staticMesh, const FMatrix4x4F& localToWorld) const
 {
     const auto& subMeshes = staticMesh.GetSubMeshes();
     const auto& materials = staticMesh.GetMaterials();
@@ -52,6 +52,8 @@ void Renderer::DrawStaticMesh(const UStaticMesh& staticMesh) const
 
         UMaterial* material = resolver->Resolve(materialHandle);
         material->Bind();
+
+        RHI::Get().SetUniformMat4("u_Model", localToWorld);
 
         RHI::Get().BindVertexArray(subMesh.vertexArray);
         RHI::Get().DrawIndexed(subMesh.drawDesc);
@@ -89,6 +91,18 @@ void Renderer::BeginFrame(const RHI::ViewportDesc& viewportDesc)
 void Renderer::EndFrame()
 {
     // Empty for now lol
+}
+
+void Renderer::Render(const FScene& scene)
+{
+    scene.ForEachPrimitive([this](const FPrimitiveSceneProxy& proxy)
+    {
+        const UStaticMesh* staticMesh = GetCurrentAssetResolver()->Resolve(proxy.staticMesh);
+
+        if(staticMesh != nullptr)
+            DrawStaticMesh(*staticMesh, proxy.localToWorld);
+    });
+
 }
 
 }

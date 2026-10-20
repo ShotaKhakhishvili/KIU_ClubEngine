@@ -24,4 +24,9 @@ UMaterial* AssetContext::Resolve(TObjectHandle<UMaterial> handle) const
     return registry.Resolve(handle);
 }
 
+UStaticMesh* AssetContext::Resolve(TObjectHandle<UStaticMesh> handle) const
+{
+    return registry.Resolve(handle);
+}
+
 }

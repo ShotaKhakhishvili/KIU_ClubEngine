@@ -18,9 +18,10 @@ target_include_directories(CERenderer
 )
 
 target_link_libraries(CERenderer
-  PRIVATE
+  PUBLIC
     ClubEngine::Core
     ClubEngine::Asset
+  PRIVATE
     ClubEngine::RHIOpenGL
     ClubEngine::RenderCore
 )

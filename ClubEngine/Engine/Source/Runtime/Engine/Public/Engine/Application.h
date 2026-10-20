@@ -22,6 +22,18 @@ public:
         return ref;
     }
 
+    template<typename T> requires std::is_base_of_v<ISystem, T>
+    T* GetSystem() const
+    {
+        for(auto& system : systems)
+        {
+            if(T* s = dynamic_cast<T*>(system.get()))
+                return s;
+        }
+
+        return nullptr;
+    }
+
     int Run();
     virtual int Update(float dt) = 0;
 

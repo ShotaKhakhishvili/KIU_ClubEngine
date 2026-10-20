@@ -20,9 +20,9 @@ target_link_libraries(CEEngine
     ClubEngine::Core
     ClubEngine::Platform
     ClubEngine::Asset
+    ClubEngine::Renderer
   PRIVATE
     ClubEngine::AssetImport
-    ClubEngine::Renderer
     ClubEngine::Project
     ThirdParty::glad
 )

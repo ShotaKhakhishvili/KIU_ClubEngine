@@ -4,8 +4,12 @@
 
 #include <Asset/UStaticMesh.h>
 
+#include <Renderer/Scene/FScene.h>
+
 namespace CE
 {
+
+class FScene;
 
 class Renderer
 {
@@ -16,11 +20,12 @@ public:
     // These are temporary for now. Later we will have a UWorld, which the renderer will receive and render fully.
 
     void BeginFrame(const RHI::ViewportDesc& viewportDesc);
+    void Render(const FScene& scene);
     void EndFrame();
 
     void SetBackend(RHI::Backend backend);
 
-    void DrawStaticMesh(const UStaticMesh& staticMesh) const;
+    void DrawStaticMesh(const UStaticMesh& staticMesh, const FMatrix4x4F& localToWorld) const;
 private:
     RHI::Backend backend;
 };

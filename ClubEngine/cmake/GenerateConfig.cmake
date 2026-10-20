@@ -36,7 +36,7 @@ function(ce_generate_config)
     string(APPEND CFG "target_link_libraries(ClubEngine::RenderCore  INTERFACE ClubEngine::Core)\n")
     string(APPEND CFG "target_link_libraries(ClubEngine::RHIOpenGL   INTERFACE ClubEngine::RenderCore)\n")
     string(APPEND CFG "target_link_libraries(ClubEngine::Renderer    INTERFACE ClubEngine::RenderCore ClubEngine::Asset)\n")
-    string(APPEND CFG "target_link_libraries(ClubEngine::Engine      INTERFACE ClubEngine::Core ClubEngine::Asset)\n")
+    string(APPEND CFG "target_link_libraries(ClubEngine::Engine      INTERFACE ClubEngine::Core ClubEngine::Asset ClubEngine::Renderer)\n")
     string(APPEND CFG "target_link_libraries(ClubEngine::Launch      INTERFACE ClubEngine::Engine ClubEngine::Project)\n")
     string(APPEND CFG "target_link_libraries(ClubEngine::Project     INTERFACE ClubEngine::Core)\n")
 

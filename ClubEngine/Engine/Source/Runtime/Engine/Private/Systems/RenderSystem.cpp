@@ -1,16 +1,20 @@
 #include <Core/ClubCore.h>
 
 #include <Engine/Systems/RenderSystem.h>
+#include <Engine/Systems/WindowSystem.h>
+#include <Engine/Systems/WorldSystem.h>
+
 
 #include "../CEConvert.h"
 
 namespace CE
 {
 
-RenderSystem::RenderSystem(WindowSystem* windowSystem, CE::RenderBackend backend)
+RenderSystem::RenderSystem(WindowSystem* windowSystem,  WorldSystem* worldSystem, CE::RenderBackend backend)
 {
     this->backend = backend;
     this->windowSystem = windowSystem;
+    this->worldSystem = worldSystem;
 }
 
 bool RenderSystem::Init()
@@ -21,7 +25,6 @@ bool RenderSystem::Init()
 
 void RenderSystem::Shutdown()
 {
-    meshesToRender.clear();
     renderer.reset();
 }
 
@@ -36,10 +39,7 @@ int RenderSystem::Update(float dt)
 
     renderer->BeginFrame({0, 0, windowSystem->GetWindow()->GetWidth(), windowSystem->GetWindow()->GetHeight()});
 
-    for(auto staticMesh : meshesToRender)
-    {
-        renderer->DrawStaticMesh(*staticMesh);
-    }
+    renderer->Render(worldSystem->GetWorld().GetScene());
 
     renderer->EndFrame();
 
@@ -51,11 +51,6 @@ int RenderSystem::Update(float dt)
 void RenderSystem::SetBackend(CE::RenderBackend backend)
 {
     renderer->SetBackend(ToRHI(backend));
-}
-
-void RenderSystem::AddMesh(UStaticMesh* newMesh)
-{
-    meshesToRender.push_back(newMesh);
 }
 
 }
