@@ -4,6 +4,12 @@
 namespace CE
 {
 
+ULevel::ULevel(UWorld* inWorld)
+    : ULevel()
+{
+    world = inWorld;
+}
+
 UWorld* ULevel::GetWorld() const
 {
     return world;

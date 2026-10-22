@@ -63,17 +63,34 @@ int Application::Run()
     this->PreInit();
 
     this->running = true;
+    size_t systemsInitialized = 0;
 
     for(auto& s : systems)
     {
         if(!s->Init())
-            return 1;
+        {
+            running = false;
+            break;
+        }
+        systemsInitialized++;
+    }
+
+    if(!running)
+    {
+        size_t i = systemsInitialized;
+        while(i-- > 0)
+        {
+            systems[i]->Shutdown();
+        }
+        return 1;
     }
 
 	this->PostInit();
 
     using Clock = std::chrono::steady_clock;
     auto previous = Clock::now();
+
+    int exitCode = 0;
 
     while(this->running)
     {
@@ -83,21 +100,30 @@ int Application::Run()
 
         for(auto& s : systems)
         {
-            const int code = s->Update(dt);
-            if(code != 0)
-                return code;
+            exitCode = s->Update(dt);
+            if(exitCode != 0)
+            {
+                running = false;
+                break;
+            }
         }
 
-        const int code = this->Update(dt);
+        if(!running)
+            break;
 
-        if(code != 0)
-            return code;
+        exitCode = this->Update(dt);
+
+        if(exitCode != 0)
+        {
+            running = false;
+            break;
+        }
     }
 
     for(auto it = systems.rbegin(); it != systems.rend(); ++it)
         (*it)->Shutdown();
 
-    return 0;
+    return exitCode;
 }
 
 void Application::PostInit()

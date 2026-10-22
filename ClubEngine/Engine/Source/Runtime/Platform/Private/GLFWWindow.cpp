@@ -15,6 +15,11 @@ std::unique_ptr<IWindow> IWindow::Create()
     return std::make_unique<GLFWWindow>();
 }
 
+GLFWWindow::~GLFWWindow()
+{
+    Shutdown();
+}
+
 bool GLFWWindow::Init(const WindowConfig& config)
 {
     if(!glfwInit())
@@ -62,8 +67,8 @@ void GLFWWindow::Shutdown()
     {
         glfwDestroyWindow(handle);
         handle = nullptr;
+        glfwTerminate();
     }
-    glfwTerminate();
 }
 
 void GLFWWindow::PollEvents()

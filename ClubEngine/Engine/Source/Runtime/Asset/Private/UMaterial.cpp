@@ -38,15 +38,15 @@ UMaterial::~UMaterial()
     this->Reset();
 }
 
-void UMaterial::Bind() const
+bool UMaterial::Bind() const
 {
     if(!this->shader.IsValid())
-        return;
+        return false;
 
     UShader* shader = CE::Resolve(this->shader);
 
-    if(shader == nullptr)
-        return;
+    if(shader == nullptr || !shader->IsReady())
+        return false;
 
     shader->Bind();
 
@@ -84,6 +84,8 @@ void UMaterial::Bind() const
         shader->SetInt(name, slot);
         ++slot;
     }
+
+    return true;
 }
 
 UMaterial& UMaterial::operator=(UMaterial&& other) noexcept

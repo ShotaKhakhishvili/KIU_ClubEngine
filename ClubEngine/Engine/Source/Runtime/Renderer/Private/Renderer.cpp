@@ -23,6 +23,13 @@ Renderer::~Renderer()
 
 void Renderer::DrawStaticMesh(const UStaticMesh& staticMesh, const FMatrix4x4F& localToWorld) const
 {
+    const auto resolver = GetCurrentAssetResolver();
+    if(!resolver)
+    {
+        CE_LOG(Error, "Tried To Draw Without An Asset Resolver");
+        return;
+    }
+
     const auto& subMeshes = staticMesh.GetSubMeshes();
     const auto& materials = staticMesh.GetMaterials();
 
@@ -48,10 +55,19 @@ void Renderer::DrawStaticMesh(const UStaticMesh& staticMesh, const FMatrix4x4F& 
             continue;
         }
 
-        const auto resolver = GetCurrentAssetResolver();
-
         UMaterial* material = resolver->Resolve(materialHandle);
-        material->Bind();
+
+        if(!material)
+        {
+            CE_LOG(Warning, "Tried To Draw Sub Mesh With Invalid Null Material");
+            continue;
+        }
+
+        if(!material->Bind())
+        {
+            CE_LOG(Warning, "Tried To Draw Sub Mesh But Couldn't Bind Material");
+            continue;
+        }
 
         RHI::Get().SetUniformMat4("u_Model", localToWorld);
 

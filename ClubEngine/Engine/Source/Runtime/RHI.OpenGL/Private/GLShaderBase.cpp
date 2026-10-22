@@ -92,15 +92,20 @@ GLShaderBase::GLShaderBase(const ShaderFileDesc& shaderFileDesc)
 GLShaderBase::GLShaderBase(const ShaderDesc& shaderDesc)
 {
     std::vector<GLuint> shaders;
+    bool success = true;
 
     for (auto stage : shaderDesc.stages)
     {
         const GLuint shader = ShaderUtils::CompileShader(stage.source.c_str(), stage.stage, false);
-
+        if(!shader)
+        {
+            success = false;
+            break;
+        }
         shaders.push_back(shader);
     }
 
-    ID = ShaderUtils::LinkProgram(shaders);
+    ID = success? ShaderUtils::LinkProgram(shaders) : 0;
 
     for (auto shader : shaders)
     {
@@ -270,6 +275,11 @@ void GLShaderBase::SetTexture(const std::string& name, uint32_t slot)
         return;
 
     glUniform1i(location, slot);
+}
+
+bool GLShaderBase::IsValid() const noexcept
+{
+    return ID != 0;
 }
 
 }

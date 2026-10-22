@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Core/Types/CoreTypes.h>
+
 #include <CoreUObject/UObject.h>
 #include <CoreUObject/UObjectHandle.h>
 #include <CoreUObject/TObjectHandle.h>
@@ -58,25 +60,36 @@ public:
     template<typename F>
     void ForEach(F&& fn)
     {
-        for(Slot& slot : slots)
+        ++iterationDepth;
+
+        size_t count = slots.size();
+        for(size_t i = 0; i < count; i++)
         {
-            if(slot.alive)
-                fn(*slot.object);
+            if(slots[i].alive)
+                fn(*(slots[i].object));
         }
+
+        if(--iterationDepth == 0)
+            FlushPendingDestroy();
     }
 
 private:
+    void FlushPendingDestroy();
+
     struct Slot
     {
         std::unique_ptr<UObject> object;
-        uint32_t generation = 0;
+        uint32 generation = 0;
         bool alive = false;
     };
 
     UObject* ResolveRaw(UObjectHandle handle);
     Slot* GetSlotFromHandle(UObjectHandle handle);
 
-    std::vector<uint32_t> freeList;
+    size_t iterationDepth = 0;
+    std::vector<uint32> pendingDestroy;
+
+    std::vector<uint32> freeList;
     std::vector<Slot> slots;
     uint64_t nextID = 0;
 };

@@ -18,6 +18,8 @@ class ULevel : public UObject
 
 public:
 
+    explicit ULevel(UWorld* world);
+
     UWorld* GetWorld() const;
 
     template<typename T, typename... Args> 

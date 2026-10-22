@@ -26,6 +26,9 @@ class UWorld : public UObject
 
 public:
 
+    UWorld(const UWorld&) = delete;
+    UWorld& operator=(const UWorld&) = delete;
+
     template<typename T, typename... Args> requires std::is_base_of_v<AActor, T>
     TObjectHandle<T> SpawnActor(const FTransform& transform, Args&&... args)
     {
@@ -58,7 +61,7 @@ private:
 
     void TickWorld(float dt);
 
-    ULevel persistentLevel;
+    ULevel persistentLevel{this};
     FScene scene;
 };
 

@@ -78,6 +78,12 @@ RHI::ShaderHandle GLRHI::CreateShader(const RHI::ShaderDesc& desc)
 
     auto shader = std::make_unique<GLShaderBase>(shaderDesc);
 
+    if(!shader->IsValid())
+    {
+        CE_LOG(Error, "RHI.OpenGL: Shader Creation Failed");
+        return RHI::ShaderHandle{};
+    }
+    
     const uint32_t id = nextShaderHandle++;
 
     shaders[id] = std::move(shader);

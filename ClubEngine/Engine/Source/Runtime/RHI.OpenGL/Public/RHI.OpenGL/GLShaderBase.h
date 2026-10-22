@@ -43,6 +43,8 @@ public:
 
     int32_t GetUniformLocation(const std::string& name);
 
+    bool IsValid() const noexcept;
+
 private:
 
     ShaderID ID{ 0 };

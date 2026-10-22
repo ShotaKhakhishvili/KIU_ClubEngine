@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Core/Types/CoreTypes.h>
+
 #include <cstdint>
 #include <limits>
 
@@ -15,8 +17,8 @@ public:
 private:
     friend class UObjectRegistry;
 
-    uint32_t index = std::numeric_limits<uint32_t>::max();
-    uint32_t generation = 0;
+    uint32 index = std::numeric_limits<uint32_t>::max();
+    uint32 generation = 0;
 };
 
 }

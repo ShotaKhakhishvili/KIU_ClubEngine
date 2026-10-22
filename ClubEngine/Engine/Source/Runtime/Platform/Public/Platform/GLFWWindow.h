@@ -13,6 +13,7 @@ namespace CE
 class GLFWWindow : public IWindow
 {
 public:
+    ~GLFWWindow                 ()                              override;
     bool    Init                (const WindowConfig& config)    override;
     void    Shutdown            ()                              override;
     void    PollEvents          ()                              override;

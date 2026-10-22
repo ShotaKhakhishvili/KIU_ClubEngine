@@ -36,7 +36,7 @@ public:
     void SetVec4    (const std::string& name, const float   x,      const float y, const float z, const float w);
     void SetTexture (const std::string& name, TObjectHandle<UTexture>      texture);
 
-    void Bind() const;
+    bool Bind() const;
 
     void Reset();
 

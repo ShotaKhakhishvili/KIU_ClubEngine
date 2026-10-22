@@ -11,9 +11,16 @@ void UObjectRegistry::Destroy(UObjectHandle handle)
     if(slot == nullptr) 
         return;
 
-    slot->object.reset();
     slot->alive = false;
     ++slot->generation;
+
+    if(iterationDepth != 0)
+    {
+        pendingDestroy.push_back(handle.index);
+        return;
+    }
+
+    slot->object.reset();
 
     freeList.push_back(handle.index);
 }
@@ -58,6 +65,17 @@ UObjectRegistry::Slot* UObjectRegistry::GetSlotFromHandle(UObjectHandle handle)
     }
 
     return &slot;
+}
+
+void UObjectRegistry::FlushPendingDestroy()
+{
+    for(const uint32 index : pendingDestroy)
+    {
+        slots[index].object.reset();
+        freeList.push_back(index);
+    }
+
+    pendingDestroy.clear();
 }
 
 }
