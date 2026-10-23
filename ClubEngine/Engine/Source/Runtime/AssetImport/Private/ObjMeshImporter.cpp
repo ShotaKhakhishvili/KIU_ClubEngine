@@ -153,7 +153,7 @@ namespace CE
             {
                 FVectorF position;
                 ss >> position.x >> position.y >> position.z;
-                positions.push_back(position);
+                positions.push_back(settings.convertAxes ? FVectorF{ -position.z, position.x, position.y } : position);
             }
             else if (type == "vt")
             {
@@ -165,7 +165,7 @@ namespace CE
             {
                 FVectorF normal;
                 ss >> normal.x >> normal.y >> normal.z;
-                normals.push_back(normal);
+                normals.push_back(settings.convertAxes ? FVectorF{ -normal.z, normal.x, normal.y } : normal);
             }
             else if (type == "o" || type == "g")
             {

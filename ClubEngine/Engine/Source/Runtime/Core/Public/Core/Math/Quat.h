@@ -16,6 +16,7 @@
 #include <Core/Math/Vector.h>
 
 #include <concepts>
+#include <type_traits>
 
 namespace CE
 {
@@ -78,8 +79,8 @@ template<std::floating_point T> inline    T         Length      (const TQuat<T>&
 template<std::floating_point T> inline    TQuat<T>  Normalize   (const TQuat<T>& q);
 template<std::floating_point T> constexpr TQuat<T>  Conjugate   (const TQuat<T>& q);
 template<std::floating_point T> inline    TQuat<T>  Inverse     (const TQuat<T>& q);
-template<std::floating_point T>           TQuat<T>  Slerp       (TQuat<T> a, TQuat<T> b, T t);
-template<std::floating_point T>           TQuat<T>  Nlerp       (TQuat<T> a, TQuat<T> b, T t);
+template<std::floating_point T>           TQuat<T>  Slerp       (TQuat<T> a, TQuat<T> b, std::type_identity_t<T> t);
+template<std::floating_point T>           TQuat<T>  Nlerp       (TQuat<T> a, TQuat<T> b, std::type_identity_t<T> t);
 template<std::floating_point T> constexpr bool      NearlyEqual (const TQuat<T>& a, const TQuat<T>& b, T tolerance = SMALL_NUMBER<T>);
 
 // ─── Type aliases ─────────────────────────────────────────────────────────────

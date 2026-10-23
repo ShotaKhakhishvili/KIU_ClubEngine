@@ -14,6 +14,7 @@ namespace CE
         bool flipV = true;
         bool triangulate = true;
         float scale = 1.0f;
+        bool convertAxes = true;
     };
 
     class ObjMeshImporter

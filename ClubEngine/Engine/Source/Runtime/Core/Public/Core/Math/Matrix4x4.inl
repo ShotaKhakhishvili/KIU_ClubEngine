@@ -229,8 +229,8 @@ template<std::floating_point T>
 TMatrix4x4<T> TMatrix4x4<T>::LookAt(TVector<T> eye, TVector<T> center, TVector<T> up)
 {
     const TVector<T> f = Normalize(center - eye);
-    const TVector<T> r = Normalize(Cross(f, up));
-    const TVector<T> u = Cross(r, f);
+    const TVector<T> r = Normalize(Cross(up, f));  
+    const TVector<T> u = Cross(f, r);               
 
     return {
         {  r.x,  u.x, -f.x, T(0) },
@@ -371,7 +371,7 @@ TMatrix4x4<T> Inverse(const TMatrix4x4<T>& m)
 
     const T det = s[0]*inv[0] + s[1]*inv[4] + s[2]*inv[8] + s[3]*inv[12];
 
-    if (NearlyZero(det))
+    if (det == T(0))
         return TMatrix4x4<T>::Identity();
 
     const T invDet = T(1) / det;

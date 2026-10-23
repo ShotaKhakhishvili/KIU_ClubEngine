@@ -195,11 +195,25 @@ template<typename T>
 inline T Length   (TVector4<T> v)                           { return std::sqrt(Dot(v, v));  }
 
 template<typename T>
-constexpr TVector2<T>   Normalize(TVector2<T> v)            { return v / Length(v);         }
+constexpr TVector2<T> Normalize(TVector2<T> v)
+{
+    const auto len = Length(v);
+    return len > decltype(len)(1e-12) ? v / len : TVector2<T>{};
+}
+
 template<typename T>
-constexpr TVector<T>    Normalize(TVector<T> v)             { return v / Length(v);         }
+constexpr TVector<T> Normalize(TVector<T> v)
+{
+    const auto len = Length(v);
+    return len > decltype(len)(1e-12) ? v / len : TVector<T>{};
+}
+
 template<typename T>
-constexpr TVector4<T>   Normalize(TVector4<T> v)            { return v / Length(v);         }
+constexpr TVector4<T> Normalize(TVector4<T> v)
+{
+    const auto len = Length(v);
+    return len > decltype(len)(1e-12) ? v / len : TVector4<T>{};
+}
 
 template<typename T>
 constexpr bool NearlyEqual(TVector2<T> a, TVector2<T> b, T tolerance)

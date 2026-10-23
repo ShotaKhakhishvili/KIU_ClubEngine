@@ -34,19 +34,17 @@ TQuat<T> TQuat<T>::FromAxisAngle(TVector<T> axis, T angle)
 template<std::floating_point T>
 TQuat<T> TQuat<T>::FromEuler(T pitch, T yaw, T roll)
 {
-    const T hp = pitch * T(0.5);
-    const T hy = yaw   * T(0.5);
-    const T hr = roll  * T(0.5);
-
-    const T cp = std::cos(hp), sp = std::sin(hp);
-    const T cy = std::cos(hy), sy = std::sin(hy);
-    const T cr = std::cos(hr), sr = std::sin(hr);
+    // Unreal convention: X forward, Y right, Z up.
+    // Pitch around Y (nose up +), Yaw around Z (turn right +), Roll around X.
+    const T sp = std::sin(pitch * T(0.5)), cp = std::cos(pitch * T(0.5));
+    const T sy = std::sin(yaw   * T(0.5)), cy = std::cos(yaw   * T(0.5));
+    const T sr = std::sin(roll  * T(0.5)), cr = std::cos(roll  * T(0.5));
 
     return {
-        sp*cy*cr + cp*sy*sr,
-        cp*sy*cr - sp*cy*sr,
-        cp*cy*sr + sp*sy*cr,
-        cp*cy*cr - sp*sy*sr
+         cr*sp*sy - sr*cp*cy,
+        -cr*sp*cy - sr*cp*sy,
+         cr*cp*sy - sr*sp*cy,
+         cr*cp*cy + sr*sp*sy
     };
 }
 
@@ -137,18 +135,9 @@ TMatrix4x4<T> TQuat<T>::ToMatrix() const
 template<std::floating_point T>
 TVector<T> TQuat<T>::ToEuler() const
 {
-    const T sinr_cosp = T(2) * (w*x + y*z);
-    const T cosr_cosp = T(1) - T(2) * (x*x + y*y);
-    const T roll  = std::atan2(sinr_cosp, cosr_cosp);
-
-    const T sinp  = T(2) * (w*y - z*x);
-    const T pitch = (std::abs(sinp) >= T(1))
-                  ? std::copysign(HALF_PI<T>, sinp)
-                  : std::asin(sinp);
-
-    const T siny_cosp = T(2) * (w*z + x*y);
-    const T cosy_cosp = T(1) - T(2) * (y*y + z*z);
-    const T yaw   = std::atan2(siny_cosp, cosy_cosp);
+    const T pitch = std::asin(Clamp(T(2) * (z*x - w*y), T(-1), T(1)));
+    const T yaw   = std::atan2(T(2) * (w*z + x*y), T(1) - T(2) * (y*y + z*z));
+    const T roll  = std::atan2(T(-2) * (w*x + y*z), T(1) - T(2) * (x*x + y*y));
 
     return { pitch, yaw, roll };
 }
@@ -165,7 +154,7 @@ TVector<T> TQuat<T>::ToEulerDegrees() const
 template<std::floating_point T>
 TVector<T> TQuat<T>::GetForward() const
 {
-    return { T(2)*(x*z + w*y), T(2)*(y*z - w*x), T(1) - T(2)*(x*x + y*y) };
+    return { T(1) - T(2)*(y*y + z*z), T(2)*(x*y + w*z), T(2)*(x*z - w*y) };
 }
 
 template<std::floating_point T>
@@ -174,7 +163,7 @@ TVector<T> TQuat<T>::GetBack() const { return -GetForward(); }
 template<std::floating_point T>
 TVector<T> TQuat<T>::GetRight() const
 {
-    return { T(1) - T(2)*(y*y + z*z), T(2)*(x*y + w*z), T(2)*(x*z - w*y) };
+    return { T(2)*(x*y - w*z), T(1) - T(2)*(x*x + z*z), T(2)*(y*z + w*x) };
 }
 
 template<std::floating_point T>
@@ -183,7 +172,7 @@ TVector<T> TQuat<T>::GetLeft() const { return -GetRight(); }
 template<std::floating_point T>
 TVector<T> TQuat<T>::GetUp() const
 {
-    return { T(2)*(x*y - w*z), T(1) - T(2)*(x*x + z*z), T(2)*(y*z + w*x) };
+    return { T(2)*(x*z + w*y), T(2)*(y*z - w*x), T(1) - T(2)*(x*x + y*y) };
 }
 
 template<std::floating_point T>
@@ -271,7 +260,7 @@ inline TQuat<T> Inverse(const TQuat<T>& q)
 }
 
 template<std::floating_point T>
-TQuat<T> Slerp(TQuat<T> a, TQuat<T> b, T t)
+TQuat<T> Slerp(TQuat<T> a, TQuat<T> b, std::type_identity_t<T> t)
 {
     T cosHalfAngle = Dot(a, b);
 
@@ -298,7 +287,7 @@ TQuat<T> Slerp(TQuat<T> a, TQuat<T> b, T t)
 }
 
 template<std::floating_point T>
-TQuat<T> Nlerp(TQuat<T> a, TQuat<T> b, T t)
+TQuat<T> Nlerp(TQuat<T> a, TQuat<T> b, std::type_identity_t<T> t)
 {
     if (Dot(a, b) < T(0))
         b = -b;

@@ -17,6 +17,7 @@
 #include <Core/Math/Quat.h>
 
 #include <concepts>
+#include <type_traits>
 
 namespace CE
 {
@@ -72,8 +73,8 @@ struct TTransform
 // ─── Free functions ───────────────────────────────────────────────────────────
 
 template<std::floating_point T> TTransform<T>   Combine     (const TTransform<T>& parent, const TTransform<T>& child);
-template<std::floating_point T> TTransform<T>   Lerp        (const TTransform<T>& a, const TTransform<T>& b, T t);
-template<std::floating_point T> TTransform<T>   SlerpLerp   (const TTransform<T>& a, const TTransform<T>& b, T t);
+template<std::floating_point T> TTransform<T>   Lerp        (const TTransform<T>& a, const TTransform<T>& b, std::type_identity_t<T> t);
+template<std::floating_point T> TTransform<T>   SlerpLerp   (const TTransform<T>& a, const TTransform<T>& b, std::type_identity_t<T> t);
 
 // ─── Type aliases ─────────────────────────────────────────────────────────────
 

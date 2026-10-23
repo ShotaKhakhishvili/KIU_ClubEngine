@@ -13,6 +13,18 @@
 namespace CE
 {
 
+// Helper
+
+template<std::floating_point T>
+inline TVector<T> SafeInverseScale(TVector<T> s)
+{
+    return {
+        NearlyZero(s.x) ? T(0) : T(1) / s.x,
+        NearlyZero(s.y) ? T(0) : T(1) / s.y,
+        NearlyZero(s.z) ? T(0) : T(1) / s.z
+    };
+}
+
 // ─── Static factories ─────────────────────────────────────────────────────────
 
 template<std::floating_point T>
@@ -77,13 +89,12 @@ constexpr TVector<T> TTransform<T>::TransformDirectionNoScale(TVector<T> d) cons
 template<std::floating_point T>
 TVector<T> TTransform<T>::InverseTransformPoint(TVector<T> p) const
 {
-    return InverseFast().TransformPoint(p);
+    return SafeInverseScale(Scale) * (Conjugate(Rotation) * (p - Translation));
 }
-
 template<std::floating_point T>
 TVector<T> TTransform<T>::InverseTransformDirection(TVector<T> d) const
 {
-    return InverseFast().TransformDirection(d);
+    return SafeInverseScale(Scale) * (Conjugate(Rotation) * d);
 }
 
 // ─── Operators ────────────────────────────────────────────────────────────────
@@ -112,7 +123,7 @@ TTransform<T> Combine(const TTransform<T>& parent, const TTransform<T>& child)
 }
 
 template<std::floating_point T>
-TTransform<T> Lerp(const TTransform<T>& a, const TTransform<T>& b, T t)
+TTransform<T> Lerp(const TTransform<T>& a, const TTransform<T>& b, std::type_identity_t<T> t)
 {
     TTransform<T> out;
     out.Translation = a.Translation + (b.Translation - a.Translation) * t;
@@ -122,7 +133,7 @@ TTransform<T> Lerp(const TTransform<T>& a, const TTransform<T>& b, T t)
 }
 
 template<std::floating_point T>
-TTransform<T> SlerpLerp(const TTransform<T>& a, const TTransform<T>& b, T t)
+TTransform<T> SlerpLerp(const TTransform<T>& a, const TTransform<T>& b, std::type_identity_t<T> t)
 {
     TTransform<T> out;
     out.Translation = a.Translation + (b.Translation - a.Translation) * t;
