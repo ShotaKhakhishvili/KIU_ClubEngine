@@ -1,7 +1,7 @@
 #pragma once
 #include <Launch/Launch.h>
 
-#include <Project/ProjectDescriptor.h>
+#include <Project/FProjectDescriptor.h>
 #include <Project/ActiveProject.h>
 
 #include <Engine/Application.h>
@@ -15,7 +15,7 @@ int main(int argc, char** argv)
 {
     (void)argc; (void)argv;
     
-    ProjectDescriptor project;
+    CE::FProjectDescriptor project;
     project.rootPath = CE_PROJECT_ROOT;
 
     CE::SetActiveProject(project);

@@ -3,7 +3,7 @@
 namespace CE
 {
 
-WindowSystem::WindowSystem(WindowConfig config)
+WindowSystem::WindowSystem(FWindowConfig config)
     : config(config)
 {
 }

@@ -1,12 +1,12 @@
 #include <Core/ClubCore.h>
 #include <Core/Config/ConfigSystem.h>
 
-#include <Platform/WindowConfig.h>
+#include <Platform/FWindowConfig.h>
 
 #include <Project/ActiveProject.h>
 
 #include <Asset/IAssetResolver.h>
-#include <Asset/SubMesh.h>
+#include <Asset/FSubMesh.h>
 #include <Asset/UStaticMesh.h>
 
 #include <AssetImport/ObjMeshImporter.h>
@@ -35,7 +35,7 @@ Application::Application()
     ConfigSystem config;
     config.LoadFile(GetActiveProject().GetConfigPath() / "DefaultRender.ini");
 
-    WindowConfig windowConfig;
+    FWindowConfig windowConfig;
     windowConfig.title  = config.Get<std::string>("Render", "Title", "ClubEngine");
     windowConfig.width  = config.Get<int>("Render", "Width", 1280);
     windowConfig.height = config.Get<int>("Render", "Height", 720);
@@ -43,7 +43,7 @@ Application::Application()
 
     auto& windowSystem = AddSystem<CE::WindowSystem>(windowConfig);
     auto& worldSystem = AddSystem<CE::WorldSystem>();
-    AddSystem<CE::RenderSystem>(&windowSystem, &worldSystem, CE::RenderBackend::OpenGL);
+    AddSystem<CE::RenderSystem>(&windowSystem, &worldSystem, CE::ERenderBackend::OpenGL);
 }
 
 Application::~Application() = default;
@@ -173,12 +173,12 @@ void Application::PostInit()
         return;
     }
 
-    const CE::MeshImportResult& meshRes = importRes.value();
+    const CE::FMeshImportResult& meshRes = importRes.value();
 
     RHI::BufferDesc vbd{};
     vbd.type = RHI::BufferType::Vertex;
     vbd.usage = RHI::BufferUsage::StaticDraw;
-    vbd.size = static_cast<uint32_t>(meshRes.vertices.size() * sizeof(CE::Vertex));
+    vbd.size = static_cast<uint32_t>(meshRes.vertices.size() * sizeof(CE::FVertex));
     auto vbHandle = RHI::Get().CreateBuffer(vbd, meshRes.vertices.data());
 
     RHI::BufferDesc ibd{};
@@ -189,18 +189,18 @@ void Application::PostInit()
 
     RHI::VertexAttributeDesc a0{};
     a0.location = 0; a0.componentCount = 3; a0.dataType = RHI::ShaderDataType::Float;
-    a0.stride = static_cast<uint32_t>(sizeof(CE::Vertex));
-    a0.offset = static_cast<uint32_t>(offsetof(CE::Vertex, coord));
+    a0.stride = static_cast<uint32_t>(sizeof(CE::FVertex));
+    a0.offset = static_cast<uint32_t>(offsetof(CE::FVertex, coord));
 
-    RHI::VertexAttributeDesc a1 = a0; a1.location = 1; a1.offset = static_cast<uint32_t>(offsetof(CE::Vertex, normal));
-    RHI::VertexAttributeDesc a2 = a0; a2.location = 2; a2.offset = static_cast<uint32_t>(offsetof(CE::Vertex, color));
-    RHI::VertexAttributeDesc a3 = a0; a3.location = 3; a3.componentCount = 2; a3.offset = static_cast<uint32_t>(offsetof(CE::Vertex, texUV));
+    RHI::VertexAttributeDesc a1 = a0; a1.location = 1; a1.offset = static_cast<uint32_t>(offsetof(CE::FVertex, normal));
+    RHI::VertexAttributeDesc a2 = a0; a2.location = 2; a2.offset = static_cast<uint32_t>(offsetof(CE::FVertex, color));
+    RHI::VertexAttributeDesc a3 = a0; a3.location = 3; a3.componentCount = 2; a3.offset = static_cast<uint32_t>(offsetof(CE::FVertex, texUV));
 
     RHI::VertexArrayDesc vaDesc;
     vaDesc.attributes = { a0, a1, a2, a3 };
     auto vaoHandle = RHI::Get().CreateVertexArray(vbHandle, ibHandle, vaDesc);
 
-    CE::SubMesh subMesh{};
+    CE::FSubMesh subMesh{};
     subMesh.vertexArray = vaoHandle;
     subMesh.drawDesc.primitiveType = RHI::PrimitiveType::Triangles;
     subMesh.drawDesc.indexType = RHI::IndexType::UInt32;

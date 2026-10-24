@@ -22,12 +22,6 @@ public:
     UMaterial(TObjectHandle<UShader> shader);
     ~UMaterial();
 
-    UMaterial& operator=(const UMaterial& other) = delete;
-    UMaterial(const UMaterial& other) = delete;
-
-    UMaterial& operator=(UMaterial&& other) noexcept;
-    UMaterial(UMaterial&& other) noexcept;
-
     void SetBool    (const std::string& name, const bool    value);
     void SetInt     (const std::string& name, const int32_t value);
     void SetFloat   (const std::string& name, const float   value);

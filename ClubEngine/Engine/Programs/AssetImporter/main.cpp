@@ -4,7 +4,7 @@
 
 int main()
 {
-    CE::ObjImportSettings settings;
+    CE::FObjImportSettings settings;
     settings.flipV = true;
     settings.triangulate = true;
     settings.scale = 1.0f;

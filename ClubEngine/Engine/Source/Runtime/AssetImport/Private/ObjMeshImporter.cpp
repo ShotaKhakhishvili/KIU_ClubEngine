@@ -33,12 +33,12 @@ namespace CE
         }
     };
 
-    ObjMeshImporter::ObjMeshImporter(ObjImportSettings inSettings)
+    ObjMeshImporter::ObjMeshImporter(FObjImportSettings inSettings)
         : settings(inSettings)
     {
     }
 
-    std::optional<MeshImportResult> ObjMeshImporter::Import(const std::filesystem::path& path)
+    std::optional<FMeshImportResult> ObjMeshImporter::Import(const std::filesystem::path& path)
     {
         ClearMessages();
 
@@ -50,7 +50,7 @@ namespace CE
             return std::nullopt;
         }
 
-        MeshImportResult result;
+        FMeshImportResult result;
 
         std::vector<FVectorF> positions;
         std::vector<FVector2F> texCoords;
@@ -58,7 +58,7 @@ namespace CE
 
         std::unordered_map<ObjVertexKey, uint32_t, ObjVertexKeyHash> vertexCache;
 
-        MeshImportSection currentSection;
+        FMeshImportSection currentSection;
         currentSection.name = "Default";
         currentSection.materialName = "Default";
         currentSection.indexStart = 0;
@@ -99,9 +99,9 @@ namespace CE
             return key;
         };
 
-        auto BuildVertex = [&](const ObjVertexKey& key) -> Vertex
+        auto BuildVertex = [&](const ObjVertexKey& key) -> FVertex
         {
-            Vertex vertex;
+            FVertex vertex;
 
             if (key.positionIndex >= 0 && key.positionIndex < static_cast<int>(positions.size()))
             {
@@ -224,7 +224,7 @@ namespace CE
                     }
                     else
                     {
-                        Vertex vertex = BuildVertex(key);
+                        FVertex vertex = BuildVertex(key);
 
                         const uint32_t newIndex = static_cast<uint32_t>(result.vertices.size());
 

@@ -58,3 +58,5 @@ ClubEngine/Intermediate/
 .vs/
 
 CLAUDE.md
+ClubEngine/.clang-format
+ClubEngine/.clang-format

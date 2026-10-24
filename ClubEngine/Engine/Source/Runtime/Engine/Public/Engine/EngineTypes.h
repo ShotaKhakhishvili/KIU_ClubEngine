@@ -7,7 +7,7 @@
 namespace CE
 {
     
-enum class RenderBackend
+enum class ERenderBackend
 {
     OpenGL
 };
@@ -33,7 +33,7 @@ struct FVoxelChunkFaceMap
     std::unordered_map<uint32, uint32[6]> faceHandles;
 };
 
-struct ChunkHash {
+struct FChunkHash {
     size_t operator()(uint32 key) const
     {
         key = ((key >> 16) ^ key) * 0x45d9f3b;

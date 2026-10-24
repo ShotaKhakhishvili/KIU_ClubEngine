@@ -1,6 +1,6 @@
 #pragma once
 
-#include <AssetImport/MeshImportResult.h>
+#include <AssetImport/FMeshImportResult.h>
 
 #include <filesystem>
 #include <optional>
@@ -9,7 +9,7 @@
 
 namespace CE
 {
-    struct ObjImportSettings
+    struct FObjImportSettings
     {
         bool flipV = true;
         bool triangulate = true;
@@ -20,9 +20,9 @@ namespace CE
     class ObjMeshImporter
     {
     public:
-        explicit ObjMeshImporter(ObjImportSettings settings = {});
+        explicit ObjMeshImporter(FObjImportSettings settings = {});
 
-        std::optional<MeshImportResult> Import(const std::filesystem::path& path);
+        std::optional<FMeshImportResult> Import(const std::filesystem::path& path);
 
         const std::vector<std::string>& GetErrors() const;
         const std::vector<std::string>& GetWarnings() const;
@@ -33,7 +33,7 @@ namespace CE
         void AddError(std::string message);
         void AddWarning(std::string message);
 
-        ObjImportSettings settings;
+        FObjImportSettings settings;
 
         std::vector<std::string> errors;
         std::vector<std::string> warnings;

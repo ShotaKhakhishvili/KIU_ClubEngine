@@ -1,9 +1,9 @@
 #pragma once
 
-#include <Project/ProjectDescriptor.h>
+#include <Project/FProjectDescriptor.h>
 
 namespace CE
 {
-    void                     SetActiveProject(const ProjectDescriptor& project);
-    const ProjectDescriptor& GetActiveProject();
+    void                     SetActiveProject(const FProjectDescriptor& project);
+    const FProjectDescriptor& GetActiveProject();
 }

@@ -4,7 +4,7 @@
 
 namespace CE
 {
-    struct Vertex
+    struct FVertex
     {
         FVectorF coord{};
         FVectorF normal{};

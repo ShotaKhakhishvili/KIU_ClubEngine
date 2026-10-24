@@ -10,7 +10,7 @@
 namespace CE
 {
 
-RenderSystem::RenderSystem(WindowSystem* windowSystem,  WorldSystem* worldSystem, CE::RenderBackend backend)
+RenderSystem::RenderSystem(WindowSystem* windowSystem,  WorldSystem* worldSystem, ERenderBackend backend)
 {
     this->backend = backend;
     this->windowSystem = windowSystem;
@@ -48,7 +48,7 @@ int RenderSystem::Update(float dt)
     return 0;
 }
 
-void RenderSystem::SetBackend(CE::RenderBackend backend)
+void RenderSystem::SetBackend(CE::ERenderBackend backend)
 {
     renderer->SetBackend(ToRHI(backend));
 }

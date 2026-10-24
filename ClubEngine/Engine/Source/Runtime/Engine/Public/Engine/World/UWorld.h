@@ -25,10 +25,6 @@ class UWorld : public UObject
     GENERATED_BODY(UWorld, UObject)
 
 public:
-
-    UWorld(const UWorld&) = delete;
-    UWorld& operator=(const UWorld&) = delete;
-
     template<typename T, typename... Args> requires std::is_base_of_v<AActor, T>
     TObjectHandle<T> SpawnActor(const FTransform& transform, Args&&... args)
     {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Core/Types/Vertex.h>
+#include <Core/Types/FVertex.h>
 
 #include <cstdint>
 #include <string>
@@ -8,7 +8,7 @@
 
 namespace CE
 {
-    struct MeshImportSection
+    struct FMeshImportSection
     {
         std::string name = "Default";
         std::string materialName = "Default";
@@ -17,11 +17,11 @@ namespace CE
         uint32_t indexCount = 0;
     };
 
-    struct MeshImportResult
+    struct FMeshImportResult
     {
-        std::vector<Vertex> vertices;
+        std::vector<FVertex> vertices;
         std::vector<uint32_t> indices;
-        std::vector<MeshImportSection> sections;
+        std::vector<FMeshImportSection> sections;
 
         bool IsValid() const
         {

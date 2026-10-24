@@ -31,9 +31,9 @@ private:
 
     TObjectHandle<UShader> shader;
 
-    std::unordered_map<uint32, FVoxelChunk, ChunkHash> chunks;
-    std::unordered_map<uint32, FVoxelChunkFaceMap, ChunkHash> chunkFaceMaps;
-    std::unordered_map<uint8, std::vector<uint32>, ChunkHash> freeFacesPerShader;
+    std::unordered_map<uint32, FVoxelChunk, FChunkHash> chunks;
+    std::unordered_map<uint32, FVoxelChunkFaceMap, FChunkHash> chunkFaceMaps;
+    std::unordered_map<uint8, std::vector<uint32>, FChunkHash> freeFacesPerShader;
 };
 
 }

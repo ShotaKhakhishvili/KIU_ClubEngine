@@ -23,11 +23,6 @@ public:
     UShader(const RHI::ShaderDesc& shaderDesc, std::string inName = "UShader");
     ~UShader() override;
 
-    UShader(const UShader&) = delete;
-    UShader& operator=(const UShader&) = delete;
-    UShader(UShader&&) noexcept = default;
-    UShader& operator=(UShader&&) noexcept = default;
-
     bool Load();
     void Unload();
     bool IsReady() const noexcept;

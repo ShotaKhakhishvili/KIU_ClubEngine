@@ -55,13 +55,13 @@ namespace CE
             return oss.str();
         }
 
-        const char* ToString(LogType type)
+        const char* ToString(ELogType type)
         {
             switch (type)
             {
-            case LogType::Info:    return "Info";
-            case LogType::Warning: return "Warning";
-            case LogType::Error:   return "Error";
+            case ELogType::Info:    return "Info";
+            case ELogType::Warning: return "Warning";
+            case ELogType::Error:   return "Error";
             default:               return "Unknown";
             }
         }
@@ -117,14 +117,14 @@ namespace CE
         }
 
 #ifdef _WIN32
-        void SetConsoleColor(LogType type)
+        void SetConsoleColor(ELogType type)
         {
             HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
             WORD color = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE; 
             
-            if (type == LogType::Warning)
+            if (type == ELogType::Warning)
                 color = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY; 
-            else if (type == LogType::Error)
+            else if (type == ELogType::Error)
                 color = FOREGROUND_RED | FOREGROUND_INTENSITY; 
 
             SetConsoleTextAttribute(h, color);
@@ -136,10 +136,10 @@ namespace CE
             SetConsoleTextAttribute(h, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
         }
 #else
-        const char* GetAnsiColor(LogType type)
+        const char* GetAnsiColor(ELogType type)
         {
-            if (type == LogType::Warning) return "\033[33m"; 
-            if (type == LogType::Error)   return "\033[31m"; 
+            if (type == ELogType::Warning) return "\033[33m";
+            if (type == ELogType::Error)   return "\033[31m";
             return "\033[37m"; 
         }
         const char* GetAnsiReset() { return "\033[0m"; }
@@ -152,7 +152,7 @@ namespace CE
         EnsureInitializedUnlocked();
     }
 
-    void LogMessage(LogType type, const std::string& message)
+    void LogMessage(ELogType type, const std::string& message)
     {
         std::lock_guard<std::mutex> lock(GLogMutex);
         EnsureInitializedUnlocked();

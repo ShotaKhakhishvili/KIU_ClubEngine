@@ -24,11 +24,6 @@ public:
              std::string inName = "UTexture");
     ~UTexture() override;
 
-    UTexture(const UTexture&) = delete;
-    UTexture& operator=(const UTexture&) = delete;
-    UTexture(UTexture&&) noexcept = default;
-    UTexture& operator=(UTexture&&) noexcept = default;
-
     bool Load();
     void Unload();
     bool IsReady() const noexcept;

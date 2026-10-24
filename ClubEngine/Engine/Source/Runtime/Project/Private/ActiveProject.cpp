@@ -4,14 +4,14 @@ namespace CE
 {
     namespace
     {
-        ProjectDescriptor activeProject;
+        FProjectDescriptor activeProject;
     }
 
-    void  SetActiveProject(const ProjectDescriptor& project)
+    void  SetActiveProject(const FProjectDescriptor& project)
     {
         activeProject = project;
     }
-    const ProjectDescriptor& GetActiveProject()
+    const FProjectDescriptor& GetActiveProject()
     {
         return activeProject;
     }

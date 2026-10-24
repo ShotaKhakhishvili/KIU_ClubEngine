@@ -4,7 +4,7 @@
 
 namespace CE_STB
 {
-    struct ImageData
+    struct FImageData
     {
         unsigned char* Pixels = nullptr;
         int Width = 0;
@@ -12,6 +12,6 @@ namespace CE_STB
         int Channels = 0;
     };
 
-    ImageData LoadImage(const std::filesystem::path& path, bool flipVertically = true);
-    void FreeImageData(ImageData& image);
+    FImageData LoadImage(const std::filesystem::path& path, bool flipVertically = true);
+    void FreeImageData(FImageData& image);
 }

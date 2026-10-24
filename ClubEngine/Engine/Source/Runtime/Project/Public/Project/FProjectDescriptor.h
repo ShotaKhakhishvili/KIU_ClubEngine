@@ -3,7 +3,9 @@
 #include <filesystem>
 #include <string>
 
-struct ProjectDescriptor
+namespace CE
+{
+struct FProjectDescriptor
 {
     std::string name;
     std::filesystem::path rootPath;
@@ -11,12 +13,12 @@ struct ProjectDescriptor
     std::filesystem::path GetEnginePath() const
     {
         return std::filesystem::path(CE_ENGINE_ROOT);
-	}
+    }
 
     std::filesystem::path GetProjectPath() const
     {
         return rootPath;
-	}
+    }
 
     std::filesystem::path GetContentPath() const
     {
@@ -50,3 +52,5 @@ struct ProjectDescriptor
         return GetContentPath() / path;
     }
 };
+
+}

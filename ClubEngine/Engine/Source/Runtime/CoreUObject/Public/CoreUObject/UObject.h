@@ -16,6 +16,11 @@ class UObject
 public:
     virtual ~UObject() = default;
 
+    UObject (const UObject&) = delete;
+    UObject& operator= (const UObject&) = delete;
+    UObject (UObject&&) = delete;
+    UObject& operator= (UObject&&) = delete;
+
     uint64_t GetID() const noexcept;
     const std::string& GetName() const noexcept;
 

@@ -3,7 +3,7 @@
 #include <CoreUObject/TObjectHandle.h>
 #include <CoreUObject/UObject.h>
 
-#include <Asset/SubMesh.h>
+#include <Asset/FSubMesh.h>
 #include <Asset/UMaterial.h>
 
 #include <vector>
@@ -19,14 +19,14 @@ class UStaticMesh : public UObject
 public:
     explicit UStaticMesh(std::string inName = "UStaticMesh");
 
-    const std::vector<SubMesh>& GetSubMeshes() const;
+    const std::vector<FSubMesh>& GetSubMeshes() const;
     const std::vector<TObjectHandle<UMaterial>>& GetMaterials() const;
 
-    void AddSubMesh(const SubMesh& subMesh);
+    void AddSubMesh(const FSubMesh& subMesh);
     void AddMaterial(TObjectHandle<UMaterial> material);
 
 private:
-    std::vector<SubMesh> subMeshes;
+    std::vector<FSubMesh> subMeshes;
     std::vector<TObjectHandle<UMaterial>> materials;
 };
 

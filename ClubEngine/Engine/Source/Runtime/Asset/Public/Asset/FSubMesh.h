@@ -9,7 +9,7 @@
 namespace CE
 {
 
-struct SubMesh
+struct FSubMesh
 {
     RHI::VertexArrayHandle vertexArray;
     RHI::DrawIndexedDesc drawDesc;

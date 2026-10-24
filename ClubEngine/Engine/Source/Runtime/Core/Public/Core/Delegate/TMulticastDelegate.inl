@@ -5,16 +5,16 @@
 namespace CE
 {
     template<typename... Args>
-    DelegateHandle MulticastDelegate<Args...>::Add(std::function<void(Args...)> fn)
+    FDelegateHandle TMulticastDelegate<Args...>::Add(std::function<void(Args...)> fn)
     {
         Entry e;
 
-        e.handle = DelegateHandle::Generate();
+        e.handle = FDelegateHandle::Generate();
         e.fn = std::move(fn);
 
         e.instance  = nullptr;
 
-        const DelegateHandle handle = e.handle;
+        const FDelegateHandle handle = e.handle;
 
         if(broadcastDepth > 0)
             pendingAdds.push_back(std::move(e));
@@ -27,18 +27,18 @@ namespace CE
 
     template<typename... Args>
     template<typename T>
-    DelegateHandle MulticastDelegate<Args...>::Add(T* instance, void(T::*fn)(Args...))
+    FDelegateHandle TMulticastDelegate<Args...>::Add(T* instance, void(T::*fn)(Args...))
     {
         static_assert(sizeof(&fn) <= sizeof(Entry::fnBytes), "Member function pointer too large");
 
         Entry e;
 
-        e.handle = DelegateHandle::Generate();
+        e.handle = FDelegateHandle::Generate();
         e.fn = [instance, fn](Args... args){ (instance->*fn)(args...);};
         e.instance = static_cast<void*>(instance);
         std::memcpy(e.fnBytes, &fn, sizeof(void*));
 
-        const DelegateHandle handle = e.handle;
+        const FDelegateHandle handle = e.handle;
 
         if(broadcastDepth > 0)
             pendingAdds.push_back(std::move(e));
@@ -50,7 +50,7 @@ namespace CE
     }
 
     template<typename... Args>
-    void MulticastDelegate<Args...>::Remove(DelegateHandle handle)
+    void TMulticastDelegate<Args...>::Remove(FDelegateHandle handle)
     {
         if(!handle.IsValid())
             return;
@@ -74,7 +74,7 @@ namespace CE
 
     template<typename... Args>
     template<typename T>
-    void MulticastDelegate<Args...>::Remove(T* instance, void(T::*fn)(Args...))
+    void TMulticastDelegate<Args...>::Remove(T* instance, void(T::*fn)(Args...))
     {
         unsigned char key[sizeof(Entry::fnBytes)]{};
         std::memcpy(&key, &fn, sizeof(void*));
@@ -98,7 +98,7 @@ namespace CE
     }
 
     template<typename... Args>
-    void MulticastDelegate<Args...>::Broadcast(Args... args) const
+    void TMulticastDelegate<Args...>::Broadcast(Args... args) const
     {
         ++broadcastDepth;
 
@@ -113,7 +113,7 @@ namespace CE
     }
 
     template<typename... Args>
-    void MulticastDelegate<Args...>::Clear()
+    void TMulticastDelegate<Args...>::Clear()
     {
         pendingAdds.clear();
 
@@ -128,7 +128,7 @@ namespace CE
     }
 
     template<typename... Args>
-    bool MulticastDelegate<Args...>::IsBound() const
+    bool TMulticastDelegate<Args...>::IsBound() const
     {
         return !pendingAdds.empty() || 
                 std::any_of(handlers.begin(), handlers.end(), 
@@ -140,7 +140,7 @@ namespace CE
     }
 
     template<typename... Args>
-    void MulticastDelegate<Args...>::AddEntry(Entry&& entry)
+    void TMulticastDelegate<Args...>::AddEntry(Entry&& entry)
     {
         if(broadcastDepth > 0)
             pendingAdds.push_back(std::move(entry));
@@ -149,7 +149,7 @@ namespace CE
     }
 
     template<typename... Args>
-    void MulticastDelegate<Args...>::Flush() const
+    void TMulticastDelegate<Args...>::Flush() const
     {
         if(pendingRemoves)
         {

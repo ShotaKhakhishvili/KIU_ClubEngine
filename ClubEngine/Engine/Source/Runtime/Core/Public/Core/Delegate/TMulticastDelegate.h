@@ -1,21 +1,20 @@
 #pragma once
-#include <Core/Delegate/DelegateHandle.h>
+#include <Core/Delegate/FDelegateHandle.h>
 #include <functional>
 #include <vector>
-#include <cstring>
 
 namespace CE
 {
     template<typename... Args>
-    class MulticastDelegate
+    class TMulticastDelegate
     {
     public:
-        DelegateHandle Add(std::function<void(Args...)> fn);
+        FDelegateHandle Add(std::function<void(Args...)> fn);
 
         template<typename T>
-        DelegateHandle Add(T* instance, void(T::*fn)(Args...));
+        FDelegateHandle Add(T* instance, void(T::*fn)(Args...));
 
-        void Remove(DelegateHandle handle);
+        void Remove(FDelegateHandle handle);
 
         template<typename T>
         void Remove(T* instance, void(T::*fn)(Args...));
@@ -27,7 +26,7 @@ namespace CE
     private:
         struct Entry
         {
-            DelegateHandle                  handle                              ;
+            FDelegateHandle                  handle                              ;
             std::function<void(Args...)>    fn                                  ;
             void*                           instance                = nullptr   ;
             alignas(void*) unsigned char    fnBytes[32]{}                       ;
@@ -75,4 +74,4 @@ namespace CE
     };
 }
 
-#include <Core/Delegate/MulticastDelegate.inl>
+#include <Core/Delegate/TMulticastDelegate.inl>

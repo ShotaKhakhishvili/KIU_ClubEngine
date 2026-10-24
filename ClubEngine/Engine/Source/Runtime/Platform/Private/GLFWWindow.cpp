@@ -20,7 +20,7 @@ GLFWWindow::~GLFWWindow()
     Shutdown();
 }
 
-bool GLFWWindow::Init(const WindowConfig& config)
+bool GLFWWindow::Init(const FWindowConfig& config)
 {
     if(!glfwInit())
     {
@@ -97,7 +97,7 @@ uint32  GLFWWindow::GetWidth            ()      const   {   return width;       
 uint32  GLFWWindow::GetHeight           ()      const   {   return height;                          }
 void*   GLFWWindow::GetNativeHandle     ()      const   {   return handle;                          }
 
-void GLFWWindow::InitGL(const WindowConfig& config)
+void GLFWWindow::InitGL(const FWindowConfig& config)
 {
     glfwWindowHint(GLFW_CLIENT_API,   GLFW_OPENGL_API);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -119,7 +119,7 @@ void GLFWWindow::InitGL(const WindowConfig& config)
     }
 }
 
-void GLFWWindow::InitNoAPI(const WindowConfig& config)
+void GLFWWindow::InitNoAPI(const FWindowConfig& config)
 {
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 

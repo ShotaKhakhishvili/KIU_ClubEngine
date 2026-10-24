@@ -2,7 +2,7 @@
 
 #include <Core/ClubCore.h>
 
-#include <Platform/WindowConfig.h>
+#include <Platform/FWindowConfig.h>
 
 #include <memory>
 
@@ -14,7 +14,7 @@ class IWindow
 public:
     virtual ~IWindow() = default;
 
-    virtual bool Init(const WindowConfig& config)   = 0;
+    virtual bool Init(const FWindowConfig& config)   = 0;
     virtual void Shutdown()                         = 0;
     virtual void PollEvents()                       = 0;
     virtual void SwapBuffers()                      = 0;

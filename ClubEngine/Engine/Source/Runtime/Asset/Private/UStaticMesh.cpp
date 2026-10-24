@@ -10,10 +10,10 @@ UStaticMesh::UStaticMesh(std::string inName)
 {
 }
 
-const std::vector<SubMesh>& UStaticMesh::GetSubMeshes() const { return subMeshes; }
+const std::vector<FSubMesh>& UStaticMesh::GetSubMeshes() const { return subMeshes; }
 const std::vector<TObjectHandle<UMaterial>>& UStaticMesh::GetMaterials() const { return materials; }
 
-void UStaticMesh::AddSubMesh (const SubMesh& subMesh) 
+void UStaticMesh::AddSubMesh (const FSubMesh& subMesh)
 { 
     if(!subMesh.vertexArray.IsValid())
     {

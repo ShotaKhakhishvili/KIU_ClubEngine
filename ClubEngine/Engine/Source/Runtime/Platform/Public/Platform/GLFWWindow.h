@@ -14,7 +14,7 @@ class GLFWWindow : public IWindow
 {
 public:
     ~GLFWWindow                 ()                              override;
-    bool    Init                (const WindowConfig& config)    override;
+    bool    Init                (const FWindowConfig& config)    override;
     void    Shutdown            ()                              override;
     void    PollEvents          ()                              override;
     void    SwapBuffers         ()                              override;
@@ -26,8 +26,8 @@ public:
     void*   GetNativeHandle     ()                        const override;
 
 private:
-    void    InitGL              (const WindowConfig& config);
-    void    InitNoAPI           (const WindowConfig& config);
+    void    InitGL              (const FWindowConfig& config);
+    void    InitNoAPI           (const FWindowConfig& config);
 
     GLFWwindow*     handle          = nullptr;
     uint32          height          = 0;

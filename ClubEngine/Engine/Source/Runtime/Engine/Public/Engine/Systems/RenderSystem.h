@@ -17,7 +17,7 @@ class RenderSystem final : public ISystem
 {
 public:
 
-    RenderSystem(WindowSystem* windowSystem, WorldSystem* worldSystem, CE::RenderBackend backend = CE::RenderBackend::OpenGL); // Make OpenGL a default (not like we don't have anything else)
+    RenderSystem(WindowSystem* windowSystem, WorldSystem* worldSystem, CE::ERenderBackend backend = CE::ERenderBackend::OpenGL); // Make OpenGL a default (not like we don't have anything else)
 
     const char* GetName() const noexcept    override;
 
@@ -25,12 +25,12 @@ public:
     void    Shutdown    ()                      override;
     int     Update      (float dt)              override;
 
-    void SetBackend(CE::RenderBackend backend);
+    void SetBackend(CE::ERenderBackend backend);
 private:
     std::unique_ptr<Renderer>   renderer;
     WindowSystem*               windowSystem;
     WorldSystem*                worldSystem;
-    RenderBackend               backend;
+    ERenderBackend               backend;
 };
 
 }

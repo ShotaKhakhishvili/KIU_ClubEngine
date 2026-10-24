@@ -12,27 +12,6 @@ UMaterial::UMaterial(TObjectHandle<UShader> inShader)
     
     }
 
-UMaterial::UMaterial(UMaterial&& other) noexcept
-    : UObject("UMaterial")
-{
-    this->shader = other.shader;
-
-    this->bools      = std::move(other.bools);
-    this->ints       = std::move(other.ints);
-    this->floats     = std::move(other.floats);
-    this->vectors_2  = std::move(other.vectors_2);
-    this->vectors_3  = std::move(other.vectors_3);
-    this->vectors_4  = std::move(other.vectors_4);
-    this->textures   = std::move(other.textures);
-
-    this->blendMode  = other.blendMode;
-    this->cullMode   = other.cullMode;
-    this->depthWrite = other.depthWrite;
-    this->depthTest  = other.depthTest;
-
-    other.Reset();
-}
-
 UMaterial::~UMaterial()
 {
     this->Reset();
@@ -86,33 +65,6 @@ bool UMaterial::Bind() const
     }
 
     return true;
-}
-
-UMaterial& UMaterial::operator=(UMaterial&& other) noexcept
-{
-    if(&other == this)
-        return *this;
-
-    this->Reset();
-
-    this->shader = other.shader;
-
-    this->bools      = std::move(other.bools);
-    this->ints       = std::move(other.ints);
-    this->floats     = std::move(other.floats);
-    this->vectors_2  = std::move(other.vectors_2);
-    this->vectors_3  = std::move(other.vectors_3);
-    this->vectors_4  = std::move(other.vectors_4);
-    this->textures   = std::move(other.textures);
-
-    this->blendMode  = other.blendMode;
-    this->cullMode   = other.cullMode;
-    this->depthWrite = other.depthWrite;
-    this->depthTest  = other.depthTest;
-
-    other.Reset();
-
-    return *this;
 }
 
 void UMaterial::Reset()

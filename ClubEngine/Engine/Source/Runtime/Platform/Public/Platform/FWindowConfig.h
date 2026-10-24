@@ -8,7 +8,7 @@
 namespace CE
 {
 
-struct WindowConfig
+struct FWindowConfig
 {
     std::string     title       = "ClubeEngine";
     uint32          width       = 1280;

@@ -7,6 +7,6 @@
 namespace CE
 {
 
-RHI::Backend ToRHI(CE::RenderBackend renderBackend);
+RHI::Backend ToRHI(CE::ERenderBackend renderBackend);
 
 }

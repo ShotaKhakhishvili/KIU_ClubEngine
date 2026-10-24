@@ -33,7 +33,7 @@ bool UTexture::Load()
 {
 	Unload();
 
-	CE_STB::ImageData image = CE_STB::LoadImage(sourcePath);
+	CE_STB::FImageData image = CE_STB::LoadImage(sourcePath);
 
     if (!image.Pixels)
     {

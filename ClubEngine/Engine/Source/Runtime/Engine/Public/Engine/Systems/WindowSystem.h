@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Platform/IWindow.h>
-#include <Platform/WindowConfig.h>
+#include <Platform/FWindowConfig.h>
 
 #include <Engine/ISystem.h>
 
@@ -14,7 +14,7 @@ namespace CE
 class WindowSystem : public ISystem
 {
 public:
-    explicit WindowSystem(WindowConfig config = {});
+    explicit WindowSystem(FWindowConfig config = {});
 
     const char*     GetName         ()              const       noexcept        override;
     bool            Init            ()                                          override;
@@ -25,7 +25,7 @@ public:
     bool            ShouldClose     ()              const;
 
 private:
-    WindowConfig                    config;
+    FWindowConfig                    config;
     std::unique_ptr<IWindow>        window;
 };
 

@@ -3,11 +3,11 @@
 namespace CE
 {
 
-RHI::Backend ToRHI(CE::RenderBackend renderBackend)
+RHI::Backend ToRHI(CE::ERenderBackend renderBackend)
 {
     switch(renderBackend)
     {
-        case CE::RenderBackend::OpenGL:
+        case CE::ERenderBackend::OpenGL:
             return RHI::Backend::OpenGL;
         default:
             return RHI::Backend::OpenGL;
