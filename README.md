@@ -2,7 +2,7 @@
 
 ClubEngine is a small C++ game/engine framework. The engine source lives in this repository, while game projects can live anywhere on disk. Projects connect to the engine through the `CLUBENGINE_ROOT` environment variable, a `.clubproject` file, and the ClubEngine tool scripts.
 
-The engine requires **C++20** and **CMake 3.20** or newer. Third-party libraries (GLFW, GLAD, GLM) are bundled — no separate downloads needed.
+The engine requires **C++20** and **CMake 3.20** or newer. Third-party libraries (GLFW, glad, GLM, stb, nlohmann/json) are bundled, so you don't need to download anything separately.
 
 ## Architecture
 
@@ -11,34 +11,40 @@ graph TD
     Launch(["Launch<br/>EntryPoint · LaunchRun"])
 
     subgraph EngineModule["  Engine Module  "]
-        Application(["Application<br/>Run · AddSystem"])
+        Application(["Application<br/>Run · AddSystem · GetSystem"])
         AssetLibrary(["AssetLibrary<br/>NewObject helper"])
         WorldSystem(["WorldSystem<br/>World tick"])
         WindowSystem(["WindowSystem<br/>Window lifecycle"])
         FpsSystem(["FpsSystem<br/>Frame delta"])
         AssetContext(["AssetContext<br/>Asset ownership"])
-        RenderSystem(["RenderSystem<br/>Frame rendering"])
-
+        RenderSystem(["RenderSystem<br/>Renders the world's scene"])
     end
 
     subgraph WorldLayer["  World · Engine Module  "]
-        UWorld(["UWorld<br/>SpawnActor · Destroy · Tick"])
+        UWorld(["UWorld<br/>SpawnActor · Destroy · Tick · GetScene"])
         ULevel(["ULevel<br/>Actor & component registries"])
         AActor(["AActor<br/>Tick · CreateDefaultSubobject"])
         UActorComponent(["UActorComponent<br/>Tick · Owner"])
         USceneComponent(["USceneComponent<br/>Transform · Attachment"])
+        UPrimitiveComponent(["UPrimitiveComponent<br/>Visibility · Scene proxy handle"])
+        UStaticMeshComponent(["UStaticMeshComponent<br/>Static mesh"])
+    end
+
+    subgraph RendererModule["  Renderer Module  "]
+        Renderer(["Renderer<br/>BeginFrame · Render · EndFrame"])
+        FScene(["FScene<br/>Pool of primitive proxies"])
+        FPrimitiveSceneProxy(["FPrimitiveSceneProxy<br/>Mesh · LocalToWorld · Visible"])
     end
 
     CoreUObject(["CoreUObject<br/>UObject · Registry · TObjectHandle"])
-    Renderer(["Renderer<br/>BeginFrame · Draw"])
     Platform(["Platform<br/>IWindow · GLFWWindow"])
-    Asset(["Asset<br/>Mesh · Material · Shader · Tex"])
+    Asset(["Asset<br/>StaticMesh · Material · Shader · Texture"])
     AssetImport(["AssetImport<br/>OBJ · image loader"])
     RenderCore(["RenderCore<br/>IRHI interface · Handles"])
     RHI_OpenGL(["RHI.OpenGL<br/>GLRHI · GL objects"])
 
     subgraph CoreFoundation["  Core Foundation  "]
-        Core(["Math · Config · Delegates · Log · FileIO · Types"])
+        Core(["Math · Containers · Config · Delegates · Log · FileIO · Types"])
     end
 
     subgraph ThirdParty["  Third-party  "]
@@ -58,29 +64,38 @@ graph TD
 
     WindowSystem --> Platform
     RenderSystem --> Renderer
+    RenderSystem -->|reads scene| WorldSystem
     WorldSystem --> UWorld
 
     UWorld -->|persistent level| ULevel
+    UWorld -->|owns| FScene
     ULevel --> AActor
     ULevel --> UActorComponent
     AActor -->|owns| UActorComponent
     AActor -->|root| USceneComponent
     USceneComponent -.->|extends| UActorComponent
+    UPrimitiveComponent -.->|extends| USceneComponent
+    UStaticMeshComponent -.->|extends| UPrimitiveComponent
+    UPrimitiveComponent -.->|proxy handle| FPrimitiveSceneProxy
+
+    FScene -->|TPool| FPrimitiveSceneProxy
+    Renderer -->|draws| FScene
+    FPrimitiveSceneProxy --> Asset
 
     ULevel --> CoreUObject
     AssetContext --> CoreUObject
     Asset --> CoreUObject
     AssetImport -->|imports into| Asset
-    Renderer --> Asset
     Renderer --> RenderCore
     Renderer -->|creates backend| RHI_OpenGL
     RHI_OpenGL -->|implements| RenderCore
 
     linkStyle default stroke:#909090,stroke-width:1.8px
-    linkStyle 4,7,16 stroke:#505050,stroke-width:1.2px,stroke-dasharray:5 3
+    linkStyle 4,7,18,19,20,21 stroke:#505050,stroke-width:1.2px,stroke-dasharray:5 3
 
     style EngineModule   fill:#1c1b2e,stroke:#4a4880,stroke-width:1.5px,stroke-dasharray:5 3,color:#9890b8
     style WorldLayer     fill:#1f1c12,stroke:#6a5a28,stroke-width:1.5px,stroke-dasharray:5 3,color:#b8a878
+    style RendererModule fill:#121f1b,stroke:#2c5e52,stroke-width:1.5px,stroke-dasharray:5 3,color:#90b8b0
     style CoreFoundation fill:#1c1c1c,stroke:#424242,stroke-width:1.5px,color:#787878
     style ThirdParty     fill:#181818,stroke:#383838,stroke-width:1px,color:#606060
 
@@ -91,11 +106,86 @@ graph TD
     classDef foundation    fill:#202020,stroke:#444444,stroke-width:1px,color:#a8a8a8
 
     class Launch,Application,FpsSystem,WorldSystem orchestration
-    class RenderSystem,WindowSystem,Renderer,Platform,RenderCore,RHI_OpenGL runtime
+    class RenderSystem,WindowSystem,Renderer,FScene,FPrimitiveSceneProxy,Platform,RenderCore,RHI_OpenGL runtime
     class AssetContext,AssetLibrary,CoreUObject,Asset,AssetImport asset
-    class UWorld,ULevel,AActor,UActorComponent,USceneComponent world
+    class UWorld,ULevel,AActor,UActorComponent,USceneComponent,UPrimitiveComponent,UStaticMeshComponent world
     class Core,GLFW,glad foundation
 ```
+
+## Engine Overview
+
+### Conventions
+
+- All engine code lives in `namespace CE`. Low-level rendering types live in `CE::RHI`.
+- Type prefixes:
+
+  | Prefix | Used for | Examples |
+  |---|---|---|
+  | `U` | UObjects | `UWorld`, `UStaticMesh`, `UMaterial` |
+  | `A` | Actors (UObjects that live in a level) | `AActor`, `AVoxelTerrain` |
+  | `F` | Plain structs and value types | `FTransform`, `FScene`, `FSubMesh` |
+  | `E` | Enums | `ELogType`, `ERenderBackend` |
+  | `T` | Templates | `TArray`, `TPool`, `TObjectHandle`, `TMulticastDelegate` |
+  | `I` | Interfaces | `ISystem`, `IWindow`, `IRHI` |
+
+  Engine services, systems, and backend classes (`Application`, `Renderer`, `RenderSystem`, `GLRHI`, …) and the `CE::RHI` descriptor types don't take a prefix.
+- **Coordinate system:** X forward, Y right, Z up, left-handed. Rotators are pitch around Y, yaw around Z, and roll around X. The OBJ importer converts Y-up meshes to engine axes by default (`FObjImportSettings::convertAxes`).
+- Classes with more than a few template or inline functions are split into a `.h` declaration and a `.inl` implementation that's included at the bottom of the header.
+
+### Core
+
+`Core` is the foundation module, and everything else depends on it. Include `<Core/ClubCore.h>` to get logging, file IO, math, core types, and containers in one go.
+
+- **Math:** `FVector`, `FQuat`, `FTransform`, `FMatrix4x4` (templated on float/double, with `F` aliases like `FVectorF` and `FMatrix4x4F`), plus `Lerp`, `Slerp`, `Nlerp`, `LookAt`, and the inverse-transform helpers.
+- **Containers:**
+  - `TArray<T>` is currently an alias of `std::vector<T>`.
+  - `TPool<T>` is a dense pool that hands out generational `TPoolHandle<T>`s. Items stay packed for fast iteration, and removing one swaps the last item into its place, so iteration order isn't stable. Always go through the handle; never keep a `T*` across an `Add` or `Remove`. A handle whose item was removed resolves to `nullptr` instead of pointing at whatever reused the slot.
+- **Delegates:** `TMulticastDelegate<Args...>` with `FDelegateHandle`. You can bind free functions, lambdas, or member functions, and it's safe to add or remove bindings while it's broadcasting.
+- **Log:** `CE_LOG(Info | Warning | Error, "format {}", args...)`.
+- **Config:** INI file loading through `IniParser` and `ConfigSystem`.
+
+### UObjects
+
+- Every engine object (`UWorld`, `ULevel`, actors, components, assets) derives from `UObject` and declares `GENERATED_BODY(Class, Super)`.
+- UObjects are owned by a `UObjectRegistry` and **cannot be copied or moved**. Everything else refers to them through `TObjectHandle<T>`, a generational handle, so a handle to a destroyed object simply resolves to `nullptr`.
+- A handle converts to a handle of any base class (`TObjectHandle<AActor>` → `TObjectHandle<UObject>`).
+- You can destroy objects inside a registry `ForEach`. The object is marked dead immediately, but its memory is freed only after the outermost iteration finishes.
+
+### Application and Systems
+
+- A game derives from `CE::Application`, implements `Update(float dt)`, and optionally overrides `PreInit()` and `PostInit()`. `CreateApplication()` is defined by the game and called from `EntryPoint.h`.
+- Engine functionality is split into `ISystem`s, which you add with `AddSystem<T>(args...)` and look up with `GetSystem<T>()`. By default the application adds `WindowSystem`, `WorldSystem`, and `RenderSystem` in that order.
+- Systems initialize in the order they were added and shut down in reverse. If one fails to initialize, the ones already initialized are shut down cleanly. If any system's `Update` returns a non-zero code, the application stops.
+
+### World, Levels, Actors, Components
+
+- `WorldSystem` owns a single `UWorld` and ticks it every frame.
+- `UWorld` owns a persistent `ULevel` and the world's `FScene`. Spawn actors with `world.SpawnActor<T>(transform, args...)` and remove them with `world.Destroy(handle)`.
+- `ULevel` holds two registries, one for actors and one for components. Each level knows its world (`GetWorld()`).
+- `AActor` creates its components in its constructor through `CreateDefaultSubobject<T>()`. If an actor doesn't set a root component, it gets a default `USceneComponent` when spawned. Override `Tick(dt)` and `OnSpawned()` for behaviour.
+- Component hierarchy: `UActorComponent` → `USceneComponent` (transform, attachment) → `UPrimitiveComponent` (visibility, scene proxy handle) → `UStaticMeshComponent`.
+
+### Rendering
+
+- The renderer never touches UObjects or actors directly. It draws an **`FScene`**, which is a `TPool` of **`FPrimitiveSceneProxy`** entries. Each proxy is plain render data: a static mesh handle, a `localToWorld` matrix, and a visibility flag.
+- `FScene` API: `AddProxy`, `RemoveProxy`, `UpdateTransform`, `UpdateStaticMesh`, `SetVisible`, and `ForEachPrimitive`. Each `UWorld` owns its scene, and you can get it with `GetScene()`.
+- Every frame, `RenderSystem` calls `Renderer::BeginFrame`, `Render(world.GetScene())`, and `EndFrame`, then swaps the window buffers.
+- If a sub-mesh has a missing or invalid material, or its shader failed to compile, the renderer skips it instead of crashing.
+- The rendering backend sits behind the `IRHI` interface (`RenderCore`). OpenGL (`RHI.OpenGL`) is the only backend right now.
+
+### Assets
+
+- `UStaticMesh` is a list of `FSubMesh`es (a vertex array, a draw descriptor, and a material index) plus the `UMaterial` handles they use.
+- `UMaterial` binds a `UShader` with its uniform values, textures, and render state (blend, cull, depth). `UTexture` loads 1, 2, 3 and 4 channel images and sizes the texture from the image itself.
+- Create assets with `NewObject<T>(args...)`. It creates them in the application's `AssetContext`, which owns them.
+- `AssetImport` contains the OBJ mesh importer and the stb-based image loader.
+
+### Current Limitations
+
+- Components don't add themselves to the scene yet. `UPrimitiveComponent` and `UStaticMeshComponent` are incomplete, so to show a mesh today, add an `FPrimitiveSceneProxy` to `world.GetScene()` yourself (see the debug mesh in `Application::PostInit`).
+- There's no camera, input, pawn/controller, or game mode framework yet. The view is a hardcoded `LookAt`.
+- `AVoxelTerrain` / `UVoxelGrid` are work in progress.
+- Asset paths and serialization aren't implemented yet; assets are loaded from paths in code.
 
 ## Getting Started
 
@@ -103,6 +193,7 @@ graph TD
 
 ## Table of Contents
 
+- [Engine Overview](#engine-overview)
 - [Windows Setup](#windows-setup)
   - [1. Install dependencies](#1-install-dependencies-windows)
   - [2. First-time tool setup](#2-first-time-tool-setup-windows)
@@ -540,7 +631,7 @@ ClubEngine/
   CMakeLists.txt          — Root build file (defines engine version)
   Engine/
     Source/Runtime/       — Engine source modules
-    ThirdParty/           — Bundled libraries (GLFW, GLAD, GLM)
+    ThirdParty/           — Bundled libraries (GLFW, glad, GLM, stb, nlohmann/json)
     Config/               — Base engine config files
     Programs/             — Standalone tools (e.g. AssetImporter)
   Templates/
