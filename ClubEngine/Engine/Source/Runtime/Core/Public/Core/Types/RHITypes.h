@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cstdint>
+#include <Core/Types/CoreTypes.h>
 #include <string>
 #include <vector>
 #include <filesystem>
@@ -73,6 +73,7 @@ enum class TextureInternalFormat
     RGB8,
     RGBA8,
     R8,
+    RG8,
     DepthComponent,
     Count
 };
@@ -82,6 +83,7 @@ enum class TextureFormat
     RGB,
     RGBA,
     Red,
+    RG,
     Depth,
     Count
 };
@@ -170,8 +172,8 @@ struct TextureDesc
 {
     TextureDimension dimension = TextureDimension::Texture2D;
 
-    uint32_t width = 0;
-    uint32_t height = 0;
+    uint32 width = 0;
+    uint32 height = 0;
 
     TextureInternalFormat format = TextureInternalFormat::RGBA8;
     TextureFormat readFormat = TextureFormat::RGBA;

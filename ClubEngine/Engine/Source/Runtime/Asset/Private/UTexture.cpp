@@ -41,11 +41,41 @@ bool UTexture::Load()
         return false;
     }
 
+	desc.width = static_cast<uint32>(image.Width);
+	desc.height = static_cast<uint32>(image.Height);
+	desc.pixelType = RHI::TexturePixelType::UnsignedByte;
+
+	switch (image.Channels)
+	{
+		case 1:
+			desc.format = RHI::TextureInternalFormat::R8;
+			desc.readFormat = RHI::TextureFormat::Red;
+			break;
+		case 2:
+			desc.format = RHI::TextureInternalFormat::RG8;
+			desc.readFormat = RHI::TextureFormat::RG;
+			break;
+		case 3:
+			desc.format = RHI::TextureInternalFormat::RGB8;
+			desc.readFormat = RHI::TextureFormat::RGB;
+			break;
+		case 4:
+			desc.format = RHI::TextureInternalFormat::RGBA8;
+			desc.readFormat = RHI::TextureFormat::RGBA;
+			break;
+		default:
+			CE_LOG(Warning, "Failed To Load Texture: [{}]", this->GetName());
+			CE_STB::FreeImageData(image);
+			return false;
+	}
+
+
 	handle = RHI::Get().CreateTexture(desc, image.Pixels);
 
 	if(!handle.IsValid())
 	{
 		CE_LOG(Error, "Failed To Load Texture: [{}]", this->GetName());
+		CE_STB::FreeImageData(image);
 		return false;
 	}
 

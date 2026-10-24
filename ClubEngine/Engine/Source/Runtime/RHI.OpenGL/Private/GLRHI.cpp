@@ -21,6 +21,7 @@ void GLRHI::Init()
 {
     gladLoadGL();
     glEnable(GL_DEPTH_TEST);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 }
 
 void GLRHI::Shutdown()
