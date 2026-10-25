@@ -58,11 +58,16 @@ echo "EngineVersion:     $ENGINE_VERSION"
 echo "Build:             $BUILD_DIR"
 echo
 
+GENERATOR=()
 if command -v ninja >/dev/null 2>&1; then
-    cmake -S "$PROJECT_ROOT" -B "$BUILD_DIR" -G Ninja -DCMAKE_BUILD_TYPE="$CONFIG" -DCE_ENGINE_VERSION="$ENGINE_VERSION"
-else
-    cmake -S "$PROJECT_ROOT" -B "$BUILD_DIR" -DCMAKE_BUILD_TYPE="$CONFIG" -DCE_ENGINE_VERSION="$ENGINE_VERSION"
+    GENERATOR=(-G Ninja)
 fi
+
+cmake -S "$PROJECT_ROOT" -B "$BUILD_DIR" "${GENERATOR[@]}" \
+    -DCMAKE_BUILD_TYPE="$CONFIG" \
+    -DCLUBENGINE_ROOT="$CLUBENGINE_ROOT" \
+    -DCE_ENGINE_VERSION="$ENGINE_VERSION" \
+    -DCE_PLATFORM_NAME="$PLATFORM"
 
 cmake --build "$BUILD_DIR" --target "$PROJECT_NAME"
 

@@ -66,8 +66,9 @@ echo
 cp -R "$TEMPLATE_ROOT" "$PROJECT_ROOT"
 
 find "$PROJECT_ROOT" -depth -name "*[[]PROJ_NAME[]]*" | while read -r path; do
-    new_path="${path//\[PROJ_NAME\]/$PROJECT_NAME}"
-    mv "$path" "$new_path"
+    dir="$(dirname "$path")"
+    base="$(basename "$path")"
+    mv "$path" "$dir/${base//\[PROJ_NAME\]/$PROJECT_NAME}"
 done
 
 find "$PROJECT_ROOT" -type f | while read -r file; do

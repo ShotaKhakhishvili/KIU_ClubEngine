@@ -75,18 +75,26 @@ namespace ShaderUtils
 
         return programID;
     }
+
+    ShaderDesc LoadShaderSources(const ShaderFileDesc& shaderFileDesc)
+    {
+        ShaderDesc shaderDesc;
+        shaderDesc.stages.resize(shaderFileDesc.stages.size());
+
+        for (uint32 i = 0; i < shaderFileDesc.stages.size(); i++)
+        {
+            shaderDesc.stages[i] = ShaderSource{ shaderFileDesc.stages[i].stage, CE::FileIO::ReadFile(shaderFileDesc.stages[i].source) };
+        }
+
+        return shaderDesc;
+    }
 }
 
+
+
 GLShaderBase::GLShaderBase(const ShaderFileDesc& shaderFileDesc)
+    :GLShaderBase(ShaderUtils::LoadShaderSources(shaderFileDesc))
 {
-    ShaderDesc shaderDesc = { .stages{shaderFileDesc.stages.size() } };
-
-	for (uint32 i = 0; i < shaderFileDesc.stages.size(); i++)
-    {
-        shaderDesc.stages[i] = ShaderSource{ shaderFileDesc.stages[i].stage, CE::FileIO::ReadFile(shaderFileDesc.stages[i].source) };
-    }
-
-	*this = GLShaderBase(shaderDesc);
 }
 
 GLShaderBase::GLShaderBase(const ShaderDesc& shaderDesc)

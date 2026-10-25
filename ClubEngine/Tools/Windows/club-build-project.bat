@@ -58,9 +58,7 @@ if not exist "%ENGINE_BIN_ROOT%" (
 )
 
 set "FOUND_ENGINE="
-for /d %%D in ("%ENGINE_BIN_ROOT%\%ENGINE_ASSOCIATION%.*") do (
-    set "FOUND_ENGINE=%%D"
-)
+for /f "usebackq delims=" %%D in (`powershell -NoProfile -Command "Get-ChildItem -LiteralPath '%ENGINE_BIN_ROOT%' -Directory -Filter '%ENGINE_ASSOCIATION%.*' | Sort-Object { try { [version]$_.Name } catch { [version]'0.0' } } | Select-Object -Last 1 -ExpandProperty FullName"`) do set "FOUND_ENGINE=%%D"
 
 if "%FOUND_ENGINE%"=="" (
     echo ERROR: No built engine matching EngineAssociation "%ENGINE_ASSOCIATION%" found.

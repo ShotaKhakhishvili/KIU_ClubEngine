@@ -1,4 +1,4 @@
-file(GLOB_RECURSE CEPLATFORM_PUBLIC  CONFIGURE_DEPENDS "Public/*.h" "Public/*.hpp")
+file(GLOB_RECURSE CEPLATFORM_PUBLIC  CONFIGURE_DEPENDS "Public/*.h" "Public/*.hpp" "Public/*.inl")
 file(GLOB_RECURSE CEPLATFORM_PRIVATE CONFIGURE_DEPENDS "Private/*.cpp" "Private/*.c")
 
 add_library(CEPlatform ${CE_MODULE_TYPE}

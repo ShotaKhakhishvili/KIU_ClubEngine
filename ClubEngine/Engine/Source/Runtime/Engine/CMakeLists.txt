@@ -1,12 +1,9 @@
-file(GLOB_RECURSE CEENGINE_PUBLIC  CONFIGURE_DEPENDS "Public/*.h" "Public/*.hpp")
+file(GLOB_RECURSE CEENGINE_PUBLIC  CONFIGURE_DEPENDS "Public/*.h" "Public/*.hpp" "Public/*.inl")
 file(GLOB_RECURSE CEENGINE_PRIVATE CONFIGURE_DEPENDS "Private/*.cpp" "Private/*.c")
 
 add_library(CEEngine ${CE_MODULE_TYPE}
   ${CEENGINE_PUBLIC}
   ${CEENGINE_PRIVATE}
-        Public/Engine/World/UWorld.inl
-        Public/Engine/World/Ulevel.inl
-        Public/Engine/World/AActor.inl
 )
 
 add_library(ClubEngine::Engine ALIAS CEEngine)

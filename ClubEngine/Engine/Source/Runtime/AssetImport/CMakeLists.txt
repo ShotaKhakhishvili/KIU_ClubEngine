@@ -1,4 +1,4 @@
-file(GLOB_RECURSE CEASSETIMPORT_PUBLIC  CONFIGURE_DEPENDS "Public/*.h" "Public/*.hpp")
+file(GLOB_RECURSE CEASSETIMPORT_PUBLIC  CONFIGURE_DEPENDS "Public/*.h" "Public/*.hpp" "Public/*.inl")
 file(GLOB_RECURSE CEASSETIMPORT_PRIVATE CONFIGURE_DEPENDS "Private/*.cpp" "Private/*.c")
 
 add_library(CEAssetImport ${CE_MODULE_TYPE}

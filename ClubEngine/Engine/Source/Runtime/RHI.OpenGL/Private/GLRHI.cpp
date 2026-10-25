@@ -20,6 +20,7 @@ GLRHI::~GLRHI() = default;
 void GLRHI::Init()
 {
     gladLoadGL();
+    GLint depthBits = 0;
     glEnable(GL_DEPTH_TEST);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 }

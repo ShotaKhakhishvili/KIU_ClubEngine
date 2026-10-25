@@ -1,4 +1,4 @@
-file(GLOB_RECURSE CERHIOPENGL_PUBLIC  CONFIGURE_DEPENDS "Public/*.h" "Public/*.hpp")
+file(GLOB_RECURSE CERHIOPENGL_PUBLIC  CONFIGURE_DEPENDS "Public/*.h" "Public/*.hpp" "Public/*.inl")
 file(GLOB_RECURSE CERHIOPENGL_PRIVATE CONFIGURE_DEPENDS "Private/*.cpp" "Private/*.c")
 
 add_library(CERHIOpenGL ${CE_MODULE_TYPE}
