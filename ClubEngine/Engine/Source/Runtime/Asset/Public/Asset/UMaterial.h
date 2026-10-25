@@ -13,6 +13,14 @@
 namespace CE
 {
 
+struct FMaterialRenderState
+{
+    RHI::BlendMode blendMode = RHI::BlendMode::Opaque;
+    RHI::CullMode cullMode = RHI::CullMode::Back;
+    bool depthWrite = true;
+    bool depthTest = true;
+};
+
 class UMaterial : public UObject
 {
     GENERATED_BODY(UMaterial, UObject)
@@ -34,6 +42,9 @@ public:
 
     void Reset();
 
+    const FMaterialRenderState& GetRenderState() const;
+    void SetRenderState(const FMaterialRenderState& newRenderState);
+
 private:
     TObjectHandle<UShader> shader;
 
@@ -45,10 +56,7 @@ private:
     std::unordered_map<std::string, FVector4F> vectors_4;
     std::unordered_map<std::string, TObjectHandle<UTexture>> textures;
 
-    RHI::BlendMode blendMode = RHI::BlendMode::Opaque;
-    RHI::CullMode cullMode = RHI::CullMode::Back;
-    bool depthWrite = true;
-    bool depthTest = true;
+    FMaterialRenderState renderState;
 };
 
 }

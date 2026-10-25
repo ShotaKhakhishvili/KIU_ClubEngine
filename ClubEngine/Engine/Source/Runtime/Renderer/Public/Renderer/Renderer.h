@@ -17,8 +17,6 @@ public:
     Renderer(RHI::Backend backend);
     ~Renderer();
 
-    // These are temporary for now. Later we will have a UWorld, which the renderer will receive and render fully.
-
     void BeginFrame(const RHI::ViewportDesc& viewportDesc);
     void Render(const FScene& scene);
     void EndFrame();

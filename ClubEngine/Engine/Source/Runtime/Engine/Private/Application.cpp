@@ -41,9 +41,9 @@ Application::Application()
     windowConfig.height = config.Get<int>("Render", "Height", 720);
     windowConfig.vSync  = config.Get<bool>("Render", "VSync", true);
 
-    auto& windowSystem = AddSystem<CE::WindowSystem>(windowConfig);
-    auto& worldSystem = AddSystem<CE::WorldSystem>();
-    AddSystem<CE::RenderSystem>(&windowSystem, &worldSystem, CE::ERenderBackend::OpenGL);
+    auto& windowSystem = AddSystem<WindowSystem>(windowConfig);
+    auto& worldSystem = AddSystem<WorldSystem>();
+    AddSystem<RenderSystem>(&windowSystem, &worldSystem, ERenderBackend::OpenGL);
 }
 
 Application::~Application() = default;
@@ -135,17 +135,17 @@ void Application::PostInit()
 
     RHI::ShaderDesc shaderDesc;
     shaderDesc.stages = {
-        { RHI::ShaderStage::Vertex,   CE::FileIO::ReadFileWithIncludes(vertPath) },
-        { RHI::ShaderStage::Fragment, CE::FileIO::ReadFileWithIncludes(fragPath) }
+        { RHI::ShaderStage::Vertex,   FileIO::ReadFileWithIncludes(vertPath) },
+        { RHI::ShaderStage::Fragment, FileIO::ReadFileWithIncludes(fragPath) }
     };
 
-    auto shaderHandle = assetContext.Create<CE::UShader>(shaderDesc, "DebugShader");
-    CE::UShader* shader = assetContext.Resolve(shaderHandle);
+    auto shaderHandle = assetContext.Create<UShader>(shaderDesc, "DebugShader");
+    UShader* shader = assetContext.Resolve(shaderHandle);
     if (shader && !shader->IsReady())
         shader->Load();
 
-    auto materialHandle = assetContext.Create<CE::UMaterial>(shaderHandle);
-    CE::UMaterial* material = assetContext.Resolve(materialHandle);
+    auto materialHandle = assetContext.Create<UMaterial>(shaderHandle);
+    UMaterial* material = assetContext.Resolve(materialHandle);
     if (material)
     {
         material->SetVec3("u_LightPos", 5.0f, 10.0f, 20.0f);
@@ -165,7 +165,7 @@ void Application::PostInit()
     }
 
     const path objPath = GetActiveProject().GetEnginePath() / "Engine/Source/Runtime/Engine/Public/Engine/Geometry/sting.obj";
-    CE::ObjMeshImporter importer;
+    ObjMeshImporter importer;
     auto importRes = importer.Import(objPath);
     if (!importRes.has_value())
     {
@@ -173,12 +173,12 @@ void Application::PostInit()
         return;
     }
 
-    const CE::FMeshImportResult& meshRes = importRes.value();
+    const FMeshImportResult& meshRes = importRes.value();
 
     RHI::BufferDesc vbd{};
     vbd.type = RHI::BufferType::Vertex;
     vbd.usage = RHI::BufferUsage::StaticDraw;
-    vbd.size = static_cast<uint32_t>(meshRes.vertices.size() * sizeof(CE::FVertex));
+    vbd.size = static_cast<uint32_t>(meshRes.vertices.size() * sizeof(FVertex));
     auto vbHandle = RHI::Get().CreateBuffer(vbd, meshRes.vertices.data());
 
     RHI::BufferDesc ibd{};
@@ -189,18 +189,18 @@ void Application::PostInit()
 
     RHI::VertexAttributeDesc a0{};
     a0.location = 0; a0.componentCount = 3; a0.dataType = RHI::ShaderDataType::Float;
-    a0.stride = static_cast<uint32_t>(sizeof(CE::FVertex));
-    a0.offset = static_cast<uint32_t>(offsetof(CE::FVertex, coord));
+    a0.stride = static_cast<uint32_t>(sizeof(FVertex));
+    a0.offset = static_cast<uint32_t>(offsetof(FVertex, coord));
 
-    RHI::VertexAttributeDesc a1 = a0; a1.location = 1; a1.offset = static_cast<uint32_t>(offsetof(CE::FVertex, normal));
-    RHI::VertexAttributeDesc a2 = a0; a2.location = 2; a2.offset = static_cast<uint32_t>(offsetof(CE::FVertex, color));
-    RHI::VertexAttributeDesc a3 = a0; a3.location = 3; a3.componentCount = 2; a3.offset = static_cast<uint32_t>(offsetof(CE::FVertex, texUV));
+    RHI::VertexAttributeDesc a1 = a0; a1.location = 1; a1.offset = static_cast<uint32_t>(offsetof(FVertex, normal));
+    RHI::VertexAttributeDesc a2 = a0; a2.location = 2; a2.offset = static_cast<uint32_t>(offsetof(FVertex, color));
+    RHI::VertexAttributeDesc a3 = a0; a3.location = 3; a3.componentCount = 2; a3.offset = static_cast<uint32_t>(offsetof(FVertex, texUV));
 
     RHI::VertexArrayDesc vaDesc;
     vaDesc.attributes = { a0, a1, a2, a3 };
     auto vaoHandle = RHI::Get().CreateVertexArray(vbHandle, ibHandle, vaDesc);
 
-    CE::FSubMesh subMesh{};
+    FSubMesh subMesh{};
     subMesh.vertexArray = vaoHandle;
     subMesh.drawDesc.primitiveType = RHI::PrimitiveType::Triangles;
     subMesh.drawDesc.indexType = RHI::IndexType::UInt32;
@@ -208,8 +208,8 @@ void Application::PostInit()
     subMesh.drawDesc.indexOffset = 0;
     subMesh.materialIndex = 0;
 
-    auto meshHandle = assetContext.Create<CE::UStaticMesh>(std::string("DebugMesh"));
-    CE::UStaticMesh* staticMesh = assetContext.Resolve(meshHandle);
+    auto meshHandle = assetContext.Create<UStaticMesh>(std::string("DebugMesh"));
+    UStaticMesh* staticMesh = assetContext.Resolve(meshHandle);
 
     if (staticMesh)
     {

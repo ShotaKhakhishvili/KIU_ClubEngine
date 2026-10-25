@@ -22,7 +22,7 @@ bool UMaterial::Bind() const
     if(!this->shader.IsValid())
         return false;
 
-    UShader* shader = CE::Resolve(this->shader);
+    UShader* shader = Resolve(this->shader);
 
     if(shader == nullptr || !shader->IsReady())
         return false;
@@ -77,11 +77,20 @@ void UMaterial::Reset()
     vectors_3.clear();
     vectors_4.clear();
     
-    blendMode = RHI::BlendMode::Opaque;
-    cullMode = RHI::CullMode::Back;
-    depthWrite = true;
-    depthTest = true;
+    renderState.blendMode = RHI::BlendMode::Opaque;
+    renderState.cullMode = RHI::CullMode::Back;
+    renderState.depthWrite = true;
+    renderState.depthTest = true;
+
     shader = TObjectHandle<UShader>{};
+}
+const FMaterialRenderState& UMaterial::GetRenderState() const
+{
+    return renderState;
+}
+void UMaterial::SetRenderState(const FMaterialRenderState& newRenderState)
+{
+    this->renderState = newRenderState;
 }
 
 void UMaterial::SetBool    (const std::string& name, const bool                 value)    {   bools[name] =     value;  }

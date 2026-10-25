@@ -71,6 +71,13 @@ void Renderer::DrawStaticMesh(const UStaticMesh& staticMesh, const FMatrix4x4F& 
 
         RHI::Get().SetUniformMat4("u_Model", localToWorld);
 
+        const FMaterialRenderState& renderState = material->GetRenderState();
+
+        RHI::Get().SetCullMode(renderState.cullMode);
+        RHI::Get().SetBlendMode(renderState.blendMode);
+        RHI::Get().SetDepthTest(renderState.depthTest);
+        RHI::Get().SetDepthWrite(renderState.depthWrite);
+
         RHI::Get().BindVertexArray(subMesh.vertexArray);
         RHI::Get().DrawIndexed(subMesh.drawDesc);
     }
@@ -95,13 +102,14 @@ void Renderer::SetBackend(RHI::Backend backend)
 void Renderer::BeginFrame(const RHI::ViewportDesc& viewportDesc)
 {
     RHI::Get().SetViewport(viewportDesc);
-    RHI::Get().SetClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-    RHI::Get().Clear(true, true);
 
     RHI::Get().SetDepthTest(true);
     RHI::Get().SetDepthWrite(true);
     RHI::Get().SetCullMode(RHI::CullMode::Back);
     RHI::Get().SetBlendMode(RHI::BlendMode::Opaque);
+
+    RHI::Get().SetClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    RHI::Get().Clear(true, true);
 }
 
 void Renderer::EndFrame()
