@@ -4,6 +4,8 @@
 namespace CE
 {
 
+uint32 UObjectRegistry::registryCounter = 0;
+
 void UObjectRegistry::Destroy(UObjectHandle handle)
 {
     Slot* slot = GetSlotFromHandle(handle);
@@ -25,8 +27,16 @@ void UObjectRegistry::Destroy(UObjectHandle handle)
     freeList.push_back(handle.index);
 }
 
+UObjectRegistry::UObjectRegistry()
+{
+    this->registryId = registryCounter++;
+}
+
 UObject* UObjectRegistry::Resolve(UObjectHandle handle)
 {
+    if (handle.registryId != registryId)
+        return nullptr;
+
     return ResolveRaw(handle);
 }
 
@@ -67,6 +77,10 @@ UObjectRegistry::Slot* UObjectRegistry::GetSlotFromHandle(UObjectHandle handle)
     return &slot;
 }
 
+uint32 UObjectRegistry::GetRegistryId() const
+{
+    return registryId;
+}
 void UObjectRegistry::FlushPendingDestroy()
 {
     for(const uint32 index : pendingDestroy)

@@ -26,32 +26,30 @@ public:
 
     virtual void Tick(float dt);
 
-    TObjectHandle<USceneComponent> GetRootComponent() const;
+    USceneComponent* GetRootComponent() const;
 
     UWorld* GetWorld() const;
     ULevel* GetLevel() const;
 
 protected:
-
     virtual void OnSpawned();
+    virtual void OnDestroyed();
 
     template<typename T, typename... Args>
         requires std::is_base_of_v<UActorComponent,T>
-    TObjectHandle<T> CreateDefaultSubobject(Args&&... args)
-    {
-        TObjectHandle<T> newSubobject = level->CreateComponent<T>(std::forward<Args>(args)...);
-        ownedComponents.push_back(newSubobject);
+    T* CreateDefaultSubobject(Args&&... args);
 
-        return newSubobject;
-    }
-
-    TObjectHandle<USceneComponent> rootComponent;
+    USceneComponent* rootComponent;
 
 private:
     friend class UWorld;
 
-    std::vector<TObjectHandle<UActorComponent>> ownedComponents;
+    bool isPendingDestroy = false;
+
+    TArray<UActorComponent*> ownedComponents;
     ULevel* level = FObjectInitializer::GetCurrent();
 };
 
 }
+
+#include "AActor.inl"

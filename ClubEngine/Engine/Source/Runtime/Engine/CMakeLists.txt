@@ -4,6 +4,9 @@ file(GLOB_RECURSE CEENGINE_PRIVATE CONFIGURE_DEPENDS "Private/*.cpp" "Private/*.
 add_library(CEEngine ${CE_MODULE_TYPE}
   ${CEENGINE_PUBLIC}
   ${CEENGINE_PRIVATE}
+        Public/Engine/World/UWorld.inl
+        Public/Engine/World/Ulevel.inl
+        Public/Engine/World/AActor.inl
 )
 
 add_library(ClubEngine::Engine ALIAS CEEngine)

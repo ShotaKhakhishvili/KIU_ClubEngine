@@ -1,11 +1,10 @@
 #pragma once
 
 #include <Core/ClubCore.h>
-
-#include <CoreUObject/UObjectMacros.h>
+#include <CoreUObject/UObjectMacros.h> // This is used in every actor that extends UObject, so don't remove
+#include <CoreUObject/UObjectHandle.h>
 
 #include <string>
-#include <cstdint>
 #include <unordered_map>
 
 namespace CE
@@ -21,11 +20,13 @@ public:
     UObject (UObject&&) = delete;
     UObject& operator= (UObject&&) = delete;
 
-    uint64_t GetID() const noexcept;
+    uint64 GetID() const noexcept;
     const std::string& GetName() const noexcept;
 
     static const char* StaticClassName() noexcept;
     virtual const char* GetClassName() const noexcept;
+
+    UObjectHandle GetHandle() const noexcept;
 
 protected:
     explicit UObject(std::string inName);
@@ -36,7 +37,9 @@ private:
 
     friend class UObjectRegistry;
 
-    uint64_t id = 0;
+    UObjectHandle selfHandle;
+
+    uint64 id = 0;
     std::string name;
 };
 

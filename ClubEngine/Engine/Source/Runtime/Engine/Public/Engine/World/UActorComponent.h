@@ -16,11 +16,15 @@ class UActorComponent : public UObject
 
 public:
     virtual void Tick(float dt);
+    virtual void OnDestroyed();
 
-    void SetOwner(TObjectHandle<AActor> owner);
+    AActor* GetOwner() const;
 
 private:
-    TObjectHandle<AActor> owner;
+    friend class ULevel;
+    friend class UWorld;
+
+    AActor* owner;
 };
 
 }

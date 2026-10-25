@@ -22,26 +22,28 @@ public:
 
     UWorld* GetWorld() const;
 
-    template<typename T, typename... Args> 
+    template<typename T, typename... Args>
         requires std::is_base_of_v<UActorComponent, T>
-    TObjectHandle<T> CreateComponent(Args&&... args)
-    {
-        return componentRegistry.Create<T>(std::forward<Args>(args)...);
-    }
+    T* CreateComponent(AActor* owner, Args&&... args);
 
     template<typename T> 
         requires std::is_base_of_v<UActorComponent, T>
-    T* ResolveComponent(TObjectHandle<T> componentHandle)
-    {
-        return componentRegistry.Resolve<T>(componentHandle);
-    }
+    T* ResolveComponent(T* componentHandle);
+
+    template<typename T>
+        requires std::is_base_of_v<AActor, T>
+    T* ResolveActor(TObjectHandle<T> componentHandle);
 
 private:
     friend class UWorld;
 
+    void TickLevel(float dt);
+
     UWorld* world = nullptr;
-    UObjectRegistry componentRegistry;
     UObjectRegistry actorRegistry;
+    UObjectRegistry componentRegistry;
 };
 
 }
+
+#include "ULevel.inl"

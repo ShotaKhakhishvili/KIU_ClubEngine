@@ -7,7 +7,6 @@
 
 #include <RenderCore/RHI/RHIHandle.h>
 
-#include <filesystem>
 #include <memory>
 #include <string>
 
@@ -16,7 +15,7 @@ namespace CE
 
 class UShader final : public UObject
 {
-    GENERATED_BODY(UShader, UObject)
+    GENERATED_BODY(UShader, UObject);
 
 public:
 

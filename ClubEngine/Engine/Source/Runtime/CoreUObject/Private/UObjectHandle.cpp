@@ -13,5 +13,9 @@ void UObjectHandle::Invalidate() noexcept
     this->index = std::numeric_limits<uint32_t>::max();
     this->generation = 0;
 }
+uint32 UObjectHandle::GetRegistryID() const noexcept
+{
+    return this->registryId;
+}
 
 }

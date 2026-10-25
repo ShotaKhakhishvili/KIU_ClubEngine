@@ -17,15 +17,24 @@ class USceneComponent : public UActorComponent
     GENERATED_BODY(USceneComponent, UActorComponent)
 
 public:
-    explicit USceneComponent(const FTransform& transform);
+    explicit USceneComponent(const FTransform& newTransform);
 
-    void SetWorldTransform(const FTransform& transform);
+    void SetWorldTransform(const FTransform& newTransform);
+
+    USceneComponent* GetParentComponent() const;
+    void SetParentComponent(USceneComponent* parent);
+
+    void RemoveChildComponent(USceneComponent* child);
+    void AddChildComponent(USceneComponent* child);
+
+    bool IsAncestorOf(const USceneComponent* other) const;
+    TArray<USceneComponent*> GetChildren() const;
 
 private:
     FTransform transform;
 
-    TObjectHandle<USceneComponent> parentComponent;
-    std::vector<TObjectHandle<USceneComponent>> childComponents;
+    USceneComponent* parentComponent = nullptr;
+    TArray<USceneComponent*> childComponents;
 };
 
 }

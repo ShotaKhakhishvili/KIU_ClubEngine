@@ -3,7 +3,7 @@
 namespace CE
 {
 
-UStaticMeshComponent::UStaticMeshComponent(TObjectHandle<UStaticMesh> inStaticMesh)
+UStaticMeshComponent::UStaticMeshComponent(UStaticMesh* inStaticMesh)
  : staticMesh(inStaticMesh)
 {}
 

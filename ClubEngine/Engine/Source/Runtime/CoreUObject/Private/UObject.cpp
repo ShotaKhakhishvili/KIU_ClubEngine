@@ -18,6 +18,10 @@ UObject::UObject(std::string inName)
 
 const char* UObject::StaticClassName() noexcept { return "UObject"; }
 const char* UObject::GetClassName() const noexcept { return "UObject"; }
+UObjectHandle UObject::GetHandle() const noexcept
+{
+    return selfHandle;
+}
 
 uint64_t UObject::GetID() const noexcept { return id; }
 const std::string& UObject::GetName() const noexcept { return name; }

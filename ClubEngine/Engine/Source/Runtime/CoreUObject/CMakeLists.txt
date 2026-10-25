@@ -4,6 +4,8 @@ file(GLOB_RECURSE CECOREUOBJECT_PRIVATE CONFIGURE_DEPENDS "Private/*.cpp" "Priva
 add_library(CECoreUObject ${CE_MODULE_TYPE}
     ${CECOREUOBJECT_PUBLIC}
     ${CECOREUOBJECT_PRIVATE}
+        Public/CoreUObject/UObjectRegistry.inl
+        Public/CoreUObject/TObjectHandle.inl
 )
 
 add_library(ClubEngine::CoreUObject ALIAS CECoreUObject)

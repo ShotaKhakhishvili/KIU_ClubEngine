@@ -10,7 +10,6 @@
 
 #include <Engine/World/AActor.h>
 #include <Engine/World/UActorComponent.h>
-#include <Engine/World/FObjectInitializer.h>
 
 #include <vector>
 #include <type_traits>
@@ -25,41 +24,42 @@ class UWorld : public UObject
     GENERATED_BODY(UWorld, UObject)
 
 public:
-    template<typename T, typename... Args> requires std::is_base_of_v<AActor, T>
-    TObjectHandle<T> SpawnActor(const FTransform& transform, Args&&... args)
-    {
-        FObjectInitializer initializer(&persistentLevel);
+    ~UWorld();
 
-        TObjectHandle<T> handle = persistentLevel.actorRegistry.Create<T>(std::forward<Args>(args)...);
-        AActor* actor = persistentLevel.actorRegistry.Resolve<AActor>(handle);
+    template<typename T, typename... Args>
+        requires std::is_base_of_v<AActor, T>
+    T* SpawnActor(const FTransform& transform, Args&&... args);
 
-        if(!actor->rootComponent.IsValid())
-        {
-            actor->rootComponent = actor->CreateDefaultSubobject<USceneComponent>();
-        }
+    void Destroy(AActor* actor);
 
-        for(auto& component : actor->ownedComponents)
-        {
-            persistentLevel.ResolveComponent<UActorComponent>(component)->SetOwner(handle);
-        }
+    template<typename T>
+        requires std::is_base_of_v<UActorComponent, T>
+    void DestroyComponent(T* component);
 
-        persistentLevel.ResolveComponent(actor->rootComponent)->SetWorldTransform(transform);
-        actor->OnSpawned();
+    template<typename T>
+        requires std::is_base_of_v<AActor, T>
+    T* ResolveActor(TObjectHandle<T> handle) const;
 
-        return handle;
-    }
-    void Destroy(TObjectHandle<AActor>);
+    template<typename T>
+    requires std::is_base_of_v<UActorComponent, T>
+    T* ResolveComponent(TObjectHandle<T> handle) const;
 
     FScene& GetScene();
 
 private:
     friend class WorldSystem;
 
+    ULevel* GetLevelFromRegistryID(uint32 registryId) const;
+
     void TickWorld(float dt);
 
-    ULevel persistentLevel{this};
+    ULevel* persistentLevel = new ULevel(this);
+    TArray<ULevel*> streamedLevels;
+
     FScene scene;
 };
 
 }
+
+#include "UWorld.inl"
 

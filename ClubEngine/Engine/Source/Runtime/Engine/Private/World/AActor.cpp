@@ -7,15 +7,15 @@ namespace CE
 AActor::AActor(const FTransform& transform)
     : AActor()
 {
-    rootComponent = level->CreateComponent<USceneComponent>(transform);
+    rootComponent = level->CreateComponent<USceneComponent>(this, transform);
 }
 
-TObjectHandle<USceneComponent> AActor::GetRootComponent() const 
+USceneComponent* AActor::GetRootComponent() const
 {
     return rootComponent;
 }
 
-void AActor::Tick(float dt)
+void AActor::Tick(const float dt)
 {
     (void)dt;
 }
@@ -33,6 +33,10 @@ ULevel* AActor::GetLevel() const
 void AActor::OnSpawned()
 {
 
+}
+
+void AActor::OnDestroyed()
+{
 }
 
 }
