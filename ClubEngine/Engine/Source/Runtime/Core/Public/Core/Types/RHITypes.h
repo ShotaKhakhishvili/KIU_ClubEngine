@@ -8,11 +8,12 @@
 namespace CE::RHI
 {
 
-using ShaderID = uint32_t;
-using TextureID = uint32_t;
-using VertexArrayID = uint32_t;
-using VertexBufferID = uint32_t;
-using IndexBufferID = uint32_t;
+using ShaderID = uint32;
+using TextureID = uint32;
+using VertexArrayID = uint32;
+using VertexBufferID = uint32;
+using IndexBufferID = uint32;
+using BufferID = uint32;
 
 enum class ShaderDataType
 {
@@ -106,9 +107,9 @@ enum class CubemapFace
     Count
 };
 
-constexpr uint32_t ToTextureUnitIndex(const TextureSlot slot) noexcept
+constexpr uint32 ToTextureUnitIndex(const TextureSlot slot) noexcept
 {
-    return static_cast<uint32_t>(slot);
+    return static_cast<uint32>(slot);
 }
 
 enum class Backend

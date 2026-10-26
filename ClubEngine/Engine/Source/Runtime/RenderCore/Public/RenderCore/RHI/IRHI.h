@@ -54,10 +54,11 @@ namespace CE::RHI
 
 		// ------------ Compute ------------
 
-        virtual void                BindBufferBase          (BufferHandle handle, uint32 bindingSlot) = 0;
-        virtual void                ReadBuffer              (BufferHandle handle, void* dest, uint32 size) = 0;
+        virtual bool                BindBufferBase          (BufferHandle handle, uint32 bindingSlot) = 0;
+        virtual bool                ReadBuffer              (BufferHandle handle, void* dest, uint32 size, size_t offset) = 0;
+        virtual bool                WriteBuffer             (BufferHandle handle, const void* data, uint32 size, size_t offset) = 0;
 		virtual void                DispatchCompute         (uint32_t groupCountX, uint32_t groupCountY, uint32_t groupCountZ) = 0;
-		
+
         virtual SyncFenceHandle     CreateFence             () = 0;
 		virtual bool                PollFence               (SyncFenceHandle handle) = 0;
 		virtual void                DestroyFence            (SyncFenceHandle handle) = 0;   

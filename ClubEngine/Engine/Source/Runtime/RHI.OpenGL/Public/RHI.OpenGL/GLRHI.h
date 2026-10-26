@@ -11,8 +11,7 @@ namespace CE::RHI
 class GLShaderBase;
 class GLTexture;
 class GLVertexArray;
-class GLVertexBuffer;
-class GLIndexBuffer;
+class GLBuffer;
 
 class GLRHI final : public IRHI
 {
@@ -33,8 +32,9 @@ public:
     BufferHandle        CreateBuffer                (const BufferDesc& desc, const void* data)                          override;
     void                DestroyBuffer               (BufferHandle buffer)                                               override;
 
-    void                BindBufferBase              (BufferHandle handle, uint32 bindingSlot)                           override;
-    void                ReadBuffer                  (BufferHandle handle, void* dest, uint32 size)                      override;
+    bool                BindBufferBase              (BufferHandle handle, uint32 bindingSlot)                           override;
+    bool                ReadBuffer                  (BufferHandle handle, void* dest, uint32 size, size_t offset)       override;
+    bool                WriteBuffer                 (BufferHandle handle, const void* data, uint32 size, size_t offset) override;
     void                DispatchCompute             (uint32_t groupCountX, uint32_t groupCountY, uint32_t groupCountZ)  override;
 		
     SyncFenceHandle     CreateFence                 ()                                                                  override;
@@ -68,28 +68,27 @@ public:
 	void SetUniformIVec2(const std::string& name, int x, int y) override;
 	void SetUniformIVec3(const std::string& name, int x, int y, int z) override;
 	void SetUniformIVec4(const std::string& name, int x, int y, int z, int w) override;
-    void SetUniformVec2(const std::string& name, const CE::FVector2F& value) override;
-    void SetUniformVec3(const std::string& name, const CE::FVectorF& value) override;
-    void SetUniformVec4(const std::string& name, const CE::FVector4F& value) override;
-	void SetUniformMat4(const std::string& name, const CE::FMatrix4x4F& value) override;
+    void SetUniformVec2(const std::string& name, const FVector2F& value) override;
+    void SetUniformVec3(const std::string& name, const FVectorF& value) override;
+    void SetUniformVec4(const std::string& name, const FVector4F& value) override;
+	void SetUniformMat4(const std::string& name, const FMatrix4x4F& value) override;
     void SetTexture(const std::string& name, TextureHandle texture, uint32_t slot) override;
     
     void DrawIndexed(const DrawIndexedDesc& desc) override;
 
 private:
-    uint32_t nextShaderHandle = 1;
-    uint32_t nextTextureHandle = 1;
-    uint32_t nextBufferHandle = 1;
-    uint32_t nextVertexArrayHandle = 1;
+
+    uint32 nextShaderHandle = 1;
+    uint32 nextTextureHandle = 1;
+    uint32 nextBufferHandle = 1;
+    uint32 nextVertexArrayHandle = 1;
 
     RHI::ShaderHandle currentShader{};
 
-    std::unordered_map<uint32_t, std::unique_ptr<GLShaderBase>> shaders;
-    std::unordered_map<uint32_t, std::unique_ptr<GLTexture>> textures;
-    std::unordered_map<uint32_t, std::unique_ptr<GLVertexBuffer>> vertexBuffers;
-    std::unordered_map<uint32_t, std::unique_ptr<GLIndexBuffer>> indexBuffers;
-    std::unordered_map<uint32_t, uint32_t> uniformBuffers;
-    std::unordered_map<uint32_t, std::unique_ptr<GLVertexArray>> vertexArrays;
+    std::unordered_map<uint32, std::unique_ptr<GLShaderBase>> shaders;
+    std::unordered_map<uint32, std::unique_ptr<GLTexture>> textures;
+    std::unordered_map<uint32, std::unique_ptr<GLBuffer>> buffers;
+    std::unordered_map<uint32, std::unique_ptr<GLVertexArray>> vertexArrays;
 };
 
 }

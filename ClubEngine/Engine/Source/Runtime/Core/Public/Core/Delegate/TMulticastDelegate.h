@@ -74,4 +74,4 @@ namespace CE
     };
 }
 
-#include <Core/Delegate/TMulticastDelegate.inl>
+#include "TMulticastDelegate.inl"

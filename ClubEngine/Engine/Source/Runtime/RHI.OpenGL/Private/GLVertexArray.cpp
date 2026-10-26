@@ -1,7 +1,7 @@
 #include "GLConvert.h"
 
 #include <RHI.OpenGL/GLVertexArray.h>
-#include <RHI.OpenGL/GLVertexBuffer.h>
+#include <RHI.OpenGL/GLBuffer.h>
 
 #include <glad/glad.h>
 #include <cassert>
@@ -18,7 +18,7 @@ GLVertexArray::GLVertexArray()
     #endif
 }
 
-void GLVertexArray::LinkAttrib(GLVertexBuffer& vbo, uint32_t layout, uint32_t componentCnt, ShaderDataType type, size_t stride, const void* offset) const
+void GLVertexArray::LinkAttrib(GLBuffer& vbo, uint32_t layout, uint32_t componentCnt, ShaderDataType type, size_t stride, const void* offset) const
 {
     assert(ID != 0);
 

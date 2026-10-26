@@ -5,8 +5,7 @@
 #include <RHI.OpenGL/GLShaderBase.h>
 #include <RHI.OpenGL/GLTexture.h>
 #include <RHI.OpenGL/GLVertexArray.h>
-#include <RHI.OpenGL/GLVertexBuffer.h>
-#include <RHI.OpenGL/GLIndexBuffer.h>
+#include <RHI.OpenGL/GLBuffer.h>
 
 #include <glad/glad.h>
 #include <cassert>
@@ -29,20 +28,13 @@ void GLRHI::Shutdown()
 {
     shaders.clear();
     textures.clear();
-    vertexBuffers.clear();
-    indexBuffers.clear();
+    buffers.clear();
     vertexArrays.clear();
 
     currentShader = {};
-
-    for (auto& [id, glBuffer] : uniformBuffers)
-    {
-        glDeleteBuffers(1, &glBuffer);
-    }
-    uniformBuffers.clear();
 }
 
-RHI::ShaderHandle GLRHI::CreateShader(const RHI::ShaderDesc& desc)
+ShaderHandle GLRHI::CreateShader(const ShaderDesc& desc)
 {
     std::string vertexShader;
     std::string fragmentShader;
@@ -51,16 +43,16 @@ RHI::ShaderHandle GLRHI::CreateShader(const RHI::ShaderDesc& desc)
     {
         switch(src.stage)
         {
-            case RHI::ShaderStage::Vertex:
+            case ShaderStage::Vertex:
                 vertexShader = src.source;
                 break;
-            case RHI::ShaderStage::Fragment:
+            case ShaderStage::Fragment:
                 fragmentShader = src.source;
                 break;
-            case RHI::ShaderStage::Compute:
+            case ShaderStage::Compute:
                 auto shader = std::make_unique<GLShaderBase>(
-                    RHI::ShaderDesc{ 
-                        .stages = {{RHI::ShaderStage::Compute, src.source}}
+                    ShaderDesc{
+                        .stages = {{ShaderStage::Compute, src.source}}
                     });
                 const uint32_t id = nextShaderHandle++;
                 shaders[id] = std::move(shader);
@@ -71,10 +63,10 @@ RHI::ShaderHandle GLRHI::CreateShader(const RHI::ShaderDesc& desc)
     assert(!vertexShader.empty());
     assert(!fragmentShader.empty());
 
-    RHI::ShaderDesc shaderDesc{
+    ShaderDesc shaderDesc{
         .stages = {
-            {RHI::ShaderStage::Vertex, vertexShader},
-            {RHI::ShaderStage::Fragment, fragmentShader}
+            {ShaderStage::Vertex, vertexShader},
+            {ShaderStage::Fragment, fragmentShader}
         }
 	};
 
@@ -83,17 +75,17 @@ RHI::ShaderHandle GLRHI::CreateShader(const RHI::ShaderDesc& desc)
     if(!shader->IsValid())
     {
         CE_LOG(Error, "RHI.OpenGL: Shader Creation Failed");
-        return RHI::ShaderHandle{};
+        return ShaderHandle{};
     }
     
     const uint32_t id = nextShaderHandle++;
 
     shaders[id] = std::move(shader);
 
-    return RHI::ShaderHandle{id};
+    return ShaderHandle{id};
 }
 
-void GLRHI::DestroyShader(RHI::ShaderHandle handle)
+void GLRHI::DestroyShader(ShaderHandle handle)
 {
     if(!handle.IsValid())
     {
@@ -107,7 +99,7 @@ void GLRHI::DestroyShader(RHI::ShaderHandle handle)
         currentShader = {};
 }
 
-void GLRHI::BindShader(RHI::ShaderHandle handle)
+void GLRHI::BindShader(ShaderHandle handle)
 {
     assert(handle.IsValid());
 
@@ -118,7 +110,7 @@ void GLRHI::BindShader(RHI::ShaderHandle handle)
     currentShader = handle;
 }
 
-RHI::TextureHandle GLRHI::CreateTexture(const RHI::TextureDesc& desc, const void* data)
+TextureHandle GLRHI::CreateTexture(const TextureDesc& desc, const void* data)
 {
     assert(desc.dimension == RHI::TextureDimension::Texture2D);
 
@@ -136,10 +128,10 @@ RHI::TextureHandle GLRHI::CreateTexture(const RHI::TextureDesc& desc, const void
 
     textures[id] = std::move(texture);
 
-    return RHI::TextureHandle{id};
+    return TextureHandle{id};
 }
 
-RHI::TextureHandle GLRHI::CreateCubemap(const RHI::TextureDesc& desc, const void* const* faceData)
+TextureHandle GLRHI::CreateCubemap(const RHI::TextureDesc& desc, const void* const* faceData)
 {
     assert(desc.dimension == RHI::TextureDimension::TextureCube);
 
@@ -171,7 +163,7 @@ void GLRHI::DestroyTexture(RHI::TextureHandle handle)
     textures.erase(handle.id);
 }
 
-void GLRHI::BindTexture(RHI::TextureHandle handle, uint32_t slot)
+void GLRHI::BindTexture(TextureHandle handle, uint32_t slot)
 {
     assert(handle.IsValid());
 
@@ -181,51 +173,22 @@ void GLRHI::BindTexture(RHI::TextureHandle handle, uint32_t slot)
     it->second->Bind(slot);
 }
 
-RHI::BufferHandle GLRHI::CreateBuffer(const RHI::BufferDesc& desc, const void* data)
+BufferHandle GLRHI::CreateBuffer(const BufferDesc& desc, const void* data)
 {
     const uint32_t id = nextBufferHandle++;
 
-    switch(desc.type)
-    {
-        case RHI::BufferType::Vertex:
-        {
-            auto buffer = std::make_unique<GLVertexBuffer>(
-                data,
-                desc.size,
-                desc.usage
-            );
-            vertexBuffers[id] = std::move(buffer);
-            break;
-        }
+    auto buffer = std::make_unique<GLBuffer>(
+        data,
+        desc.size,
+        desc.type,
+        desc.usage
+        );
+    buffers[id] = std::move(buffer);
 
-        case RHI::BufferType::Index:
-        {
-            auto buffer = std::make_unique<GLIndexBuffer>(
-                data,
-                desc.size,
-                desc.usage
-            );
-            indexBuffers[id] = std::move(buffer);
-            break;
-        }
-
-        case RHI::BufferType::Uniform:
-        {
-            GLuint glBuffer = 0;
-            glGenBuffers(1, &glBuffer);
-            glBindBuffer(GL_UNIFORM_BUFFER, glBuffer);
-            glBufferData(GL_UNIFORM_BUFFER, desc.size, data, ToGL(desc.usage));
-            glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
-            uniformBuffers[id] = glBuffer;
-            break;
-        }
-    }
-
-    return RHI::BufferHandle{id};
+    return BufferHandle{id};
 }
 
-void GLRHI::DestroyBuffer(RHI::BufferHandle handle)
+void GLRHI::DestroyBuffer(BufferHandle handle)
 {
     if(!handle.IsValid())
     {
@@ -233,26 +196,32 @@ void GLRHI::DestroyBuffer(RHI::BufferHandle handle)
         return;
     }
 
-    vertexBuffers.erase(handle.id);
-    indexBuffers.erase(handle.id);
-
-    auto it = uniformBuffers.find(handle.id);
-    if(it != uniformBuffers.end())
-    {
-        GLuint glBuffer = it->second;
-        glDeleteBuffers(1, &glBuffer);
-        uniformBuffers.erase(it);
-    }
+    buffers.erase(handle.id);
 }
 
-void GLRHI::BindBufferBase(BufferHandle handle, uint32 bindingSlot) 
+bool GLRHI::BindBufferBase(BufferHandle handle, uint32 bindingSlot)
 {
+    auto it = buffers.find(handle.id);
+    assert(it != buffers.end());
 
+    return it->second->BindBase(bindingSlot);
 }
-void GLRHI::ReadBuffer(BufferHandle handle, void* dest, uint32 size)
+
+bool GLRHI::ReadBuffer(BufferHandle handle, void* dest, uint32 size, size_t offset)
 {
+    auto it = buffers.find(handle.id);
+    assert(it != buffers.end());
 
+    return it->second->Read(dest, size, offset);
 }
+bool GLRHI::WriteBuffer(BufferHandle handle, const void* data, const uint32 size, const size_t offset)
+{
+    auto it = buffers.find(handle.id);
+    assert(it != buffers.end());
+
+    return it->second->Write(data, size, offset);
+}
+
 void GLRHI::DispatchCompute(uint32_t groupCountX, uint32_t groupCountY, uint32_t groupCountZ)
 {
 
@@ -271,20 +240,21 @@ void GLRHI::DestroyFence(SyncFenceHandle handle)
 
 }
 
-RHI::VertexArrayHandle GLRHI::CreateVertexArray(
-    RHI::BufferHandle vertexBufferHandle,
-    RHI::BufferHandle indexBufferHandle,
-    const RHI::VertexArrayDesc& desc
+VertexArrayHandle GLRHI::CreateVertexArray(
+
+    BufferHandle vertexBufferHandle,
+    BufferHandle indexBufferHandle,
+    const VertexArrayDesc& desc
 )
 {
     assert(vertexBufferHandle.IsValid());
     assert(indexBufferHandle.IsValid());
 
-    auto VBOIt = vertexBuffers.find(vertexBufferHandle.id);
-    auto EBOIt = indexBuffers.find(indexBufferHandle.id);
+    auto VBOIt = buffers.find(vertexBufferHandle.id);
+    auto EBOIt = buffers.find(indexBufferHandle.id);
 
-    assert(VBOIt != vertexBuffers.end());
-    assert(EBOIt != indexBuffers.end());
+    assert(VBOIt != buffers.end());
+    assert(EBOIt != buffers.end());
 
     auto vao = std::make_unique<GLVertexArray>();
 
@@ -305,17 +275,17 @@ RHI::VertexArrayHandle GLRHI::CreateVertexArray(
     }
 
     GLVertexArray::Unbind();
-    GLVertexBuffer::Unbind();
-    GLIndexBuffer::Unbind();
+    GLBuffer::Unbind(BufferType::Vertex);
+    GLBuffer::Unbind(BufferType::Index);
 
     const uint32_t id = nextVertexArrayHandle++;
 
     vertexArrays[id] = std::move(vao);
 
-    return RHI::VertexArrayHandle{id};
+    return VertexArrayHandle{id};
 }
 
-void GLRHI::DestroyVertexArray(RHI::VertexArrayHandle handle)
+void GLRHI::DestroyVertexArray(VertexArrayHandle handle)
 {
     if(!handle.IsValid())
     {
@@ -326,7 +296,7 @@ void GLRHI::DestroyVertexArray(RHI::VertexArrayHandle handle)
     vertexArrays.erase(handle.id);
 }
 
-void GLRHI::BindVertexArray(RHI::VertexArrayHandle handle)
+void GLRHI::BindVertexArray(VertexArrayHandle handle)
 {
     assert(handle.IsValid());
 
@@ -336,7 +306,7 @@ void GLRHI::BindVertexArray(RHI::VertexArrayHandle handle)
     VAO->second->Bind();
 }
 
-void GLRHI::SetViewport(const RHI::ViewportDesc& desc)
+void GLRHI::SetViewport(const ViewportDesc& desc)
 {
     glViewport(
         static_cast<GLint>(desc.x),
@@ -364,9 +334,9 @@ void GLRHI::Clear(bool color, bool depth)
     glClear(flags);
 }
 
-void GLRHI::SetCullMode(RHI::CullMode mode)
+void GLRHI::SetCullMode(CullMode mode)
 {
-    if (mode == RHI::CullMode::None)
+    if (mode == CullMode::None)
     {
         glDisable(GL_CULL_FACE);
         return;
@@ -376,46 +346,46 @@ void GLRHI::SetCullMode(RHI::CullMode mode)
 
     switch (mode)
     {
-        case RHI::CullMode::Back:
+        case CullMode::Back:
             glCullFace(GL_BACK);
             break;
 
-        case RHI::CullMode::Front:
+        case CullMode::Front:
             glCullFace(GL_FRONT);
             break;
 
-        case RHI::CullMode::Count:
+        case CullMode::Count:
             assert(false && "Invalid CullMode");
             break;
 
-        case RHI::CullMode::None:
+        case CullMode::None:
             break;
     }
 }
 
-void GLRHI::SetBlendMode(RHI::BlendMode mode)
+void GLRHI::SetBlendMode(BlendMode mode)
 {
     switch (mode)
     {
-        case RHI::BlendMode::Opaque:
+        case BlendMode::Opaque:
             glDisable(GL_BLEND);
             break;
 
-        case RHI::BlendMode::Masked:
+        case BlendMode::Masked:
             glDisable(GL_BLEND);
             break;
 
-        case RHI::BlendMode::Translucent:
+        case BlendMode::Translucent:
             glEnable(GL_BLEND);
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
             break;
 
-        case RHI::BlendMode::Additive:
+        case BlendMode::Additive:
             glEnable(GL_BLEND);
             glBlendFunc(GL_SRC_ALPHA, GL_ONE);
             break;
 
-        case RHI::BlendMode::Count:
+        case BlendMode::Count:
             assert(false && "Invalid BlendMode");
             break;
     }
@@ -494,7 +464,7 @@ void GLRHI::SetUniformMat4(const std::string& name, const FMatrix4x4F& value)
     shaders[currentShader.id]->SetMat4(name, value);
 }
 
-void GLRHI::SetTexture(const std::string& name, RHI::TextureHandle texture, uint32_t slot)
+void GLRHI::SetTexture(const std::string& name, TextureHandle texture, uint32_t slot)
 {
     auto shaderIt = shaders.find(currentShader.id);
     if (shaderIt == shaders.end() || !shaderIt->second)
@@ -515,10 +485,10 @@ void GLRHI::SetTexture(const std::string& name, RHI::TextureHandle texture, uint
     shaderIt->second->SetInt(name, static_cast<int32_t>(slot));
 }
 
-void GLRHI::DrawIndexed(const RHI::DrawIndexedDesc& desc)
+void GLRHI::DrawIndexed(const DrawIndexedDesc& desc)
 {
     const uint32_t indexSize =
-    desc.indexType == RHI::IndexType::UInt16 ? sizeof(uint16_t) : sizeof(uint32_t);
+    desc.indexType == IndexType::UInt16 ? sizeof(uint16_t) : sizeof(uint32_t);
 
     const uintptr_t byteOffset =
         static_cast<uintptr_t>(desc.indexOffset) * indexSize;

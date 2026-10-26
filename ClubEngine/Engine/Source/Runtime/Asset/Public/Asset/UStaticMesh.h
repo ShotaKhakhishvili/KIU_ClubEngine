@@ -12,6 +12,8 @@
 namespace CE
 {
 
+struct FMeshImportResult;
+
 class UStaticMesh : public UObject
 {
     GENERATED_BODY(UStaticMesh, UObject)
@@ -23,6 +25,7 @@ public:
     const std::vector<TObjectHandle<UMaterial>>& GetMaterials() const;
 
     void AddSubMesh(const FSubMesh& subMesh);
+    void AddSubMeshWithImportResult(const FMeshImportResult* meshRes, uint32 materialIndex = 0);
     void AddMaterial(TObjectHandle<UMaterial> material);
 
 private:

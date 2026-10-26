@@ -122,9 +122,10 @@ GLenum ToGL(RHI::BufferType type) noexcept
 {
     switch (type)
     {
-        case RHI::BufferType::Vertex:  return GL_ARRAY_BUFFER;
-        case RHI::BufferType::Index:   return GL_ELEMENT_ARRAY_BUFFER;
-        case RHI::BufferType::Uniform: return GL_UNIFORM_BUFFER;
+        case RHI::BufferType::Vertex:           return GL_ARRAY_BUFFER;
+        case RHI::BufferType::Index:            return GL_ELEMENT_ARRAY_BUFFER;
+        case RHI::BufferType::Uniform:          return GL_UNIFORM_BUFFER;
+        case RHI::BufferType::ShaderStorage:    return GL_SHADER_STORAGE_BUFFER;
     }
     assert(false && "Unhandled BufferType");
     return GL_ARRAY_BUFFER;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Core/Types/CoreTypes.h>
 #include <Core/Types/RHITypes.h>
 
 #include <RenderCore/RHI/RHIHandle.h>
@@ -14,7 +15,7 @@ struct FSubMesh
     RHI::VertexArrayHandle vertexArray;
     RHI::DrawIndexedDesc drawDesc;
 
-    uint32_t materialIndex = 0;
+    uint32 materialIndex = 0;
 };
 
 }

@@ -4,6 +4,8 @@ file(GLOB_RECURSE CERHIOPENGL_PRIVATE CONFIGURE_DEPENDS "Private/*.cpp" "Private
 add_library(CERHIOpenGL ${CE_MODULE_TYPE}
   ${CERHIOPENGL_PUBLIC}
   ${CERHIOPENGL_PRIVATE}
+        Private/GLBuffer.cpp
+        Public/RHI.OpenGL/GLBuffer.h
 )
 
 add_library(ClubEngine::RHIOpenGL ALIAS CERHIOpenGL)

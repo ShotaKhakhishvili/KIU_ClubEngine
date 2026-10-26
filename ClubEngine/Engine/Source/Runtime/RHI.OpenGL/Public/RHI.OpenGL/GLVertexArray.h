@@ -8,7 +8,7 @@
 namespace CE::RHI
 {
 
-class GLVertexBuffer;
+class GLBuffer;
 
 class GLVertexArray
 {
@@ -17,7 +17,7 @@ public:
     ~GLVertexArray();
     GLVertexArray();
 
-    void LinkAttrib(GLVertexBuffer& vbo, uint32_t layout, uint32_t componentCnt, ShaderDataType type, size_t stride, const void* offset) const;
+    void LinkAttrib(GLBuffer& vbo, uint32_t layout, uint32_t componentCnt, ShaderDataType type, size_t stride, const void* offset) const;
 
     void Bind() const;
     static void Unbind();
