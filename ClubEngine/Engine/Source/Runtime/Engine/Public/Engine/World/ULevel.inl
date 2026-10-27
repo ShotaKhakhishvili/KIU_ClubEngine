@@ -5,11 +5,10 @@ namespace CE
 
 template<typename T, typename... Args>
     requires std::is_base_of_v<UActorComponent, T>
-T* ULevel::CreateComponent(AActor* owner, Args&&... args)
+T* ULevel::CreateComponent(Args&&... args)
 {
     auto handle = componentRegistry.Create<T>(std::forward<Args>(args)...);
     auto newComponent = componentRegistry.Resolve<T>(handle);
-    newComponent->owner = owner;
 
     return newComponent;
 }

@@ -4,6 +4,8 @@ file(GLOB_RECURSE CECORE_PRIVATE CONFIGURE_DEPENDS "Private/*.cpp" "Private/*.c"
 add_library(CECore ${CE_MODULE_TYPE}
     ${CECORE_PUBLIC}
     ${CECORE_PRIVATE}
+        Public/Core/Math/Rotator.h
+        Public/Core/Math/Rotator.inl
 )
 
 add_library(ClubEngine::Core ALIAS CECore)

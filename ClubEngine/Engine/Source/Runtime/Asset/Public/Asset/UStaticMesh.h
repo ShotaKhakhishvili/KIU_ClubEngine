@@ -19,7 +19,7 @@ class UStaticMesh : public UObject
     GENERATED_BODY(UStaticMesh, UObject)
 
 public:
-    explicit UStaticMesh(std::string inName = "UStaticMesh");
+    explicit UStaticMesh() = default;
 
     const std::vector<FSubMesh>& GetSubMeshes() const;
     const std::vector<TObjectHandle<UMaterial>>& GetMaterials() const;

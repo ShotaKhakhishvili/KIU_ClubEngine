@@ -24,7 +24,7 @@ public:
 
     template<typename T, typename... Args>
         requires std::is_base_of_v<UActorComponent, T>
-    T* CreateComponent(AActor* owner, Args&&... args);
+    T* CreateComponent(Args&&... args);
 
     template<typename T> 
         requires std::is_base_of_v<UActorComponent, T>

@@ -138,10 +138,8 @@ void Renderer::Render(const FScene& scene) const
 {
     scene.ForEachPrimitive([this](const FPrimitiveSceneProxy& proxy)
     {
-        const UStaticMesh* staticMesh = GetCurrentAssetResolver()->Resolve(proxy.staticMesh);
-
-        if(staticMesh != nullptr)
-            DrawStaticMesh(*staticMesh, proxy.localToWorld);
+        if(proxy.staticMesh != nullptr)
+            DrawStaticMesh(*proxy.staticMesh, proxy.localToWorld);
     });
 
 }

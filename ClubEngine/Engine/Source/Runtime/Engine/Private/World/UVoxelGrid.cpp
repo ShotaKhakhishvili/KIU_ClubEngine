@@ -10,8 +10,8 @@
 namespace CE
 {
     
-UVoxelGrid::UVoxelGrid(uint16 chunkSizeX, uint16 chunkSizeY, uint16 chunkSizeZ)
-    : chunkSizeX(chunkSizeX), chunkSizeY(chunkSizeY), chunkSizeZ(chunkSizeZ)
+UVoxelGrid::UVoxelGrid(AActor* owner, uint16 chunkSizeX, uint16 chunkSizeY, uint16 chunkSizeZ)
+    : Super(owner, FTransform()), chunkSizeX(chunkSizeX), chunkSizeY(chunkSizeY), chunkSizeZ(chunkSizeZ)
 {
     CompileChunkGenShader();
 }
@@ -34,7 +34,7 @@ void UVoxelGrid::CompileChunkGenShader()
     
     const std::string shaderCode = oss.str();
 
-    shader = NewObject<UShader>(RHI::ShaderDesc{ std::vector<RHI::ShaderSource>{RHI::ShaderSource{RHI::ShaderStage::Compute, oss.str()} } }, "ChunkGen.comp");
+    shader = NewObject<UShader>(RHI::ShaderDesc{ std::vector<RHI::ShaderSource>{RHI::ShaderSource{RHI::ShaderStage::Compute, oss.str()} } });
 
     std::ofstream file(intermediateDir / "Shaders/ChunkGen.comp");
     file << shaderCode;

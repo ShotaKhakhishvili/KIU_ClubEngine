@@ -15,7 +15,7 @@ public:
     bool RemoveProxy                    (const FPrimitiveSceneProxyHandle& proxyToRemove);
 
     bool UpdateTransform                (FPrimitiveSceneProxyHandle handle, const FTransform& transform);
-    bool UpdateStaticMesh               (FPrimitiveSceneProxyHandle handle, TObjectHandle<UStaticMesh> staticMesh);
+    bool UpdateStaticMesh               (FPrimitiveSceneProxyHandle handle, UStaticMesh* staticMesh);
     bool SetVisible                     (FPrimitiveSceneProxyHandle handle, bool isVisible);
 
     template<typename F>

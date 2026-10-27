@@ -26,6 +26,7 @@ TObjectHandle<T> UObjectRegistry::Create(Args&&... args)
     slot.alive = true;
 
     slot.object->id = ++nextID;
+    slot.object->SetName(nullptr);
 
     UObjectHandle handle{};
 

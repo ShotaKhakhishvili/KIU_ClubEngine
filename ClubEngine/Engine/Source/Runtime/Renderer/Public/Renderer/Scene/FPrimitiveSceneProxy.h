@@ -11,7 +11,7 @@ namespace CE
 
 struct FPrimitiveSceneProxy
 {
-    TObjectHandle<UStaticMesh> staticMesh;
+    UStaticMesh* staticMesh;
     FMatrix4x4F localToWorld = FMatrix4x4F::Identity();
     bool isVisible = true;
 };

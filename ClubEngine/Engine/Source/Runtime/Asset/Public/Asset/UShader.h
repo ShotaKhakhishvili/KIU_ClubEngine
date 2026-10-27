@@ -19,7 +19,7 @@ class UShader final : public UObject
 
 public:
 
-    UShader(const RHI::ShaderDesc& shaderDesc, std::string inName = "UShader");
+    UShader(RHI::ShaderDesc  shaderDesc);
     ~UShader() override;
 
     bool Load();

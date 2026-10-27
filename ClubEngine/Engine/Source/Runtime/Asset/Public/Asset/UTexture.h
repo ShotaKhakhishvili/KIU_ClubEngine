@@ -20,8 +20,7 @@ class UTexture final : public UObject
 
 public:
     UTexture(std::filesystem::path inSourcePath,
-             const RHI::TextureDesc& inDesc,
-             std::string inName = "UTexture");
+             const RHI::TextureDesc& inDesc);
     ~UTexture() override;
 
     bool Load();

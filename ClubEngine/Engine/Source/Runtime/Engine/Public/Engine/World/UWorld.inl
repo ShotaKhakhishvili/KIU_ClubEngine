@@ -19,12 +19,12 @@ T* UWorld::SpawnActor(const FTransform& transform, Args&&... args)
 {
     FObjectInitializer initializer(persistentLevel);
 
-    TObjectHandle<T> handle = persistentLevel->actorRegistry.Create<T>(std::forward<Args>(args)...);
+    TObjectHandle<T> handle = persistentLevel->actorRegistry.Create<T>(transform, std::forward<Args>(args)...);
     AActor* actor = persistentLevel->actorRegistry.Resolve<AActor>(handle);
 
     if(!actor->rootComponent)
     {
-        actor->rootComponent = actor->CreateDefaultSubobject<USceneComponent>();
+        actor->rootComponent = actor->CreateDefaultSubobject<USceneComponent>(transform);
     }
 
     for(auto& component : actor->ownedComponents)
@@ -35,7 +35,7 @@ T* UWorld::SpawnActor(const FTransform& transform, Args&&... args)
     actor->rootComponent->SetWorldTransform(transform);
     actor->OnSpawned();
 
-    return actor;
+    return persistentLevel->actorRegistry.Resolve<T>(handle);
 }
 
 template<typename T>

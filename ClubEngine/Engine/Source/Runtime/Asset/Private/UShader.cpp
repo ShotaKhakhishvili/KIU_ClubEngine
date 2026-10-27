@@ -12,8 +12,8 @@
 namespace CE
 {
 
-UShader::UShader(const RHI::ShaderDesc& inShaderDesc, std::string inName)
-	: UObject(std::move(inName), "UShader"), shaderDesc(inShaderDesc)
+UShader::UShader(RHI::ShaderDesc  shaderDesc)
+	: shaderDesc(std::move(shaderDesc))
 {
 }
 

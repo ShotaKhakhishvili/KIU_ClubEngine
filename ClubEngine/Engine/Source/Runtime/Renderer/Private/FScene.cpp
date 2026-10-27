@@ -1,5 +1,7 @@
 #include <Renderer/Scene/FScene.h>
 
+#include "Asset/IAssetResolver.h"
+
 namespace CE
 {
 
@@ -23,7 +25,7 @@ bool FScene::UpdateTransform(FPrimitiveSceneProxyHandle handle, const FTransform
     proxy->localToWorld = FMatrix4x4F(transform.ToMatrix());
     return true;
 }
-bool FScene::UpdateStaticMesh(FPrimitiveSceneProxyHandle handle, TObjectHandle<UStaticMesh> staticMesh)
+bool FScene::UpdateStaticMesh(FPrimitiveSceneProxyHandle handle, UStaticMesh* staticMesh)
 {
     FPrimitiveSceneProxy* proxy = proxyPool.Resolve(handle);
 

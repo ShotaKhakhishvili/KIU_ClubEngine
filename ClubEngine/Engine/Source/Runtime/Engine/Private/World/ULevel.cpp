@@ -5,7 +5,6 @@ namespace CE
 {
 
 ULevel::ULevel(UWorld* inWorld)
-    : ULevel()
 {
     world = inWorld;
 }

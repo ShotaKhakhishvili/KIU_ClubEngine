@@ -61,13 +61,17 @@ void AssetContext::CreateEngineDefaults()
                 { RHI::ShaderStage::Fragment, FileIO::ReadFileWithIncludes(fragPath) }
     };
 
-    defaultShader = Create<UShader>(shaderDesc, "DefaultShader");
+    defaultShader = Create<UShader>(shaderDesc);
     UShader* shader = Resolve(defaultShader);
+    shader->SetName("DefaultShader");
+
     if (shader && !shader->IsReady())
         shader->Load();
 
-    defaultMaterial = Create<UMaterial>(defaultShader, "DefaultMaterial");
+    defaultMaterial = Create<UMaterial>(defaultShader);
     UMaterial* material = Resolve(defaultMaterial);
+    material->SetName("DefaultMaterial");
+
     if (material)
     {
         material->SetVec3("u_LightPos", 5.0f, 10.0f, 20.0f);
@@ -85,8 +89,9 @@ void AssetContext::CreateEngineDefaults()
 
     const FMeshImportResult& meshRes = importRes.value();
 
-    debugStaticMesh = Create<UStaticMesh>(std::string("DebugMesh"));
+    debugStaticMesh = Create<UStaticMesh>();
     UStaticMesh* staticMesh = Resolve(debugStaticMesh);
+    staticMesh->SetName("DebugStaticMesh");
 
     if (staticMesh)
     {

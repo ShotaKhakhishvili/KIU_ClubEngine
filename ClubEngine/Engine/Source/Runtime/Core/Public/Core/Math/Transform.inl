@@ -142,4 +142,10 @@ TTransform<T> SlerpLerp(const TTransform<T>& a, const TTransform<T>& b, std::typ
     return out;
 }
 
+template<std::floating_point T>
+void TTransform<T>::SetRotation(const FRotator& r) { Rotation = r.ToQuat(); }
+
+template<std::floating_point T>
+FRotator TTransform<T>::GetRotator() const             { return FRotator::FromQuat(Rotation); }
+
 } // namespace CE

@@ -5,7 +5,6 @@ namespace CE
 {
 
 AActor::AActor(const FTransform& transform)
-    : AActor()
 {
     rootComponent = level->CreateComponent<USceneComponent>(this, transform);
 }

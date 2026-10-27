@@ -11,11 +11,6 @@
 namespace CE
 {
 
-UStaticMesh::UStaticMesh(std::string inName)
-    : UObject(std::move(inName), "UStaticMesh")
-{
-}
-
 const std::vector<FSubMesh>& UStaticMesh::GetSubMeshes() const { return subMeshes; }
 const std::vector<TObjectHandle<UMaterial>>& UStaticMesh::GetMaterials() const { return materials; }
 

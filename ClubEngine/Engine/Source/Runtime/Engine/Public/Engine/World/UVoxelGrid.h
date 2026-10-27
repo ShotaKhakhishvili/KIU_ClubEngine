@@ -20,7 +20,7 @@ class UVoxelGrid : public USceneComponent
     GENERATED_BODY(UVoxelGrid, USceneComponent)
 
 public:
-    UVoxelGrid(uint16 chunkSizeX = 16, uint16 chunkSizeY = 16, uint16 chunkSizeZ = 256);
+    UVoxelGrid(AActor* owner, uint16 chunkSizeX = 16, uint16 chunkSizeY = 16, uint16 chunkSizeZ = 256);
 
 private:
     void CompileChunkGenShader();

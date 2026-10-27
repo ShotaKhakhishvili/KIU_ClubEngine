@@ -14,15 +14,18 @@ class UPrimitiveComponent : public USceneComponent
     GENERATED_BODY(UPrimitiveComponent, USceneComponent)
 
 public:
-    explicit UPrimitiveComponent(FPrimitiveSceneProxyHandle primitiveSceneProxy);
+    explicit UPrimitiveComponent(AActor* owner, const FTransform& transform);
 
     bool IsVisible()const;
     void SetVisible(bool newVisibility);
 
+protected:
+    FPrimitiveSceneProxyHandle GetPrimitiveSceneProxy() const;
+
 private:
     bool isVisible = true;
 
-    FPrimitiveSceneProxyHandle primitiveSceneProxy;
+    FPrimitiveSceneProxyHandle primitiveSceneProxyHandle;
 };
 
 }

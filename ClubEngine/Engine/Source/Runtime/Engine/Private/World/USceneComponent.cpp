@@ -4,10 +4,10 @@
 namespace CE
 {
 
-USceneComponent::USceneComponent(const FTransform& newTransform)
-    : transform(newTransform)
+USceneComponent::USceneComponent(AActor* owner, const FTransform& newTransform)
+    : Super(owner), transform(newTransform)
 {
-    
+
 }
 
 void USceneComponent::SetWorldTransform(const FTransform& newTransform)

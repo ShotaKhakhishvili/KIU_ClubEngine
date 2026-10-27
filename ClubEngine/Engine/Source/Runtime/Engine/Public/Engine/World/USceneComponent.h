@@ -17,7 +17,7 @@ class USceneComponent : public UActorComponent
     GENERATED_BODY(USceneComponent, UActorComponent)
 
 public:
-    explicit USceneComponent(const FTransform& newTransform);
+    explicit USceneComponent(AActor* owner, const FTransform& newTransform);
 
     void SetWorldTransform(const FTransform& newTransform);
 

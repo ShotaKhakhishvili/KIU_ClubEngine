@@ -6,6 +6,10 @@
 namespace CE
 {
 
+UActorComponent::UActorComponent(AActor* owner)
+    : owner(owner)
+{
+}
 void UActorComponent::Tick(const float dt)
 {
     (void)dt;

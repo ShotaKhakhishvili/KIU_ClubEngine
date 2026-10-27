@@ -6,11 +6,10 @@
 namespace CE
 {
 
-UMaterial::UMaterial(TObjectHandle<UShader> inShader, std::string inName)
-    : UObject(std::move(inName), "UMaterial"), shader(inShader)
-    {
-    
-    }
+UMaterial::UMaterial(TObjectHandle<UShader> inShader)
+    : shader(inShader)
+{
+}
 
 UMaterial::~UMaterial()
 {

@@ -15,6 +15,7 @@
 #include <Core/Math/Vector.h>
 #include <Core/Math/Matrix4x4.h>
 #include <Core/Math/Quat.h>
+#include <Core/Math/Rotator.h>
 
 #include <concepts>
 #include <type_traits>
@@ -55,6 +56,10 @@ struct TTransform
     TMatrix4x4<T>   ToMatrix()          const;
     TMatrix4x4<T>   ToMatrixNoScale()   const;
     TTransform      InverseFast()       const;
+
+    // FTransform: quaternion storage, Euler convenience
+    void     SetRotation                (const FRotator& r)             ;
+    FRotator GetRotator                 ()                      const   ;
 
     // ── Point / direction transform ───────────────────────────────────────────
 

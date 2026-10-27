@@ -10,10 +10,10 @@ class UStaticMeshComponent : public UPrimitiveComponent
     GENERATED_BODY(UStaticMeshComponent, UPrimitiveComponent)
 
 public:
-    UStaticMeshComponent(UStaticMesh* staticMesh);
+    UStaticMeshComponent(AActor* owner, const FTransform& transform, TObjectHandle<UStaticMesh> staticMesh);
 
 private:
-    UStaticMesh* staticMesh;
+    TObjectHandle<UStaticMesh> staticMesh;
 };
 
 }

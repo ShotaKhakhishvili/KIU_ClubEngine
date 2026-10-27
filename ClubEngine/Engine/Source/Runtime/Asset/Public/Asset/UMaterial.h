@@ -27,7 +27,7 @@ class UMaterial : public UObject
 
 public:
     
-    UMaterial(TObjectHandle<UShader> shader, std::string inName = "UMaterial");
+    UMaterial(TObjectHandle<UShader> shader);
     ~UMaterial();
 
     void SetBool    (const std::string& name, const bool    value);
