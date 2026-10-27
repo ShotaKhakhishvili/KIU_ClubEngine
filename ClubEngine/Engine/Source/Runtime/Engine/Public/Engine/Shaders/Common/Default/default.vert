@@ -6,9 +6,13 @@ layout(location = 1) in vec3 aNormal;
 layout(location = 2) in vec3 aColor;
 layout(location = 3) in vec2 aTexUV;
 
+layout (std140, binding = 0) uniform FrameData
+{
+    mat4 u_View;
+    mat4 u_Projection;
+} frameData;
+
 uniform mat4 u_Model;
-uniform mat4 u_View;
-uniform mat4 u_Projection;
 
 out vec3 v_Normal;
 out vec3 v_Color;
@@ -23,5 +27,5 @@ void main()
     v_Color = aColor;
     v_TexUV = aTexUV;
 
-    gl_Position = u_Projection * u_View * u_Model * vec4(aPos, 1.0);
+    gl_Position = frameData.u_Projection * frameData.u_View * u_Model * vec4(aPos, 1.0);
 }

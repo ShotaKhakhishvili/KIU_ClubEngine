@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Core/Types/CoreTypes.h>
+
 #include <string>
 #include <vector>
 #include <filesystem>
@@ -166,7 +167,7 @@ struct BufferDesc
 {
     BufferType type = BufferType::Vertex;
     BufferUsage usage = BufferUsage::StaticDraw;
-    uint32_t size = 0;
+    uint32 size = 0;
 };
 
 struct TextureDesc
@@ -207,12 +208,12 @@ struct ShaderFileDesc
 
 struct VertexAttributeDesc
 {
-    uint32_t location = 0;
-    uint32_t componentCount = 0;
+    uint32 location = 0;
+    uint32 componentCount = 0;
     ShaderDataType dataType = ShaderDataType::Float;
 
-    uint32_t stride = 0;
-    uint32_t offset = 0;
+    uint32 stride = 0;
+    uint32 offset = 0;
 };
 
 struct VertexArrayDesc
@@ -225,8 +226,8 @@ struct DrawIndexedDesc
     PrimitiveType primitiveType = PrimitiveType::Triangles;
     IndexType indexType = IndexType::UInt32;
         
-    uint32_t indexCount = 0;
-    uint32_t indexOffset = 0;
+    uint32 indexCount = 0;
+    uint32 indexOffset = 0;
 };
 
 enum class CullMode
@@ -248,10 +249,10 @@ enum class BlendMode
 
 struct ViewportDesc
 {
-    uint32_t x = 0;
-    uint32_t y = 0;
-    uint32_t width = 0;
-    uint32_t height = 0;
+    uint32 x = 0;
+    uint32 y = 0;
+    uint32 width = 0;
+    uint32 height = 0;
 };
 
 }

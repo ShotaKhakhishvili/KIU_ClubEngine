@@ -97,6 +97,10 @@ BufferID GLBuffer::GetID() const noexcept
 {
     return ID;
 }
+BufferType GLBuffer::GetType() const noexcept
+{
+    return bufferType;
+}
 
 GLBuffer::~GLBuffer()
 {

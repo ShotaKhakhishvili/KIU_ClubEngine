@@ -253,8 +253,8 @@ VertexArrayHandle GLRHI::CreateVertexArray(
     auto VBOIt = buffers.find(vertexBufferHandle.id);
     auto EBOIt = buffers.find(indexBufferHandle.id);
 
-    assert(VBOIt != buffers.end());
-    assert(EBOIt != buffers.end());
+    assert(VBOIt != buffers.end() && VBOIt->second->GetType() == BufferType::Vertex);
+    assert(EBOIt != buffers.end() && EBOIt->second->GetType() == BufferType::Index);
 
     auto vao = std::make_unique<GLVertexArray>();
 

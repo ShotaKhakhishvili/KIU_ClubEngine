@@ -5,15 +5,11 @@ namespace CE
 
 std::unordered_map<std::string, uint32> UObject::unnamedClassInstanceCounts;
 
-UObject::UObject(const char* className)
+UObject::UObject(std::string_view inObjectName, std::string_view inClassName)
 {
     const uint32 count = unnamedClassInstanceCounts[className]++;
-    name = className + std::to_string(count);
-}
-
-UObject::UObject(std::string inName)
-    : name(std::move(inName))
-{
+    className = inClassName;
+    objectName = className + (inObjectName.empty() ? std::string(":") + std::string(inObjectName) : std::to_string(count));
 }
 
 const char* UObject::StaticClassName() noexcept { return "UObject"; }
@@ -24,6 +20,6 @@ UObjectHandle UObject::GetHandle() const noexcept
 }
 
 uint64_t UObject::GetID() const noexcept { return id; }
-const std::string& UObject::GetName() const noexcept { return name; }
+const std::string& UObject::GetName() const noexcept { return objectName; }
 
 }

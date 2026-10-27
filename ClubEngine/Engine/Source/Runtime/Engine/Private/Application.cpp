@@ -85,6 +85,8 @@ int Application::Run()
         return 1;
     }
 
+    assetContext.CreateEngineDefaults();
+
 	this->PostInit();
 
     using Clock = std::chrono::steady_clock;
@@ -128,66 +130,7 @@ int Application::Run()
 
 void Application::PostInit()
 {
-    using std::filesystem::path;
 
-    const path vertPath = GetActiveProject().GetEnginePath() / path("Engine/Source/Runtime/Engine/Public/Engine/Shaders/Common/Default/default.vert");
-    const path fragPath = GetActiveProject().GetEnginePath() / path("Engine/Source/Runtime/Engine/Public/Engine/Shaders/Common/Default/default.frag");
-
-    RHI::ShaderDesc shaderDesc;
-    shaderDesc.stages = {
-        { RHI::ShaderStage::Vertex,   FileIO::ReadFileWithIncludes(vertPath) },
-        { RHI::ShaderStage::Fragment, FileIO::ReadFileWithIncludes(fragPath) }
-    };
-
-    auto shaderHandle = assetContext.Create<UShader>(shaderDesc, "DebugShader");
-    UShader* shader = assetContext.Resolve(shaderHandle);
-    if (shader && !shader->IsReady())
-        shader->Load();
-
-    auto materialHandle = assetContext.Create<UMaterial>(shaderHandle);
-    UMaterial* material = assetContext.Resolve(materialHandle);
-    if (material)
-    {
-        material->SetVec3("u_LightPos", 5.0f, 10.0f, 20.0f);
-        material->SetBool("u_UseTexture", false);
-    }
-
-    // MVP sword sits around x:0-10, z:8-14, so pull camera back
-    const FMatrix4x4F model = FMatrix4x4F::Identity();
-    const FMatrix4x4F view = FMatrix4x4F::LookAt({ 0.0f, -45.0f, 25.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 1.0f });
-    const FMatrix4x4F projection = FMatrix4x4F::Perspective(0.9f, 16.0f / 9.0f, 0.1f, 100.0f);
-
-    if (shader)
-    {
-        shader->SetMat4("u_Model", model);
-        shader->SetMat4("u_View", view);
-        shader->SetMat4("u_Projection", projection);
-    }
-
-    const path objPath = GetActiveProject().GetEnginePath() / "Engine/Source/Runtime/Engine/Public/Engine/Geometry/sting.obj";
-    ObjMeshImporter importer;
-    auto importRes = importer.Import(objPath);
-    if (!importRes.has_value())
-    {
-        CE_LOG(Warning, "Debug mesh import failed: {}", objPath.string());
-        return;
-    }
-
-    const FMeshImportResult& meshRes = importRes.value();
-
-    auto meshHandle = assetContext.Create<UStaticMesh>(std::string("DebugMesh"));
-    UStaticMesh* staticMesh = assetContext.Resolve(meshHandle);
-
-    if (staticMesh)
-    {
-        staticMesh->AddMaterial(materialHandle);
-        staticMesh->AddSubMeshWithImportResult(&meshRes);
-        
-        FPrimitiveSceneProxy proxy = {};
-        proxy.staticMesh = meshHandle;
-
-        GetSystem<WorldSystem>()->GetWorld().GetScene().AddProxy(proxy);
-    }
 }
 
 void Application::PreInit()

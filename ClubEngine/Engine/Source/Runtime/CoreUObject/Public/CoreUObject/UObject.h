@@ -29,8 +29,7 @@ public:
     UObjectHandle GetHandle() const noexcept;
 
 protected:
-    explicit UObject(std::string inName);
-    explicit UObject(const char* className);
+    explicit UObject(std::string_view inName = {}, std::string_view className = "UObject");
 
 private:
     static std::unordered_map<std::string, uint32> unnamedClassInstanceCounts;
@@ -40,7 +39,8 @@ private:
     UObjectHandle selfHandle;
 
     uint64 id = 0;
-    std::string name;
+    std::string className;
+    std::string objectName;
 };
 
 }

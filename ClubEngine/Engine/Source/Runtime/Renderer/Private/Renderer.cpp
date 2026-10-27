@@ -7,18 +7,53 @@
 #include <Asset/IAssetResolver.h>
 
 #include <Renderer/Renderer.h>
+#include <Renderer/FFrameData.h>
 
 namespace CE
 {
 
-Renderer::Renderer(RHI::Backend backend)
+Renderer::Renderer(const RHI::Backend backend)
 {
     SetBackend(backend);
+
+    constexpr RHI::BufferDesc frameDataDesc =
+    {
+        RHI::BufferType::Uniform,
+        RHI::BufferUsage::DynamicDraw,
+        sizeof(FFrameData)
+    };
+
+    frameData.view = FMatrix4x4F::LookAt({ 0.0f, -45.0f, 25.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 1.0f });
+    frameData.proj = FMatrix4x4F::Perspective(0.9f, 16.0f / 9.0f, 0.1f, 100.0f);
+
+    frameDataHandle = RHI::Get().CreateBuffer(frameDataDesc, &frameData);
 }
 
 Renderer::~Renderer()
 {
+    RHI::Get().DestroyBuffer(frameDataHandle);
     RHI::Get().Shutdown();
+}
+
+void Renderer::BeginFrame(const RHI::ViewportDesc& viewportDesc) const
+{
+    RHI::Get().SetViewport(viewportDesc);
+
+    RHI::Get().SetDepthTest(true);
+    RHI::Get().SetDepthWrite(true);
+    RHI::Get().SetCullMode(RHI::CullMode::Back);
+    RHI::Get().SetBlendMode(RHI::BlendMode::Opaque);
+
+    RHI::Get().SetClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    RHI::Get().Clear(true, true);
+
+    RHI::Get().WriteBuffer(frameDataHandle, &frameData, sizeof(frameData), 0);
+    RHI::Get().BindBufferBase(frameDataHandle, frameDataSlot);
+}
+
+void Renderer::EndFrame()
+{
+    // Empty for now lol
 }
 
 void Renderer::DrawStaticMesh(const UStaticMesh& staticMesh, const FMatrix4x4F& localToWorld) const
@@ -99,25 +134,7 @@ void Renderer::SetBackend(RHI::Backend backend)
     }
 }
 
-void Renderer::BeginFrame(const RHI::ViewportDesc& viewportDesc)
-{
-    RHI::Get().SetViewport(viewportDesc);
-
-    RHI::Get().SetDepthTest(true);
-    RHI::Get().SetDepthWrite(true);
-    RHI::Get().SetCullMode(RHI::CullMode::Back);
-    RHI::Get().SetBlendMode(RHI::BlendMode::Opaque);
-
-    RHI::Get().SetClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-    RHI::Get().Clear(true, true);
-}
-
-void Renderer::EndFrame()
-{
-    // Empty for now lol
-}
-
-void Renderer::Render(const FScene& scene)
+void Renderer::Render(const FScene& scene) const
 {
     scene.ForEachPrimitive([this](const FPrimitiveSceneProxy& proxy)
     {

@@ -34,6 +34,8 @@ public:
 
     BufferID GetID() const noexcept;
 
+    BufferType GetType() const noexcept;
+
 private:
     BufferID ID;
     size_t size;

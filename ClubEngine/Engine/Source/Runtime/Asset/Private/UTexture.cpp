@@ -18,7 +18,7 @@ namespace CE
 UTexture::UTexture(std::filesystem::path inSourcePath,
 				   const RHI::TextureDesc& inDesc,
 				   std::string inName)
-	: UObject(std::move(inName))
+	: UObject(std::move(inName), "UTexture")
 	, sourcePath(std::move(inSourcePath))
 	, desc(inDesc)
 {

@@ -12,7 +12,7 @@ namespace CE
 {
 
 UStaticMesh::UStaticMesh(std::string inName)
-    : UObject(std::move(inName))
+    : UObject(std::move(inName), "UStaticMesh")
 {
 }
 
