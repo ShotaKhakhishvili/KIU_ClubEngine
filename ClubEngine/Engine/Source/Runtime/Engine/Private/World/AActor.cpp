@@ -6,7 +6,6 @@ namespace CE
 
 AActor::AActor(const FTransform& transform)
 {
-    rootComponent = level->CreateComponent<USceneComponent>(this, transform);
 }
 
 USceneComponent* AActor::GetRootComponent() const

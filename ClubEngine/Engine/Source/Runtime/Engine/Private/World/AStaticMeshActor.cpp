@@ -9,8 +9,7 @@ namespace CE
 AStaticMeshActor::AStaticMeshActor(const FTransform& transform, TObjectHandle<UStaticMesh> staticMeshHandle)
     : Super(transform)
 {
-    staticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(transform, staticMeshHandle);
-    staticMeshComponent->SetParentComponent(rootComponent);
+    rootComponent = staticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(transform, staticMeshHandle);
 }
 
 UStaticMeshComponent* AStaticMeshActor::GetStaticMeshComponent() const
