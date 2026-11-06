@@ -21,6 +21,7 @@
 #include <Engine/Systems/RenderSystem.h>
 #include <Engine/Systems/WindowSystem.h>
 #include <Engine/Systems/WorldSystem.h>
+#include <Engine/Input/UInputAction.h>
 
 #include <filesystem>
 #include <string>
@@ -130,7 +131,7 @@ int Application::Run()
 
 void Application::PostInit()
 {
-
+    UInputAction testInputAction(EInputActionValueType::Bool, {}, {});  // test
 }
 
 void Application::PreInit()

@@ -4,6 +4,8 @@ file(GLOB_RECURSE CEPLATFORM_PRIVATE CONFIGURE_DEPENDS "Private/*.cpp" "Private/
 add_library(CEPlatform ${CE_MODULE_TYPE}
     ${CEPLATFORM_PUBLIC}
     ${CEPLATFORM_PRIVATE}
+        Private/GLFWConvert.h
+        Private/GLFWConvert.cpp
 )
 
 add_library(ClubEngine::Platform ALIAS CEPlatform)
