@@ -22,6 +22,9 @@
 #include <Engine/Systems/WindowSystem.h>
 #include <Engine/Systems/WorldSystem.h>
 
+#include <Engine/Input/FActionKeyMapping.h>
+#include <Engine/Input/UInputComponent.h>
+
 #include <filesystem>
 #include <string>
 #include <vector>
@@ -130,8 +133,16 @@ int Application::Run()
     return exitCode;
 }
 
+void print()
+{
+
+}
+
 void Application::PostInit()
 {
+    FActionKeyMapping action_key_mapping{None, nullptr, {}, {}};
+    AActor* actor = GetSystem<WorldSystem>()->GetWorld().SpawnActor<AActor>(FTransform());
+    actor->GetLevel()->CreateComponent<UInputComponent>(nullptr, None, &print);
 }
 
 void Application::PreInit()

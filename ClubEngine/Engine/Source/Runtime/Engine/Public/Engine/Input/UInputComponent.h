@@ -15,10 +15,15 @@ class UInputComponent : public UActorComponent
     GENERATED_BODY(UInputComponent, UActorComponent)
 
 public:
+    using UActorComponent::UActorComponent;
 
     template<typename T>
-    FDelegateHandle BindAction(UInputAction* action, ETriggerEvent triggerEvent, UObject* context,
+    FDelegateHandle BindAction(UInputAction* action, ETriggerEvent triggerEvent, T* context,
                 void (T::*function)(const FInputActionValue&));
+
+    template<typename T>
+    FDelegateHandle BindAction(UInputAction* action, ETriggerEvent triggerEvent, T* context,
+            void (T::*function)(const FInputActionValue&) const);
 
     FDelegateHandle BindAction(UInputAction* action, ETriggerEvent triggerEvent,
             const std::function<void(const FInputActionValue&)>& callback);
