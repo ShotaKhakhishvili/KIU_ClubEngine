@@ -133,16 +133,26 @@ int Application::Run()
     return exitCode;
 }
 
-void print()
+void print(const FInputActionValue& value)
 {
-
+    (void)value;
+    CE_LOG(Info, "Jump fired");
 }
 
 void Application::PostInit()
 {
-    FActionKeyMapping action_key_mapping{None, nullptr, {}, {}};
+    TObjectHandle<UInputAction> jumpHandle = GetAssetContext().Create<UInputAction>(
+        EInputActionValueType::Bool, TArray<UInputTrigger*>{}, TArray<UInputModifier*>{});
+    UInputAction* jump = GetAssetContext().Resolve(jumpHandle);
+
+    FActionKeyMapping jumpMapping{EKey::SpaceBar, jump, {}, {}};
+
     AActor* actor = GetSystem<WorldSystem>()->GetWorld().SpawnActor<AActor>(FTransform());
-    actor->GetLevel()->CreateComponent<UInputComponent>(nullptr, None, &print);
+    UInputComponent* input = actor->GetLevel()->CreateComponent<UInputComponent>(actor);
+
+    const FDelegateHandle handle = input->BindAction(jump, ETriggerEvent::Triggered, &print);
+
+    CE_LOG(Info, "Mapping key: {}, bind handle valid: {}", ToString(jumpMapping.GetKey()), handle.IsValid());
 }
 
 void Application::PreInit()
