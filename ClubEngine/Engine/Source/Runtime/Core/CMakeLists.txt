@@ -4,7 +4,6 @@ file(GLOB_RECURSE CECORE_PRIVATE CONFIGURE_DEPENDS "Private/*.cpp" "Private/*.c"
 add_library(CECore ${CE_MODULE_TYPE}
     ${CECORE_PUBLIC}
     ${CECORE_PRIVATE}
-        Private/Types/InputTypes.cpp
 )
 
 add_library(ClubEngine::Core ALIAS CECore)

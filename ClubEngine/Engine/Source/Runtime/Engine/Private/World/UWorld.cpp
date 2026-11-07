@@ -11,6 +11,14 @@ void UWorld::TickWorld(const float dt)
 
     for (ULevel* level : streamedLevels)
         level->TickLevel(dt);
+
+    persistentLevel->componentRegistry.FlushPendingDestroy();
+    persistentLevel->actorRegistry.FlushPendingDestroy();
+    for (ULevel* level : streamedLevels)
+    {
+        level->componentRegistry.FlushPendingDestroy();
+        level->actorRegistry.FlushPendingDestroy();
+    }
 }
 
 ULevel* UWorld::GetLevelFromRegistryID(uint32 registryId) const

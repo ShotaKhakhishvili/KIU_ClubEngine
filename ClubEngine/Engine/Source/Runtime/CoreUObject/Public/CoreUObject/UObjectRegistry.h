@@ -32,9 +32,9 @@ public:
 
     uint32 GetRegistryId() const;
 
-private:
     void FlushPendingDestroy();
 
+private:
     struct Slot
     {
         std::unique_ptr<UObject> object;
@@ -45,7 +45,6 @@ private:
     UObject* ResolveRaw(UObjectHandle handle);
     Slot* GetSlotFromHandle(UObjectHandle handle);
 
-    size_t iterationDepth = 0;
     std::vector<uint32> pendingDestroy;
 
     std::vector<uint32> freeList;

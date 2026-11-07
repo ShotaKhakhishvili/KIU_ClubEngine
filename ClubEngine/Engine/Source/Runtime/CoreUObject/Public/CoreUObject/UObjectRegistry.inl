@@ -51,17 +51,12 @@ T* UObjectRegistry::Resolve(TObjectHandle<T> handle)
 template<typename F>
 void UObjectRegistry::ForEach(F&& fn)
 {
-    ++iterationDepth;
-
-    size_t count = slots.size();
+    const size_t count = slots.size();
     for(size_t i = 0; i < count; i++)
     {
         if(slots[i].alive)
             fn(*(slots[i].object));
     }
-
-    if(--iterationDepth == 0)
-        FlushPendingDestroy();
 }
 
 }

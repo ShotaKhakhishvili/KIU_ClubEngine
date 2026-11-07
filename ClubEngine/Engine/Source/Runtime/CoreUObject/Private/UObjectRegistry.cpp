@@ -6,7 +6,7 @@ namespace CE
 
 uint32 UObjectRegistry::registryCounter = 0;
 
-void UObjectRegistry::Destroy(UObjectHandle handle)
+void UObjectRegistry::Destroy(const UObjectHandle handle)
 {
     Slot* slot = GetSlotFromHandle(handle);
     
@@ -16,15 +16,7 @@ void UObjectRegistry::Destroy(UObjectHandle handle)
     slot->alive = false;
     ++slot->generation;
 
-    if(iterationDepth != 0)
-    {
-        pendingDestroy.push_back(handle.index);
-        return;
-    }
-
-    slot->object.reset();
-
-    freeList.push_back(handle.index);
+    pendingDestroy.push_back(handle.index);
 }
 
 UObjectRegistry::UObjectRegistry()
@@ -32,7 +24,7 @@ UObjectRegistry::UObjectRegistry()
     this->registryId = registryCounter++;
 }
 
-UObject* UObjectRegistry::Resolve(UObjectHandle handle)
+UObject* UObjectRegistry::Resolve(const UObjectHandle handle)
 {
     if (handle.registryId != registryId)
         return nullptr;
@@ -40,7 +32,7 @@ UObject* UObjectRegistry::Resolve(UObjectHandle handle)
     return ResolveRaw(handle);
 }
 
-UObject* UObjectRegistry::ResolveRaw(UObjectHandle handle) 
+UObject* UObjectRegistry::ResolveRaw(const UObjectHandle handle)
 {
     const Slot* slot = GetSlotFromHandle(handle);
 
@@ -50,7 +42,7 @@ UObject* UObjectRegistry::ResolveRaw(UObjectHandle handle)
     return slot->object.get();
 }
 
-UObjectRegistry::Slot* UObjectRegistry::GetSlotFromHandle(UObjectHandle handle)
+UObjectRegistry::Slot* UObjectRegistry::GetSlotFromHandle(const UObjectHandle handle)
 {
     if(static_cast<uint32_t>(slots.size()) <= handle.index)
     {
