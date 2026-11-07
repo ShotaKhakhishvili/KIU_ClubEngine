@@ -30,6 +30,15 @@ graph TD
         UStaticMeshComponent(["UStaticMeshComponent<br/>Static mesh"])
     end
 
+    subgraph InputLayer["  Input · Engine Module  "]
+        UInputComponent(["UInputComponent<br/>BindAction per action & trigger event"])
+        UInputMapContext(["UInputMapContext<br/>Key mappings for a set of actions"])
+        FActionKeyMapping(["FActionKeyMapping<br/>Key · triggers · modifiers"])
+        UInputAction(["UInputAction<br/>Value type · triggers · modifiers"])
+        UInputTrigger(["UInputTrigger<br/>When an action fires · Pressed"])
+        UInputModifier(["UInputModifier<br/>Changes the input value · Negate"])
+    end
+
     subgraph RendererModule["  Renderer Module  "]
         Renderer(["Renderer<br/>BeginFrame · Render · EndFrame"])
         FScene(["FScene<br/>Pool of primitive proxies"])
@@ -37,7 +46,7 @@ graph TD
     end
 
     CoreUObject(["CoreUObject<br/>UObject · Registry · TObjectHandle"])
-    Platform(["Platform<br/>IWindow · GLFWWindow"])
+    Platform(["Platform<br/>IWindow · GLFWWindow · Key conversion"])
     Asset(["Asset<br/>StaticMesh · Material · Shader · Texture"])
     AssetImport(["AssetImport<br/>OBJ · image loader"])
     RenderCore(["RenderCore<br/>IRHI interface · Handles"])
@@ -90,11 +99,22 @@ graph TD
     Renderer -->|creates backend| RHI_OpenGL
     RHI_OpenGL -->|implements| RenderCore
 
+    UInputComponent -.->|extends| UActorComponent
+    UInputComponent -->|binds| UInputAction
+    UInputMapContext -->|owns| FActionKeyMapping
+    FActionKeyMapping -->|maps to| UInputAction
+    FActionKeyMapping --> UInputTrigger
+    FActionKeyMapping --> UInputModifier
+    UInputAction --> UInputTrigger
+    UInputAction --> UInputModifier
+    UInputAction --> CoreUObject
+
     linkStyle default stroke:#909090,stroke-width:1.8px
-    linkStyle 4,7,18,19,20,21 stroke:#505050,stroke-width:1.2px,stroke-dasharray:5 3
+    linkStyle 4,7,18,19,20,21,32 stroke:#505050,stroke-width:1.2px,stroke-dasharray:5 3
 
     style EngineModule   fill:#1c1b2e,stroke:#4a4880,stroke-width:1.5px,stroke-dasharray:5 3,color:#9890b8
     style WorldLayer     fill:#1f1c12,stroke:#6a5a28,stroke-width:1.5px,stroke-dasharray:5 3,color:#b8a878
+    style InputLayer     fill:#221425,stroke:#6a3c70,stroke-width:1.5px,stroke-dasharray:5 3,color:#c0a0c8
     style RendererModule fill:#121f1b,stroke:#2c5e52,stroke-width:1.5px,stroke-dasharray:5 3,color:#90b8b0
     style CoreFoundation fill:#1c1c1c,stroke:#424242,stroke-width:1.5px,color:#787878
     style ThirdParty     fill:#181818,stroke:#383838,stroke-width:1px,color:#606060
@@ -103,12 +123,14 @@ graph TD
     classDef runtime       fill:#152a24,stroke:#2c5e52,stroke-width:1.5px,color:#90b8b0
     classDef asset         fill:#2c1810,stroke:#5c3828,stroke-width:1.5px,color:#c09888
     classDef world         fill:#2e2610,stroke:#6a5a28,stroke-width:1.5px,color:#d8c898
+    classDef input         fill:#33183a,stroke:#6a3c70,stroke-width:1.5px,color:#dcc0e4
     classDef foundation    fill:#202020,stroke:#444444,stroke-width:1px,color:#a8a8a8
 
     class Launch,Application,FpsSystem,WorldSystem orchestration
     class RenderSystem,WindowSystem,Renderer,FScene,FPrimitiveSceneProxy,Platform,RenderCore,RHI_OpenGL runtime
     class AssetContext,AssetLibrary,CoreUObject,Asset,AssetImport asset
     class UWorld,ULevel,AActor,UActorComponent,USceneComponent,UPrimitiveComponent,UStaticMeshComponent world
+    class UInputComponent,UInputMapContext,FActionKeyMapping,UInputAction,UInputTrigger,UInputModifier input
     class Core,GLFW,glad foundation
 ```
 
@@ -140,7 +162,9 @@ graph TD
 - **Containers:**
   - `TArray<T>` is currently an alias of `std::vector<T>`.
   - `TPool<T>` is a dense pool that hands out generational `TPoolHandle<T>`s. Items stay packed for fast iteration, and removing one swaps the last item into its place, so iteration order isn't stable. Always go through the handle; never keep a `T*` across an `Add` or `Remove`. A handle whose item was removed resolves to `nullptr` instead of pointing at whatever reused the slot.
-- **Delegates:** `TMulticastDelegate<Args...>` with `FDelegateHandle`. You can bind free functions, lambdas, or member functions, and it's safe to add or remove bindings while it's broadcasting.
+- **Delegates:** `TMulticastDelegate<Args...>` with `FDelegateHandle`. You can bind free functions, lambdas, or member functions (`const` ones too), and it's safe to add or remove bindings while it's broadcasting, including a binding that was added during the same broadcast.
+- **Types:** fixed-size aliases `int8`–`int64`, `uint8`–`uint64`, `float32` and `float64`.
+- **Input types:** `EKey` lists every keyboard key, mouse button and mouse axis. `ToString(EKey)` and `ToKey(name)` convert between keys and their names (`SpaceBar`, `LeftMouseButton`, …), for config files and debug output.
 - **Log:** `CE_LOG(Info | Warning | Error, "format {}", args...)`.
 - **Config:** INI file loading through `IniParser` and `ConfigSystem`.
 
@@ -149,7 +173,8 @@ graph TD
 - Every engine object (`UWorld`, `ULevel`, actors, components, assets) derives from `UObject` and declares `GENERATED_BODY(Class, Super)`.
 - UObjects are owned by a `UObjectRegistry` and **cannot be copied or moved**. Everything else refers to them through `TObjectHandle<T>`, a generational handle, so a handle to a destroyed object simply resolves to `nullptr`.
 - A handle converts to a handle of any base class (`TObjectHandle<AActor>` → `TObjectHandle<UObject>`).
-- You can destroy objects inside a registry `ForEach`. The object is marked dead immediately, but its memory is freed only after the outermost iteration finishes.
+- Destroying an object never frees it right away. `Destroy` marks it dead, so its handles resolve to `nullptr` immediately, but the memory stays valid until the registry's `FlushPendingDestroy()`. That makes it safe to destroy objects from anywhere: inside a `ForEach`, a delegate callback, or the object's own code.
+- Each registry owner flushes at the end of its frame work: `UWorld` flushes every level at the end of `TickWorld` (components before actors), and `Application` flushes the asset registry once per frame, after all systems and `Update` have run.
 
 ### Application and Systems
 
@@ -160,9 +185,9 @@ graph TD
 ### World, Levels, Actors, Components
 
 - `WorldSystem` owns a single `UWorld` and ticks it every frame.
-- `UWorld` owns a persistent `ULevel` and the world's `FScene`. Spawn actors with `world.SpawnActor<T>(transform, args...)` and remove them with `world.Destroy(handle)`.
+- `UWorld` owns a persistent `ULevel` and the world's `FScene`. Spawn actors with `world.SpawnActor<T>(transform, args...)` and remove them with `world.Destroy(actor)`. A destroyed actor and its components are freed at the end of the world's tick.
 - `ULevel` holds two registries, one for actors and one for components. Each level knows its world (`GetWorld()`).
-- `AActor` creates its components in its constructor through `CreateDefaultSubobject<T>()`. If an actor doesn't set a root component, it gets a default `USceneComponent` when spawned. Override `Tick(dt)` and `OnSpawned()` for behaviour.
+- `AActor` creates its components in its constructor through `CreateDefaultSubobject<T>()`, and can make one of them the root by assigning it to `rootComponent`. If an actor doesn't set a root component, it gets a default `USceneComponent` when spawned. Override `Tick(dt)` and `OnSpawned()` for behaviour.
 - Component hierarchy: `UActorComponent` → `USceneComponent` (transform, attachment) → `UPrimitiveComponent` (visibility, scene proxy handle) → `UStaticMeshComponent`.
 
 ### Rendering
@@ -180,10 +205,24 @@ graph TD
 - Create assets with `NewObject<T>(args...)`. It creates them in the application's `AssetContext`, which owns them.
 - `AssetImport` contains the OBJ mesh importer and the stb-based image loader.
 
+### Input
+
+Input follows an action-based model: gameplay code binds to **actions**, never to keys, and which keys drive an action is configured separately.
+
+- **`UInputAction`** is a named input with a value type (`Bool`, `Axis1D`, `Axis2D`, `Axis3D`) and optional triggers and modifiers that apply to every key mapped to it. Its value is an `FInputActionValue`: a 3-component vector plus the type.
+- **`UInputMapContext`** holds the key mappings for a set of actions. `AddMapping(action, key)` returns the `FActionKeyMapping`, so you can add triggers and modifiers to it right away (use the pointer immediately, the next `AddMapping` can invalidate it). `RemoveMapping`, `RemoveAllKeysFromMapping` and `UnmapAll` remove them again.
+- **`FActionKeyMapping`** is one key → action pair with its own triggers and modifiers, which apply only to that key (for example a `Negate` on the S key of a 2D move action).
+- **`UInputModifier`** changes a value (`UInputModifierNegate`). **`UInputTrigger`** decides when an action fires, returning an `ETriggerState` (`None`, `Ongoing`, `Triggered`); it tracks the last input value for edge detection and has an actuation threshold for analog inputs (`UInputTriggerPressed`).
+- **`UInputComponent`** is an actor component holding bindings: `BindAction(action, ETriggerEvent, object, &Class::Function)` or a lambda. Events are `Started`, `Ongoing`, `Triggered`, `Completed` and `Canceled`. Each binding returns an `FDelegateHandle`.
+
+Not implemented yet: reading keys from the window, the per-frame input state, and the player input that evaluates the active contexts each frame and calls the bindings. Until then, bindings can be created but never fire.
+
 ### Current Limitations
 
-- Components don't add themselves to the scene yet. `UPrimitiveComponent` and `UStaticMeshComponent` are incomplete, so to show a mesh today, add an `FPrimitiveSceneProxy` to `world.GetScene()` yourself (see the debug mesh in `Application::PostInit`).
-- There's no camera, input, pawn/controller, or game mode framework yet. The view is a hardcoded `LookAt`.
+- `UPrimitiveComponent` adds its scene proxy when it's created, but the proxy isn't updated when the component moves and isn't removed when the component is destroyed.
+- `USceneComponent` stores a single transform: there are no relative transforms yet, so attached children don't follow their parent.
+- Input is only partly done (see [Input](#input)): actions, contexts and bindings exist, but nothing reads the keyboard or mouse or fires bindings yet.
+- There's no camera, pawn/controller, or game mode framework yet. The view is a hardcoded `LookAt`.
 - `AVoxelTerrain` / `UVoxelGrid` are work in progress.
 - Asset paths and serialization aren't implemented yet; assets are loaded from paths in code.
 
