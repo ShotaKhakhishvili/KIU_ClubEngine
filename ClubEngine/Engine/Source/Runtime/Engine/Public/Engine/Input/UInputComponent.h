@@ -28,6 +28,8 @@ public:
     FDelegateHandle BindAction(UInputAction* action, ETriggerEvent triggerEvent,
             const std::function<void(const FInputActionValue&)>& callback);
 
+    void DispatchActionTrigger(UInputAction* action, ETriggerEvent triggerEvent, const FInputActionValue& actionValue);
+
 private:
     TMap<UInputAction*, TMap<ETriggerEvent, TMulticastDelegate<const FInputActionValue&>>> bindings;
 };

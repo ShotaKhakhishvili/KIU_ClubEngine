@@ -11,4 +11,14 @@ FDelegateHandle UInputComponent::BindAction(UInputAction* action, ETriggerEvent 
 
     return bindings[action][triggerEvent].Add(callback);
 }
+void UInputComponent::DispatchActionTrigger(UInputAction* action, ETriggerEvent triggerEvent, const FInputActionValue& actionValue)
+{
+    const auto triggerMap = bindings.find(action);
+    if (triggerMap == bindings.end())
+        return;
+
+    auto triggerDispatcher = triggerMap->second.find(triggerEvent);
+    if (triggerDispatcher != triggerMap->second.end())
+        triggerDispatcher->second.Broadcast(actionValue);
+}
 }

@@ -38,7 +38,7 @@ private:
     void InstallInputCallbacks();
 
     TArray<FInputEvent>     pendingEvents;
-    FVector2D               lastCursorPos       = FVector2D(0, 0);
+    FVector2F               lastCursorPos       = FVector2F(0, 0);
     bool                    hasCursorPos        = false;
 };
 

@@ -16,14 +16,14 @@
 #include <Renderer/Scene/FScene.h>
 
 #include <Engine/Application.h>
+
 #include <Engine/AssetContext.h>
 #include <Engine/AssetLibrary.h>
+
+#include <Engine/Systems/InputSystem.h>
 #include <Engine/Systems/RenderSystem.h>
 #include <Engine/Systems/WindowSystem.h>
 #include <Engine/Systems/WorldSystem.h>
-
-#include <Engine/Input/FActionKeyMapping.h>
-#include <Engine/Input/UInputComponent.h>
 
 #include <filesystem>
 #include <string>
@@ -45,6 +45,7 @@ Application::Application()
     windowConfig.vSync  = config.Get<bool>("Render", "VSync", true);
 
     auto& windowSystem = AddSystem<WindowSystem>(windowConfig);
+    AddSystem<InputSystem>(&windowSystem);
     auto& worldSystem = AddSystem<WorldSystem>();
     AddSystem<RenderSystem>(&windowSystem, &worldSystem, ERenderBackend::OpenGL);
 }
@@ -90,7 +91,7 @@ int Application::Run()
 
     assetContext.CreateEngineDefaults();
 
-	this->PostInit();
+    this->PostInit();
 
     using Clock = std::chrono::steady_clock;
     auto previous = Clock::now();

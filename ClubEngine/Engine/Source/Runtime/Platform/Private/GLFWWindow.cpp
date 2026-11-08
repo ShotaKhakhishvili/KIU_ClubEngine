@@ -180,7 +180,7 @@ void GLFWWindow::InstallInputCallbacks()
                 static_cast<float>(x - self->lastCursorPos.x), static_cast<float>(y - self->lastCursorPos.y) });
         }
 
-        self->lastCursorPos = {x,y};
+        self->lastCursorPos = FVector2F(x, y);
         self->hasCursorPos = true;
     });
 
@@ -192,7 +192,7 @@ void GLFWWindow::InstallInputCallbacks()
         self->pendingEvents.push_back({ EInputEventType::MouseWheel, EKey::None, 0.0f, static_cast<float>(yOffset) });
     });
 
-    glfwSetWindowFocusCallback(handle, [](GLFWwindow* win, int focused)
+    glfwSetWindowFocusCallback(handle, [](GLFWwindow* win, const int focused)
     {
         auto* self = static_cast<GLFWWindow*>(glfwGetWindowUserPointer(win));
         self->hasCursorPos = false;
