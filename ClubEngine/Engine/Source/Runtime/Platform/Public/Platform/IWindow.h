@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Core/ClubCore.h>
+#include <Core/Types/InputTypes.h>
 
 #include <Platform/FWindowConfig.h>
 
@@ -24,6 +25,8 @@ public:
     virtual uint32 GetHeight()                const = 0;
     virtual float GetAspectRatio()            const = 0;
     virtual void* GetNativeHandle()           const = 0;
+
+    virtual void ConsumeInputEvents(TArray<FInputEvent>& outEvents) = 0;
 
     static std::unique_ptr<IWindow> Create();
 };

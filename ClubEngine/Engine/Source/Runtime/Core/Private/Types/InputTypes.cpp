@@ -21,9 +21,9 @@ static_assert(std::size(keyNames) == static_cast<size_t>(Count), "Key count must
 
 }
 
-char ToString(const EKey key)
+const char* ToString(const EKey key)
 {
-    return *keyNames[static_cast<size_t>(key)];
+    return keyNames[static_cast<size_t>(key)];
 }
 
 EKey ToKey(const std::string_view key)

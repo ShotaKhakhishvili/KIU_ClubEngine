@@ -45,10 +45,27 @@ constexpr bool IsAxisKey(const EKey key)
 
 constexpr bool IsMouseButton(const EKey key)
 {
-    return key >=LeftMouseButton && key <= MouseWheelAxis;
+    return key >=LeftMouseButton && key <= ThumbMouseButton2;
 }
 
-char  ToString    (EKey key);
-EKey        ToKey       (std::string_view key);
+enum class EInputEventType : uint8
+{
+    KeyDown,
+    KeyUp,
+    MouseMove,
+    MouseWheel,
+    FocusLost
+};
+
+struct FInputEvent
+{
+    EInputEventType type = EInputEventType::KeyDown;
+    EKey            key = EKey::None;
+    float           x   = 0.0f;
+    float           y   = 0.0f;
+};
+
+const char*     ToString    (EKey key);
+EKey            ToKey       (std::string_view key);
 
 }

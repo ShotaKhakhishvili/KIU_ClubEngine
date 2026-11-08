@@ -2,6 +2,8 @@
 
 #include <Platform/GLFWWindow.h>
 
+#include "GLFWConvert.h"
+
 #include <glad/glad.h>
 
 #include <GLFW/glfw3.h>
@@ -17,7 +19,7 @@ std::unique_ptr<IWindow> IWindow::Create()
 
 GLFWWindow::~GLFWWindow()
 {
-    Shutdown();
+    GLFWWindow::Shutdown();
 }
 
 bool GLFWWindow::Init(const FWindowConfig& config)
@@ -58,6 +60,8 @@ bool GLFWWindow::Init(const FWindowConfig& config)
         CE_LOG(Info, "width: {}, height: {}", W, H);
     });
 
+    InstallInputCallbacks();
+
     return true;
 }
 
@@ -97,6 +101,12 @@ uint32  GLFWWindow::GetWidth            ()      const   {   return width;       
 uint32  GLFWWindow::GetHeight           ()      const   {   return height;                          }
 void*   GLFWWindow::GetNativeHandle     ()      const   {   return handle;                          }
 
+void GLFWWindow::ConsumeInputEvents(TArray<FInputEvent>& outEvents)
+{
+    std::swap(outEvents, pendingEvents);
+    pendingEvents.clear();
+}
+
 void GLFWWindow::InitGL(const FWindowConfig& config)
 {
     glfwWindowHint(GLFW_CLIENT_API,   GLFW_OPENGL_API);
@@ -129,5 +139,66 @@ void GLFWWindow::InitNoAPI(const FWindowConfig& config)
         config.title.c_str(),
         nullptr, nullptr
     );
+}
+void GLFWWindow::InstallInputCallbacks()
+{
+    glfwSetKeyCallback(handle, [](GLFWwindow* win, const int key, const int scancode, const int action, const int mods)
+    {
+        (void)scancode;
+        (void)mods;
+
+        if (action == GLFW_REPEAT)
+            return;
+
+        EKey eKey = ToEKey(key);
+        if (eKey == EKey::None)
+            return;
+
+        const auto self = static_cast<GLFWWindow*>(glfwGetWindowUserPointer(win));
+        self->pendingEvents.push_back({action == GLFW_PRESS ? EInputEventType::KeyDown : EInputEventType::KeyUp, eKey});
+    });
+
+    glfwSetMouseButtonCallback(handle, [](GLFWwindow* win, const int button, const int action, const int mods)
+    {
+        (void)mods;
+
+        const EKey engineKey = ToEKeyMouse(button);
+        if (engineKey == EKey::None)
+            return;
+
+        auto* self = static_cast<GLFWWindow*>(glfwGetWindowUserPointer(win));
+        self->pendingEvents.push_back({ action == GLFW_PRESS ? EInputEventType::KeyDown : EInputEventType::KeyUp, engineKey });
+    });
+
+    glfwSetCursorPosCallback(handle, [](GLFWwindow* win, double x, double y)
+    {
+        auto* self = static_cast<GLFWWindow*>(glfwGetWindowUserPointer(win));
+
+        if (self->hasCursorPos)
+        {
+            self->pendingEvents.push_back({ EInputEventType::MouseMove, EKey::None,
+                static_cast<float>(x - self->lastCursorPos.x), static_cast<float>(y - self->lastCursorPos.y) });
+        }
+
+        self->lastCursorPos = {x,y};
+        self->hasCursorPos = true;
+    });
+
+    glfwSetScrollCallback(handle, [](GLFWwindow* win, const double xOffset, const double yOffset)
+    {
+        (void)xOffset;
+
+        auto* self = static_cast<GLFWWindow*>(glfwGetWindowUserPointer(win));
+        self->pendingEvents.push_back({ EInputEventType::MouseWheel, EKey::None, 0.0f, static_cast<float>(yOffset) });
+    });
+
+    glfwSetWindowFocusCallback(handle, [](GLFWwindow* win, int focused)
+    {
+        auto* self = static_cast<GLFWWindow*>(glfwGetWindowUserPointer(win));
+        self->hasCursorPos = false;
+
+        if (!focused)
+            self->pendingEvents.push_back({ EInputEventType::FocusLost });
+    });
 }
 }

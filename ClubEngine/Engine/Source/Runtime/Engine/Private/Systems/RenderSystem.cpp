@@ -48,7 +48,7 @@ int RenderSystem::Update(float dt)
     return 0;
 }
 
-void RenderSystem::SetBackend(CE::ERenderBackend backend)
+void RenderSystem::SetBackend(const CE::ERenderBackend backend)
 {
     renderer->SetBackend(ToRHI(backend));
 }
