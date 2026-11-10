@@ -14,7 +14,7 @@ float FInputState::GetKeyValue(const EKey key) const
     case EKey::MouseX:          return mouseDelta.x;
     case EKey::MouseY:          return mouseDelta.y;
     case EKey::MouseWheelAxis:  return wheelDelta;
-    default:                    return IsDown(key) || WasPressed(key) ? 1.0f : 0.0f;
+    default:                    return IsDown(key) ? 1.0f : 0.0f;
     }
 };
 

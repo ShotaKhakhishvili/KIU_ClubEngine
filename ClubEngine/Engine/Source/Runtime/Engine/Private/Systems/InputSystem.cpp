@@ -29,6 +29,7 @@ int InputSystem::Update(const float dt)
 
     inputState.pressed.reset();
     inputState.released.reset();
+    inputState.pressReleaseList.clear();
     inputState.mouseDelta = {};
     inputState.wheelDelta = 0.0f;
 
@@ -39,11 +40,13 @@ int InputSystem::Update(const float dt)
         case EInputEventType::KeyDown:
             inputState.pressed.set(event.key);
             inputState.down.set(event.key);
+            inputState.pressReleaseList.emplace_back(event.key, true);
             break;
 
         case EInputEventType::KeyUp:
             inputState.released.set(event.key);
             inputState.down.reset(event.key);
+            inputState.pressReleaseList.emplace_back(event.key, false);
             break;
 
         case EInputEventType::MouseMove:
@@ -56,6 +59,11 @@ int InputSystem::Update(const float dt)
             break;
 
         case EInputEventType::FocusLost:
+            for (size_t i = 0; i < inputState.down.size(); ++i)
+            {
+                if (inputState.down.test(i))
+                    inputState.pressReleaseList.emplace_back(static_cast<EKey>(i), true);
+            }
             inputState.released |= inputState.down;
             inputState.down.reset();
             break;
