@@ -25,6 +25,15 @@
 #include <Engine/Systems/WindowSystem.h>
 #include <Engine/Systems/WorldSystem.h>
 
+#include <Engine/Input/Types/FInputState.h>
+#include <Engine/Input/UInputMapContext.h>
+#include <Engine/Input/UInputComponent.h>
+#include <Engine/Input/FPlayerInput.h>
+#include <Engine/Input/InputTriggers/UInputTriggerPressed.h>
+#include <Engine/Input/InputModifiers/UInputModifierNegate.h>
+
+#include <Engine/World/AStaticMeshActor.h>
+
 #include <filesystem>
 #include <string>
 #include <vector>
@@ -136,6 +145,33 @@ int Application::Run()
 
 void Application::PostInit()
 {
+    AStaticMeshActor* testActor = GetSystem<WorldSystem>()->GetWorld().SpawnActor<AStaticMeshActor>(FTransform(), assetContext.GetDebugStaticMesh());
+    UInputComponent* inputComponent = testActor->GetLevel()->CreateComponent<UInputComponent>(testActor);
+    GetSystem<InputSystem>()->testInputComponent = inputComponent;
+
+    UInputMapContext* context = assetContext.Resolve(assetContext.Create<UInputMapContext>());
+    UInputTriggerPressed* pressedTrigger = assetContext.Resolve(assetContext.Create<UInputTriggerPressed>());
+    UInputModifierNegate* negateModifier = assetContext.Resolve(assetContext.Create<UInputModifierNegate>());
+    UInputAction* actionPress = assetContext.Resolve(assetContext.Create<UInputAction>(EInputActionValueType::Axis1D, TArray<UInputTrigger*>{pressedTrigger}, TArray<UInputModifier*>{}));
+    UInputAction* actionHold = assetContext.Resolve(assetContext.Create<UInputAction>(EInputActionValueType::Axis1D, TArray<UInputTrigger*>{}, TArray<UInputModifier*>{}));
+
+    context->AddMapping(actionPress, EKey::W);
+    context->AddMapping(actionPress, EKey::S)->AddModifier(negateModifier);
+
+    context->AddMapping(actionHold, EKey::W);
+    context->AddMapping(actionHold, EKey::S)->AddModifier(negateModifier);
+
+    GetSystem<InputSystem>()->testPlayerInput.AddMappingContext(context);
+
+    inputComponent->BindAction(actionPress, ETriggerEvent::Triggered, [](const FInputActionValue& v)
+    {
+        std::printf("Press: %f\n", v.value.x);
+    });
+
+    inputComponent->BindAction(actionHold, ETriggerEvent::Triggered, [](const FInputActionValue& v)
+    {
+        std::printf("Hold: %f\n", v.value.x);
+    });
 }
 
 void Application::PreInit()

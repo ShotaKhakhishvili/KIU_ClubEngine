@@ -70,6 +70,8 @@ int InputSystem::Update(const float dt)
         }
     }
 
+    testPlayerInput.Process(inputState, dt, {testInputComponent});
+
     return 0;
 }
 const FInputState& InputSystem::GetState() const

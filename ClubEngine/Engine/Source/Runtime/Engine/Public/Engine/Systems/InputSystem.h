@@ -4,6 +4,7 @@
 
 #include <Engine/ISystem.h>
 #include <Engine/Input/Types/FInputState.h>
+#include <Engine/Input/FPlayerInput.h>
 
 namespace CE
 {
@@ -19,6 +20,10 @@ public:
     int Update(float dt) override;
 
     const FInputState& GetState() const;
+
+    FPlayerInput testPlayerInput;
+    UInputComponent* testInputComponent;
+
 private:
     WindowSystem* windowSystem;
 
