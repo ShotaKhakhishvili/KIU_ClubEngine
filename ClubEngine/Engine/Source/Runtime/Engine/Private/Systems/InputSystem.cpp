@@ -62,7 +62,7 @@ int InputSystem::Update(const float dt)
             for (size_t i = 0; i < inputState.down.size(); ++i)
             {
                 if (inputState.down.test(i))
-                    inputState.pressReleaseList.emplace_back(static_cast<EKey>(i), true);
+                    inputState.pressReleaseList.emplace_back(static_cast<EKey>(i), false);
             }
             inputState.released |= inputState.down;
             inputState.down.reset();

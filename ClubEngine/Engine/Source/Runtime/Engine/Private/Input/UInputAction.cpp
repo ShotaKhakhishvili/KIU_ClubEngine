@@ -3,8 +3,8 @@
 namespace CE
 {
 
-UInputAction::UInputAction(const EInputActionValueType valueType, TArray<UInputTrigger*> triggers, TArray<UInputModifier*> modifiers)
-    : valueType(valueType), modifiers(std::move(modifiers)), triggers(std::move(triggers))
+UInputAction::UInputAction(const EInputActionValueType valueType)
+    : valueType(valueType)
 {
 }
 EInputActionValueType UInputAction::GetValueType() const
@@ -12,12 +12,12 @@ EInputActionValueType UInputAction::GetValueType() const
     return valueType;
 }
 
-const TArray<UInputTrigger*>& UInputAction::GetTriggers() const
+const TArray<std::unique_ptr<UInputTrigger>>& UInputAction::GetTriggers() const
 {
     return triggers;
 }
 
-const TArray<UInputModifier*>& UInputAction::GetModifiers() const
+const TArray<std::unique_ptr<UInputModifier>>& UInputAction::GetModifiers() const
 {
     return modifiers;
 }

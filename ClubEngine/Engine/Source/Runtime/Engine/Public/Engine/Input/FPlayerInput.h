@@ -1,6 +1,5 @@
 #pragma once
 
-#include <array>
 #include <Core/Containers/TArray.h>
 #include <Core/Containers/TMap.h>
 #include <Core/Types/InputTypes.h>
@@ -8,6 +7,9 @@
 #include <Engine/Input/Types/FInputActionValue.h>
 #include <Engine/Input/Types/ETriggerState.h>
 #include <Engine/Input/Types/ETriggerEvent.h>
+
+#include <array>
+#include <memory>
 
 namespace CE
 {
@@ -67,7 +69,7 @@ private:
     void                    EndRemovedActions       ();
     void                    Dispatch                (const TArray<UInputComponent*>& inputStack) const;
 
-    static ETriggerState    EvaluateTriggers        (const TArray<UInputTrigger*>& triggers, const FInputActionValue& value, float dt);
+    static ETriggerState    EvaluateTriggers        (const TArray<std::unique_ptr<UInputTrigger>>& triggers, const FInputActionValue& value, float dt);
     static void             ZeroUnusedAxes          (FInputActionValue& value);
 
     TArray<FContextEntry>                   contexts;

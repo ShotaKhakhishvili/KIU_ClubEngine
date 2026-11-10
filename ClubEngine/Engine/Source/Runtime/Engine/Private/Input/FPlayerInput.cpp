@@ -86,7 +86,7 @@ void FPlayerInput::EvaluateMapping(FActiveMapping& active, const float keyValue,
     value.value.x = keyValue;
     value.type = active.action->GetValueType();
 
-    for (UInputModifier* modifier : active.mapping->GetModifiers())
+    for (const std::unique_ptr<UInputModifier>& modifier : active.mapping->GetModifiers())
         value = modifier->ModifyRaw(value, dt);
 
     ZeroUnusedAxes(value);
@@ -121,7 +121,7 @@ void FPlayerInput::EvaluateAction(UInputAction* action, const float dt, const bo
 
     FInputActionValue value{combined, action->GetValueType()};
 
-    for (UInputModifier* modifier : action->GetModifiers())
+    for (const std::unique_ptr<UInputModifier>& modifier : action->GetModifiers())
         value = modifier->ModifyRaw(value, dt);
 
     ZeroUnusedAxes(value);
@@ -182,10 +182,10 @@ void FPlayerInput::RebuildActiveMappings()
     }
 }
 
-ETriggerState FPlayerInput::EvaluateTriggers(const TArray<UInputTrigger*>& triggers, const FInputActionValue& value, const float dt)
+ETriggerState FPlayerInput::EvaluateTriggers(const TArray<std::unique_ptr<UInputTrigger>>& triggers, const FInputActionValue& value, const float dt)
 {
     ETriggerState state = ETriggerState::None;
-    for (UInputTrigger* trigger : triggers)
+    for (const std::unique_ptr<UInputTrigger>& trigger : triggers)
         state = std::max(state, trigger->Update(value, dt));
 
     return state;

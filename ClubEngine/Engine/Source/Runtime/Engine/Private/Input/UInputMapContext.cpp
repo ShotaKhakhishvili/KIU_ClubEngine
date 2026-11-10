@@ -12,7 +12,7 @@ FActionKeyMapping* UInputMapContext::AddMapping(UInputAction* action, const EKey
     if (idx != -1)
         return &mappings[idx];
 
-    mappings.emplace_back(key, action, TArray<UInputTrigger*>{}, TArray<UInputModifier*>{});
+    mappings.emplace_back(key, action);
     return &mappings.back();
 }
 

@@ -150,16 +150,15 @@ void Application::PostInit()
     GetSystem<InputSystem>()->testInputComponent = inputComponent;
 
     UInputMapContext* context = assetContext.Resolve(assetContext.Create<UInputMapContext>());
-    UInputTriggerPressed* pressedTrigger = assetContext.Resolve(assetContext.Create<UInputTriggerPressed>());
-    UInputModifierNegate* negateModifier = assetContext.Resolve(assetContext.Create<UInputModifierNegate>());
-    UInputAction* actionPress = assetContext.Resolve(assetContext.Create<UInputAction>(EInputActionValueType::Axis1D, TArray<UInputTrigger*>{pressedTrigger}, TArray<UInputModifier*>{}));
-    UInputAction* actionHold = assetContext.Resolve(assetContext.Create<UInputAction>(EInputActionValueType::Axis1D, TArray<UInputTrigger*>{}, TArray<UInputModifier*>{}));
 
+    UInputAction* actionPress = assetContext.Resolve(assetContext.Create<UInputAction>(EInputActionValueType::Axis1D));
+    actionPress->AddTrigger<UInputTriggerPressed>();
     context->AddMapping(actionPress, EKey::W);
-    context->AddMapping(actionPress, EKey::S)->AddModifier(negateModifier);
+    context->AddMapping(actionPress, EKey::S);
 
+    UInputAction* actionHold = assetContext.Resolve(assetContext.Create<UInputAction>(EInputActionValueType::Axis1D));
     context->AddMapping(actionHold, EKey::W);
-    context->AddMapping(actionHold, EKey::S)->AddModifier(negateModifier);
+    context->AddMapping(actionHold, EKey::S)->AddModifier<UInputModifierNegate>();
 
     GetSystem<InputSystem>()->testPlayerInput.AddMappingContext(context);
 

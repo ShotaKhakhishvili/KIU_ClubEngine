@@ -22,7 +22,7 @@ public:
     const FInputState& GetState() const;
 
     FPlayerInput testPlayerInput;
-    UInputComponent* testInputComponent;
+    UInputComponent* testInputComponent = nullptr;
 
 private:
     WindowSystem* windowSystem;
