@@ -15,6 +15,7 @@ graph TD
         AssetLibrary(["AssetLibrary<br/>NewObject helper"])
         WorldSystem(["WorldSystem<br/>World tick"])
         WindowSystem(["WindowSystem<br/>Window lifecycle"])
+        InputSystem(["InputSystem<br/>Window events → FInputState"])
         FpsSystem(["FpsSystem<br/>Frame delta"])
         AssetContext(["AssetContext<br/>Asset ownership"])
         RenderSystem(["RenderSystem<br/>Renders the world's scene"])
@@ -31,6 +32,8 @@ graph TD
     end
 
     subgraph InputLayer["  Input · Engine Module  "]
+        FInputState(["FInputState<br/>Held keys · ordered presses/releases · mouse deltas"])
+        FPlayerInput(["FPlayerInput<br/>Evaluates contexts · fires action events"])
         UInputComponent(["UInputComponent<br/>BindAction per action & trigger event"])
         UInputMapContext(["UInputMapContext<br/>Key mappings for a set of actions"])
         FActionKeyMapping(["FActionKeyMapping<br/>Key · triggers · modifiers"])
@@ -46,7 +49,7 @@ graph TD
     end
 
     CoreUObject(["CoreUObject<br/>UObject · Registry · TObjectHandle"])
-    Platform(["Platform<br/>IWindow · GLFWWindow · Key conversion"])
+    Platform(["Platform<br/>IWindow · GLFWWindow · Key conversion · Input events"])
     Asset(["Asset<br/>StaticMesh · Material · Shader · Texture"])
     AssetImport(["AssetImport<br/>OBJ · image loader"])
     RenderCore(["RenderCore<br/>IRHI interface · Handles"])
@@ -103,11 +106,18 @@ graph TD
     UInputComponent -->|binds| UInputAction
     UInputMapContext -->|owns| FActionKeyMapping
     FActionKeyMapping -->|maps to| UInputAction
-    FActionKeyMapping --> UInputTrigger
-    FActionKeyMapping --> UInputModifier
-    UInputAction --> UInputTrigger
-    UInputAction --> UInputModifier
+    FActionKeyMapping -->|owns| UInputTrigger
+    FActionKeyMapping -->|owns| UInputModifier
+    UInputAction -->|owns| UInputTrigger
+    UInputAction -->|owns| UInputModifier
     UInputAction --> CoreUObject
+
+    Application --> InputSystem
+    InputSystem -->|consumes window events| WindowSystem
+    InputSystem -->|builds| FInputState
+    FPlayerInput -->|reads| FInputState
+    FPlayerInput -->|active contexts| UInputMapContext
+    FPlayerInput -->|dispatches events| UInputComponent
 
     linkStyle default stroke:#909090,stroke-width:1.8px
     linkStyle 4,7,18,19,20,21,32 stroke:#505050,stroke-width:1.2px,stroke-dasharray:5 3
@@ -127,10 +137,10 @@ graph TD
     classDef foundation    fill:#202020,stroke:#444444,stroke-width:1px,color:#a8a8a8
 
     class Launch,Application,FpsSystem,WorldSystem orchestration
-    class RenderSystem,WindowSystem,Renderer,FScene,FPrimitiveSceneProxy,Platform,RenderCore,RHI_OpenGL runtime
+    class RenderSystem,WindowSystem,InputSystem,Renderer,FScene,FPrimitiveSceneProxy,Platform,RenderCore,RHI_OpenGL runtime
     class AssetContext,AssetLibrary,CoreUObject,Asset,AssetImport asset
     class UWorld,ULevel,AActor,UActorComponent,USceneComponent,UPrimitiveComponent,UStaticMeshComponent world
-    class UInputComponent,UInputMapContext,FActionKeyMapping,UInputAction,UInputTrigger,UInputModifier input
+    class UInputComponent,UInputMapContext,FActionKeyMapping,UInputAction,UInputTrigger,UInputModifier,FInputState,FPlayerInput input
     class Core,GLFW,glad foundation
 ```
 
@@ -179,7 +189,7 @@ graph TD
 ### Application and Systems
 
 - A game derives from `CE::Application`, implements `Update(float dt)`, and optionally overrides `PreInit()` and `PostInit()`. `CreateApplication()` is defined by the game and called from `EntryPoint.h`.
-- Engine functionality is split into `ISystem`s, which you add with `AddSystem<T>(args...)` and look up with `GetSystem<T>()`. By default the application adds `WindowSystem`, `WorldSystem`, and `RenderSystem` in that order.
+- Engine functionality is split into `ISystem`s, which you add with `AddSystem<T>(args...)` and look up with `GetSystem<T>()`. By default the application adds `WindowSystem`, `InputSystem`, `WorldSystem`, and `RenderSystem` in that order.
 - Systems initialize in the order they were added and shut down in reverse. If one fails to initialize, the ones already initialized are shut down cleanly. If any system's `Update` returns a non-zero code, the application stops.
 
 ### World, Levels, Actors, Components
@@ -207,21 +217,36 @@ graph TD
 
 ### Input
 
-Input follows an action-based model: gameplay code binds to **actions**, never to keys, and which keys drive an action is configured separately.
+Input follows an action-based model: gameplay code binds to **actions**, never to keys, and which keys drive an action is configured separately. Each frame it flows window → `InputSystem` → `FInputState` → `FPlayerInput` → `UInputComponent` bindings.
 
-- **`UInputAction`** is a named input with a value type (`Bool`, `Axis1D`, `Axis2D`, `Axis3D`) and optional triggers and modifiers that apply to every key mapped to it. Its value is an `FInputActionValue`: a 3-component vector plus the type.
-- **`UInputMapContext`** holds the key mappings for a set of actions. `AddMapping(action, key)` returns the `FActionKeyMapping`, so you can add triggers and modifiers to it right away (use the pointer immediately, the next `AddMapping` can invalidate it). `RemoveMapping`, `RemoveAllKeysFromMapping` and `UnmapAll` remove them again.
-- **`FActionKeyMapping`** is one key → action pair with its own triggers and modifiers, which apply only to that key (for example a `Negate` on the S key of a 2D move action).
-- **`UInputModifier`** changes a value (`UInputModifierNegate`). **`UInputTrigger`** decides when an action fires, returning an `ETriggerState` (`None`, `Ongoing`, `Triggered`); it tracks the last input value for edge detection and has an actuation threshold for analog inputs (`UInputTriggerPressed`).
-- **`UInputComponent`** is an actor component holding bindings: `BindAction(action, ETriggerEvent, object, &Class::Function)` or a lambda. Events are `Started`, `Ongoing`, `Triggered`, `Completed` and `Canceled`. Each binding returns an `FDelegateHandle`.
+**Raw input**
 
-Not implemented yet: reading keys from the window, the per-frame input state, and the player input that evaluates the active contexts each frame and calls the bindings. Until then, bindings can be created but never fire.
+- The window's GLFW callbacks turn key, mouse button, cursor, scroll and focus changes into `FInputEvent`s. `InputSystem` consumes them once per frame and builds an **`FInputState`**: which keys are held, the ordered list of this frame's presses and releases, and the mouse movement and scroll for the frame. Losing window focus releases every held key.
+
+**Actions and mappings**
+
+- **`UInputAction`** is a named input with a value type (`Bool`, `Axis1D`, `Axis2D`, `Axis3D`) and optional triggers and modifiers that apply to every key mapped to it. Its value is an `FInputActionValue`: a 3-component vector plus the type (unused components are always zero).
+- **`UInputMapContext`** holds the key mappings for a set of actions. `AddMapping(action, key)` returns the `FActionKeyMapping` (use the pointer right away, the next `AddMapping` can invalidate it). `RemoveMapping`, `RemoveAllKeysFromMapping` and `UnmapAll` remove them again.
+- **`FActionKeyMapping`** is one key → action pair with its own triggers and modifiers, which apply only to that key (for example a `Negate` on the S key of a move action).
+- Triggers and modifiers are created and owned by the mapping or action they belong to: `AddTrigger<T>(args...)` and `AddModifier<T>(args...)` return the new object so it can be configured, and each one belongs to exactly one owner.
+- **`UInputModifier`** changes a value (`UInputModifierNegate`). **`UInputTrigger`** decides when an action fires, returning an `ETriggerState` (`None`, `Ongoing`, `Triggered`); it tracks the last input value for edge detection and has an actuation threshold for analog inputs (`UInputTriggerPressed`). With no triggers, an action is triggered whenever its value is non-zero.
+
+**Evaluation**
+
+- **`FPlayerInput`** holds the active contexts with a priority (`AddMappingContext(context, priority)`). A key used by a higher priority context is ignored by lower ones.
+- Each mapping's key value goes through its modifiers and triggers; an action's mappings are combined (largest value per axis, strongest state), then the action's own modifiers and triggers run. With triggers on both levels, both have to agree.
+- The resulting state change fires `ETriggerEvent`s: `Started`, `Ongoing`, `Triggered`, `Completed` and `Canceled`. Removing a context ends its active actions with `Completed` or `Canceled`.
+- **No press is lost.** Every press and release in the frame is evaluated in order, so a key tapped faster than one frame, or several times within one frame, fires every time. Because of that, `Triggered` can fire more than once per frame: accumulate continuous input like movement and apply it in `Tick`.
+
+**Bindings**
+
+- **`UInputComponent`** is an actor component holding bindings: `BindAction(action, ETriggerEvent, object, &Class::Function)` or a lambda. Each binding returns an `FDelegateHandle`. `FPlayerInput` dispatches the frame's events to the components in its input stack after evaluation.
 
 ### Current Limitations
 
 - `UPrimitiveComponent` adds its scene proxy when it's created, but the proxy isn't updated when the component moves and isn't removed when the component is destroyed.
 - `USceneComponent` stores a single transform: there are no relative transforms yet, so attached children don't follow their parent.
-- Input is only partly done (see [Input](#input)): actions, contexts and bindings exist, but nothing reads the keyboard or mouse or fires bindings yet.
+- `FPlayerInput` currently lives in `InputSystem` with a test setup; it moves to the player controller once that exists. Only the `Pressed` trigger and `Negate` modifier exist so far, and there's no swizzle/scale modifier or mouse capture yet.
 - There's no camera, pawn/controller, or game mode framework yet. The view is a hardcoded `LookAt`.
 - `AVoxelTerrain` / `UVoxelGrid` are work in progress.
 - Asset paths and serialization aren't implemented yet; assets are loaded from paths in code.
