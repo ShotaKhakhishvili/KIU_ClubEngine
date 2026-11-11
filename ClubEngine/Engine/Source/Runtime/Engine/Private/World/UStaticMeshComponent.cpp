@@ -10,8 +10,7 @@ namespace CE
 UStaticMeshComponent::UStaticMeshComponent(AActor* owner, const FTransform& transform, TObjectHandle<UStaticMesh> staticMesh)
     : Super(owner, transform), staticMesh(staticMesh)
 {
-    GetOwner()->GetWorld()->GetScene().UpdateStaticMesh(GetPrimitiveSceneProxy(),
-        GetCurrentAssetResolver()->Resolve(staticMesh));
+    GetOwner()->GetWorld()->GetScene().UpdateStaticMesh(GetPrimitiveSceneProxy(), staticMesh);
 }
 
 

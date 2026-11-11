@@ -24,7 +24,7 @@ ETriggerState UInputTriggerHold::UpdateState(const FInputActionValue& value, con
     const bool firstTrigger = !triggered;
     triggered = true;
 
-    return firstTrigger || oneShot ? ETriggerState::None : ETriggerState::Triggered;
+    return (firstTrigger || !oneShot) ? ETriggerState::Triggered : ETriggerState::None;
 }
 
 }
