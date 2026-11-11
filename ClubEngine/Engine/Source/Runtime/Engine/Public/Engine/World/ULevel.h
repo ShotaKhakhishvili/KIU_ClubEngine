@@ -28,7 +28,7 @@ public:
 
     template<typename T> 
         requires std::is_base_of_v<UActorComponent, T>
-    T* ResolveComponent(T* componentHandle);
+    T* ResolveComponent(TObjectHandle<T> componentHandle);
 
     template<typename T>
         requires std::is_base_of_v<AActor, T>

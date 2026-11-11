@@ -15,7 +15,7 @@ T* ULevel::CreateComponent(Args&&... args)
 
 template<typename T>
     requires std::is_base_of_v<UActorComponent, T>
-T* ULevel::ResolveComponent(T* componentHandle)
+T* ULevel::ResolveComponent(TObjectHandle<T> componentHandle)
 {
     return componentRegistry.Resolve<T>(componentHandle);
 }

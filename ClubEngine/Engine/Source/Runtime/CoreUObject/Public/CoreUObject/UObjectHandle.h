@@ -23,7 +23,7 @@ private:
 
     uint32 index = std::numeric_limits<uint32_t>::max();
     uint32 generation = 0;
-    uint32 registryId = 1;
+    uint32 registryId = std::numeric_limits<uint32>::max();
 };
 
 }

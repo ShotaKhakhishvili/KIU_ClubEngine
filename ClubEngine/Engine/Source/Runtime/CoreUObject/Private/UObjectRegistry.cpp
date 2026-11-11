@@ -8,6 +8,9 @@ uint32 UObjectRegistry::registryCounter = 0;
 
 void UObjectRegistry::Destroy(const UObjectHandle handle)
 {
+    if (!IsAlive(handle))
+        return;
+
     Slot* slot = GetSlotFromHandle(handle);
     
     if(slot == nullptr) 
@@ -74,7 +77,7 @@ uint32 UObjectRegistry::GetRegistryId() const
     return registryId;
 }
 
-bool UObjectRegistry::IsAlive(UObjectHandle handle) const
+bool UObjectRegistry::IsAlive(const UObjectHandle handle) const
 {
     if (handle.registryId != registryId)
         return false;
