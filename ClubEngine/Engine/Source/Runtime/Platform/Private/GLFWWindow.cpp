@@ -12,6 +12,7 @@
 
 namespace CE
 {
+
 std::unique_ptr<IWindow> IWindow::Create()
 {
     return std::make_unique<GLFWWindow>();
@@ -105,6 +106,40 @@ void GLFWWindow::ConsumeInputEvents(TArray<FInputEvent>& outEvents)
 {
     std::swap(outEvents, pendingEvents);
     pendingEvents.clear();
+}
+
+void GLFWWindow::SetCursorMode(const ECursorMode mode)
+{
+    if (!handle || mode == cursorMode)
+        return;
+
+    int glfwMode = GLFW_CURSOR_NORMAL;
+    switch (mode)
+    {
+    case ECursorMode::Normal:   glfwMode = GLFW_CURSOR_NORMAL;   break;
+    case ECursorMode::Hidden:   glfwMode = GLFW_CURSOR_HIDDEN;   break;
+    case ECursorMode::Captured: glfwMode = GLFW_CURSOR_CAPTURED; break;
+    case ECursorMode::Locked:   glfwMode = GLFW_CURSOR_DISABLED; break;
+    }
+
+    glfwSetInputMode(handle, GLFW_CURSOR, glfwMode);
+
+    if (glfwRawMouseMotionSupported())
+        glfwSetInputMode(handle, GLFW_RAW_MOUSE_MOTION, mode == ECursorMode::Locked ? GLFW_TRUE : GLFW_FALSE);
+
+    hasCursorPos = false;
+
+    cursorMode = mode;
+}
+
+ECursorMode GLFWWindow::GetCursorMode() const
+{
+    return cursorMode;
+}
+
+FVector2F GLFWWindow::GetCursorPosition() const
+{
+    return lastCursorPos;
 }
 
 void GLFWWindow::InitGL(const FWindowConfig& config)
@@ -201,4 +236,5 @@ void GLFWWindow::InstallInputCallbacks()
             self->pendingEvents.push_back({ EInputEventType::FocusLost });
     });
 }
+
 }

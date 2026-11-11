@@ -18,16 +18,13 @@ struct FKeyPressState
 struct FInputState
 {
     std::bitset<EKey::Count>        down;
-    std::bitset<EKey::Count>        pressed;
-    std::bitset<EKey::Count>        released;
     FVector2F                       mouseDelta;
     float                           wheelDelta{};
+    FVector2D                       mousePos;
 
     TArray<FKeyPressState>          pressReleaseList;
 
     bool IsDown         (EKey key) const;
-    bool WasPressed     (EKey key) const;
-    bool WasReleased    (EKey key) const;
 
     float GetKeyValue(EKey key) const;
 };

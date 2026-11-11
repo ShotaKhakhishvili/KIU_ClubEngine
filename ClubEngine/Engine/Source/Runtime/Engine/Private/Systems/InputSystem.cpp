@@ -27,8 +27,6 @@ int InputSystem::Update(const float dt)
 
     window->ConsumeInputEvents(frameEvents);
 
-    inputState.pressed.reset();
-    inputState.released.reset();
     inputState.pressReleaseList.clear();
     inputState.mouseDelta = {};
     inputState.wheelDelta = 0.0f;
@@ -38,13 +36,11 @@ int InputSystem::Update(const float dt)
         switch (event.type)
         {
         case EInputEventType::KeyDown:
-            inputState.pressed.set(event.key);
             inputState.down.set(event.key);
             inputState.pressReleaseList.emplace_back(event.key, true);
             break;
 
         case EInputEventType::KeyUp:
-            inputState.released.set(event.key);
             inputState.down.reset(event.key);
             inputState.pressReleaseList.emplace_back(event.key, false);
             break;
@@ -64,13 +60,12 @@ int InputSystem::Update(const float dt)
                 if (inputState.down.test(i))
                     inputState.pressReleaseList.emplace_back(static_cast<EKey>(i), false);
             }
-            inputState.released |= inputState.down;
             inputState.down.reset();
             break;
         }
     }
 
-    testPlayerInput.Process(inputState, dt, {testInputComponent});
+    inputState.mouseDelta = window->GetCursorPosition();
 
     return 0;
 }

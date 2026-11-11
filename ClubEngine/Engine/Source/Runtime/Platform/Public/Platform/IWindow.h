@@ -4,6 +4,7 @@
 #include <Core/Types/InputTypes.h>
 
 #include <Platform/FWindowConfig.h>
+#include <Platform/Types/ECursorMode.h>
 
 #include <memory>
 
@@ -27,6 +28,10 @@ public:
     virtual void* GetNativeHandle()           const = 0;
 
     virtual void ConsumeInputEvents(TArray<FInputEvent>& outEvents) = 0;
+
+    virtual void        SetCursorMode(ECursorMode mode)       = 0;
+    virtual ECursorMode GetCursorMode()                 const = 0;
+    virtual FVector2F   GetCursorPosition()             const = 0;
 
     static std::unique_ptr<IWindow> Create();
 };
