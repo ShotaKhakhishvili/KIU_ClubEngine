@@ -16,9 +16,6 @@ public:
     AStaticMeshActor(const FTransform& transform, TObjectHandle<UStaticMesh> staticMeshHandle);
 
     UStaticMeshComponent* GetStaticMeshComponent() const;
-
-private:
-    UStaticMeshComponent* staticMeshComponent;
 };
 
 }

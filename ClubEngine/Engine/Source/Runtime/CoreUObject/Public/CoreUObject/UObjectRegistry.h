@@ -32,6 +32,8 @@ public:
 
     uint32 GetRegistryId() const;
 
+    bool IsAlive(UObjectHandle handle) const;
+
     void FlushPendingDestroy();
 
 private:

@@ -9,12 +9,12 @@ namespace CE
 AStaticMeshActor::AStaticMeshActor(const FTransform& transform, TObjectHandle<UStaticMesh> staticMeshHandle)
     : Super(transform)
 {
-    rootComponent = staticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(transform, staticMeshHandle);
+    rootComponent = CreateDefaultSubobject<UStaticMeshComponent>(transform, staticMeshHandle);
 }
 
 UStaticMeshComponent* AStaticMeshActor::GetStaticMeshComponent() const
 {
-
+    return dynamic_cast<UStaticMeshComponent*>(rootComponent);
 }
 
 }

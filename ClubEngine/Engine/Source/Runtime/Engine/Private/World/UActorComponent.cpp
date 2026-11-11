@@ -16,12 +16,15 @@ void UActorComponent::Tick(const float dt)
 }
 void UActorComponent::OnDestroyed()
 {
-
 }
 
 AActor* UActorComponent::GetOwner() const
 {
     return owner;
+}
+bool UActorComponent::IsPendingDestroy() const
+{
+    return !owner->GetLevel()->IsAlive(GetHandle());
 }
 
 }

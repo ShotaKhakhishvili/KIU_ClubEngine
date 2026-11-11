@@ -27,6 +27,10 @@ ULevel* AActor::GetLevel() const
 {
     return level;
 }
+bool AActor::IsPendingDestroy() const
+{
+    return level && !level->IsAlive(GetHandle());
+}
 
 void AActor::OnSpawned()
 {

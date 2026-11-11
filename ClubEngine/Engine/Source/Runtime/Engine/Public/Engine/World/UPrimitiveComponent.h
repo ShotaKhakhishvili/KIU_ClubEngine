@@ -19,6 +19,9 @@ public:
     bool IsVisible()const;
     void SetVisible(bool newVisibility);
 
+    void SetWorldTransform(const FTransform& newTransform) override;
+    void OnDestroyed() override;
+
 protected:
     FPrimitiveSceneProxyHandle GetPrimitiveSceneProxy() const;
 

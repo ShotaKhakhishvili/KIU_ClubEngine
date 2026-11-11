@@ -34,6 +34,8 @@ public:
         requires std::is_base_of_v<AActor, T>
     T* ResolveActor(TObjectHandle<T> componentHandle);
 
+    bool IsAlive(UObjectHandle handle) const;
+
 private:
     friend class UWorld;
 

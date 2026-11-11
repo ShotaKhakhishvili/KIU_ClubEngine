@@ -31,6 +31,8 @@ public:
     UWorld* GetWorld() const;
     ULevel* GetLevel() const;
 
+    bool IsPendingDestroy() const;
+
 protected:
     virtual void OnSpawned();
     virtual void OnDestroyed();
@@ -43,8 +45,6 @@ protected:
 
 private:
     friend class UWorld;
-
-    bool isPendingDestroy = false;
 
     TArray<UActorComponent*> ownedComponents;
     ULevel* level = FObjectInitializer::GetCurrent();

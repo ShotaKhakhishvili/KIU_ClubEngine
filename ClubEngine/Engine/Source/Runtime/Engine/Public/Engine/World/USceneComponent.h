@@ -19,7 +19,10 @@ class USceneComponent : public UActorComponent
 public:
     explicit USceneComponent(AActor* owner, const FTransform& newTransform);
 
-    void SetWorldTransform(const FTransform& newTransform);
+    void OnDestroyed() override;
+
+    virtual void SetWorldTransform(const FTransform& newTransform);
+    FTransform GetWorldTransform() const;
 
     USceneComponent* GetParentComponent() const;
     void SetParentComponent(USceneComponent* parent);

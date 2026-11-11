@@ -73,6 +73,19 @@ uint32 UObjectRegistry::GetRegistryId() const
 {
     return registryId;
 }
+
+bool UObjectRegistry::IsAlive(UObjectHandle handle) const
+{
+    if (handle.registryId != registryId)
+        return false;
+
+    if (handle.index >= static_cast<uint32>(slots.size()))
+        return false;
+
+    const Slot& slot = slots[handle.index];
+    return slot.alive && slot.generation == handle.generation;
+}
+
 void UObjectRegistry::FlushPendingDestroy()
 {
     for(const uint32 index : pendingDestroy)

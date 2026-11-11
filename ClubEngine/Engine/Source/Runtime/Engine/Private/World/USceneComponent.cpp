@@ -9,11 +9,28 @@ USceneComponent::USceneComponent(AActor* owner, const FTransform& newTransform)
 {
 
 }
+void USceneComponent::OnDestroyed()
+{
+    Super::OnDestroyed();
+
+    SetParentComponent(nullptr);
+
+    for (USceneComponent* child : childComponents)
+        child->parentComponent = nullptr;
+
+    childComponents.clear();
+}
 
 void USceneComponent::SetWorldTransform(const FTransform& newTransform)
 {
     this->transform = newTransform;
 }
+
+FTransform USceneComponent::GetWorldTransform() const
+{
+    return transform;
+}
+
 USceneComponent* USceneComponent::GetParentComponent() const
 {
     return parentComponent;

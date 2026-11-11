@@ -23,6 +23,19 @@ bool UPrimitiveComponent::IsVisible()const
 void UPrimitiveComponent::SetVisible(bool newVisibility)
 {
     isVisible = newVisibility;
+    GetOwner()->GetWorld()->GetScene().SetVisible(primitiveSceneProxyHandle, isVisible);
+}
+void UPrimitiveComponent::SetWorldTransform(const FTransform& newTransform)
+{
+    Super::SetWorldTransform(newTransform);
+
+    GetOwner()->GetWorld()->GetScene().UpdateTransform(primitiveSceneProxyHandle, newTransform);
+}
+void UPrimitiveComponent::OnDestroyed()
+{
+    Super::OnDestroyed();
+
+    GetOwner()->GetWorld()->GetScene().RemoveProxy(primitiveSceneProxyHandle);
 }
 
 FPrimitiveSceneProxyHandle UPrimitiveComponent::GetPrimitiveSceneProxy() const

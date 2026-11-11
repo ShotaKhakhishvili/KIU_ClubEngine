@@ -42,9 +42,24 @@ template<typename T>
     requires std::is_base_of_v<UActorComponent, T>
 void UWorld::DestroyComponent(T* component)
 {
-    if(!component)
+    if (!component)
         return;
 
+    ULevel* level = GetLevelFromRegistryID(component->GetHandle().GetRegistryID());
+
+    if(!level || !level->IsAlive(component->GetHandle()))
+        return;
+
+    if (component == component->owner->GetRootComponent())
+    {
+        Destroy(component->owner);
+        return;
+    }
+
+    level->componentRegistry.Destroy(component->GetHandle());
+
+    component->OnDestroyed();
+    std::erase(component->owner->ownedComponents, component);
 }
 template <typename T>
     requires std::is_base_of_v<AActor, T>

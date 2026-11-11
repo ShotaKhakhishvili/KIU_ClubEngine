@@ -13,6 +13,12 @@ UWorld* ULevel::GetWorld() const
 {
     return world;
 }
+
+bool ULevel::IsAlive(UObjectHandle handle) const
+{
+    return actorRegistry.IsAlive(handle) || componentRegistry.IsAlive(handle);
+}
+
 void ULevel::TickLevel(const float dt)
 {
     actorRegistry.ForEach([dt](UObject& object)

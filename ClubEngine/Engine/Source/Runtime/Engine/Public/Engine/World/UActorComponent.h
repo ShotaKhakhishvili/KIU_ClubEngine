@@ -22,6 +22,8 @@ public:
 
     AActor* GetOwner() const;
 
+    bool IsPendingDestroy() const;
+
 private:
     friend class ULevel;
     friend class UWorld;

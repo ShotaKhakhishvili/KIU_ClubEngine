@@ -45,25 +45,25 @@ UWorld::~UWorld()
 }
 void UWorld::Destroy(AActor* actor)
 {
-    if(actor == nullptr || actor->isPendingDestroy)
+    if(actor == nullptr)
         return;
 
-    actor->isPendingDestroy = true;
-    actor->OnDestroyed();
+    if (actor->IsPendingDestroy())
+        return;
 
     ULevel* level = actor->level;
+    level->actorRegistry.Destroy(actor->GetHandle());
 
-    for (auto component : actor->ownedComponents)
-        component->OnDestroyed();
-
-    for (auto component : actor->ownedComponents)
+    for (const auto& component : actor->ownedComponents)
         level->componentRegistry.Destroy(component->GetHandle());
 
+    actor->OnDestroyed();
+
+    for (const auto& component : actor->ownedComponents)
+        component->OnDestroyed();
 
     actor->ownedComponents.clear();
     actor->rootComponent = nullptr;
-
-    level->actorRegistry.Destroy(actor->GetHandle());
 }
 FScene& UWorld::GetScene()
 {
