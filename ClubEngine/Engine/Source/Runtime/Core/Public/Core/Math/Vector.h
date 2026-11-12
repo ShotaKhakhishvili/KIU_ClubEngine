@@ -216,6 +216,36 @@ constexpr TVector4<T> Normalize(TVector4<T> v)
 }
 
 template<typename T>
+constexpr TVector2<T> DivideSafe(TVector2<T> a, TVector2<T> b)
+{
+    return {
+        NearlyZero(b.x) ? T(0) : a.x / b.x,
+        NearlyZero(b.y) ? T(0) : a.y / b.y
+    };
+}
+
+template<typename T>
+constexpr TVector<T> DivideSafe(TVector<T> a, TVector<T> b)
+{
+    return {
+        NearlyZero(b.x) ? T(0) : a.x / b.x,
+        NearlyZero(b.y) ? T(0) : a.y / b.y,
+        NearlyZero(b.z) ? T(0) : a.z / b.z
+    };
+}
+
+template<typename T>
+constexpr TVector4<T> DivideSafe(TVector4<T> a, TVector4<T> b)
+{
+    return {
+        NearlyZero(b.x) ? T(0) : a.x / b.x,
+        NearlyZero(b.y) ? T(0) : a.y / b.y,
+        NearlyZero(b.z) ? T(0) : a.z / b.z,
+        NearlyZero(b.w) ? T(0) : a.w / b.w
+    };
+}
+
+template<typename T>
 constexpr bool NearlyEqual(TVector2<T> a, TVector2<T> b, T tolerance)
 {
     return std::abs(a.x - b.x) < tolerance
