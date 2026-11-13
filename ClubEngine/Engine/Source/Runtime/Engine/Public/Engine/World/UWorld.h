@@ -5,11 +5,13 @@
 #include <CoreUObject/UObject.h>
 #include <CoreUObject/TObjectHandle.h>
 #include <CoreUObject/UObjectRegistry.h>
+#include <CoreUObject/TSubclassOf.h>
 
 #include <Renderer/Scene/FScene.h>
 
 #include <Engine/World/AActor.h>
 #include <Engine/World/UActorComponent.h>
+#include <Engine/World/FActorSpawnParameters.h>
 
 #include <vector>
 #include <type_traits>
@@ -26,9 +28,23 @@ class UWorld : public UObject
 public:
     ~UWorld();
 
-    template<typename T, typename... Args>
+    AActor* SpawnActor(UClass* actorClass, const FTransform& transform, const FActorSpawnParameters& params = {});
+
+    template<typename T>
         requires std::is_base_of_v<AActor, T>
-    T* SpawnActor(const FTransform& transform, Args&&... args);
+    T* SpawnActor(const FTransform& transform, const FActorSpawnParameters& params = {});
+
+    template<typename T>
+        requires std::is_base_of_v<AActor, T>
+    T* SpawnActor(TSubclassOf<T> actorClass, const FTransform& transform, const FActorSpawnParameters& params = {});
+
+    template<typename T>
+        requires std::is_base_of_v<AActor, T>
+    T* SpawnActorDeferred(const FTransform& transform);
+
+    template<typename T>
+        requires std::is_base_of_v<AActor, T>
+    T* SpawnActorDeferred(TSubclassOf<T> actorClass, const FTransform& transform);
 
     void Destroy(AActor* actor);
 

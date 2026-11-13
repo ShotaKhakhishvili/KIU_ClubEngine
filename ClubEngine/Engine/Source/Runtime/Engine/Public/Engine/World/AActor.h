@@ -8,6 +8,7 @@
 #include <Engine/World/USceneComponent.h>
 #include <Engine/World/FObjectInitializer.h>
 #include <Engine/World/ULevel.h>
+#include <Engine/EngineTypes.h>
 
 #include <type_traits>
 
@@ -21,10 +22,15 @@ class AActor : public UObject
     GENERATED_BODY(AActor, UObject)
 
 public:
-    explicit AActor(const FTransform& transform);
+    AActor() = default;
     ~AActor() override = default;
 
+    void FinishSpawning(const FTransform& transform);
+
     virtual void Tick(float dt);
+
+    void RegisterAllComponents();
+    void UnregisterAllComponents();
 
     USceneComponent* GetRootComponent() const;
 
@@ -37,17 +43,19 @@ protected:
     virtual void OnSpawned();
     virtual void OnDestroyed();
 
-    template<typename T, typename... Args>
+    template<typename T>
         requires std::is_base_of_v<UActorComponent,T>
-    T* CreateDefaultSubobject(Args&&... args);
+    T* CreateDefaultSubobject(const char* name);
 
-    USceneComponent* rootComponent;
+    USceneComponent* rootComponent = nullptr;
 
 private:
     friend class UWorld;
 
     TArray<UActorComponent*> ownedComponents;
     ULevel* level = FObjectInitializer::GetCurrent();
+
+    EActorState state = EActorState::Constructed;
 };
 
 }

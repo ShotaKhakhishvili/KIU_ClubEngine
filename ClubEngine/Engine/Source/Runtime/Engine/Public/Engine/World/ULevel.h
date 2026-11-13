@@ -22,9 +22,9 @@ public:
 
     UWorld* GetWorld() const;
 
-    template<typename T, typename... Args>
+    template<typename T>
         requires std::is_base_of_v<UActorComponent, T>
-    T* CreateComponent(Args&&... args);
+    T* CreateComponent(AActor* owner);
 
     template<typename T> 
         requires std::is_base_of_v<UActorComponent, T>

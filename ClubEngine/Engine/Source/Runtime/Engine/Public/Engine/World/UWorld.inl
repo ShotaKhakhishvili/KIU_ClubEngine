@@ -13,29 +13,35 @@
 namespace CE
 {
 
-template<typename T, typename... Args>
+template<typename T>
     requires std::is_base_of_v<AActor, T>
-T* UWorld::SpawnActor(const FTransform& transform, Args&&... args)
+T* UWorld::SpawnActor(const FTransform& transform, const FActorSpawnParameters& params)
 {
-    FObjectInitializer initializer(persistentLevel);
+    static_assert(!std::is_abstract_v<T> && std::is_default_constructible_v<T>,
+                  "Actors must be default constructible to be spawned");
 
-    TObjectHandle<T> handle = persistentLevel->actorRegistry.Create<T>(transform, std::forward<Args>(args)...);
-    AActor* actor = persistentLevel->actorRegistry.Resolve<AActor>(handle);
+    return static_cast<T*>(SpawnActor(T::StaticClass(), transform, params));
+}
 
-    if(!actor->rootComponent)
-    {
-        actor->rootComponent = actor->CreateDefaultSubobject<USceneComponent>(transform);
-    }
+template<typename T>
+    requires std::is_base_of_v<AActor, T>
+T* UWorld::SpawnActor(TSubclassOf<T> actorClass, const FTransform& transform, const FActorSpawnParameters& params)
+{
+    return static_cast<T*>(SpawnActor(actorClass.Get(), transform, params));
+}
 
-    for(auto& component : actor->ownedComponents)
-    {
-        component->owner = actor;
-    }
+template<typename T>
+    requires std::is_base_of_v<AActor, T>
+T* UWorld::SpawnActorDeferred(const FTransform& transform)
+{
+    return SpawnActor<T>(transform, FActorSpawnParameters{ .deferConstruction = true });
+}
 
-    actor->rootComponent->SetWorldTransform(transform);
-    actor->OnSpawned();
-
-    return persistentLevel->actorRegistry.Resolve<T>(handle);
+template<typename T>
+    requires std::is_base_of_v<AActor, T>
+T* UWorld::SpawnActorDeferred(TSubclassOf<T> actorClass, const FTransform& transform)
+{
+    return SpawnActor<T>(actorClass, transform, FActorSpawnParameters{ .deferConstruction = true });
 }
 
 template<typename T>
@@ -57,6 +63,7 @@ void UWorld::DestroyComponent(T* component)
     }
 
     level->componentRegistry.Destroy(component->GetHandle());
+    component->UnregisterComponent();
 
     component->OnDestroyed();
     std::erase(component->owner->ownedComponents, component);

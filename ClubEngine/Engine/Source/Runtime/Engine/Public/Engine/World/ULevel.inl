@@ -3,17 +3,22 @@
 namespace CE
 {
 
-template<typename T, typename... Args>
+template <typename T>
     requires std::is_base_of_v<UActorComponent, T>
-T* ULevel::CreateComponent(Args&&... args)
+T* ULevel::CreateComponent(AActor* owner)
 {
-    auto handle = componentRegistry.Create<T>(std::forward<Args>(args)...);
+    static_assert(!std::is_abstract_v<T> && std::is_default_constructible_v<T>,
+              "Components must be default constructible");
+
+    auto handle = componentRegistry.Create<T>();
     auto newComponent = componentRegistry.Resolve<T>(handle);
+
+    newComponent->owner = owner;
 
     return newComponent;
 }
 
-template<typename T>
+template <typename T>
     requires std::is_base_of_v<UActorComponent, T>
 T* ULevel::ResolveComponent(TObjectHandle<T> componentHandle)
 {

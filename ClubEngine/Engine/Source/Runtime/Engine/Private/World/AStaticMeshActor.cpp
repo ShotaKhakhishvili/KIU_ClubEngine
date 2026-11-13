@@ -8,15 +8,15 @@ namespace CE
 
 IMPLEMENT_CLASS(AStaticMeshActor)
 
-AStaticMeshActor::AStaticMeshActor(const FTransform& transform, TObjectHandle<UStaticMesh> staticMeshHandle)
-    : Super(transform)
+AStaticMeshActor::AStaticMeshActor()
 {
-    rootComponent = CreateDefaultSubobject<UStaticMeshComponent>(transform, staticMeshHandle);
+    staticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComponent");
+    rootComponent = staticMeshComponent;
 }
 
 UStaticMeshComponent* AStaticMeshActor::GetStaticMeshComponent() const
 {
-    return dynamic_cast<UStaticMeshComponent*>(rootComponent);
+    return staticMeshComponent;
 }
 
 }

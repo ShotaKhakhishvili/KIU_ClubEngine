@@ -14,14 +14,15 @@ class UPrimitiveComponent : public USceneComponent
     GENERATED_BODY(UPrimitiveComponent, USceneComponent)
 
 public:
-    explicit UPrimitiveComponent(AActor* owner, const FTransform& transform);
+    UPrimitiveComponent() = default;
 
     bool IsVisible()const;
     void SetVisible(bool newVisibility);
 
-    void OnDestroyed() override;
-
 protected:
+    void OnRegister() override;
+    void OnUnregister() override;
+
     FPrimitiveSceneProxyHandle GetPrimitiveSceneProxy() const;
 
     void OnTransformUpdated() override;

@@ -17,7 +17,7 @@ class USceneComponent : public UActorComponent
     GENERATED_BODY(USceneComponent, UActorComponent)
 
 public:
-    explicit USceneComponent(AActor* owner, const FTransform& newTransform);
+    USceneComponent() = default;
 
     void OnDestroyed() override;
 

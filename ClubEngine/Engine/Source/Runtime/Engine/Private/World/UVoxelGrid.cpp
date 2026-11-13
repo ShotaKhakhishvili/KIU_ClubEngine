@@ -12,9 +12,9 @@ namespace CE
 
 IMPLEMENT_CLASS(UVoxelGrid)
 
-UVoxelGrid::UVoxelGrid(AActor* owner, uint16 chunkSizeX, uint16 chunkSizeY, uint16 chunkSizeZ)
-    : Super(owner, FTransform()), chunkSizeX(chunkSizeX), chunkSizeY(chunkSizeY), chunkSizeZ(chunkSizeZ)
+void UVoxelGrid::OnRegister()
 {
+    Super::OnRegister();
     CompileChunkGenShader();
 }
 

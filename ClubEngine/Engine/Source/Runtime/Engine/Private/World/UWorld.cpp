@@ -7,6 +7,42 @@ namespace CE
 
 IMPLEMENT_CLASS(UWorld)
 
+AActor* UWorld::SpawnActor(UClass* actorClass, const FTransform& transform, const FActorSpawnParameters& params)
+{
+    if (actorClass == nullptr || !actorClass->IsChildOf(AActor::StaticClass()))
+    {
+        CE_LOG(Error, "Tried To Spawn Non-Actor Class {}.", actorClass ? actorClass->GetName() : "null");
+        return nullptr;
+    }
+
+    AActor* actor = nullptr;
+
+    {
+        FObjectInitializer initializer(persistentLevel);
+
+        const UObjectHandle handle = persistentLevel->actorRegistry.Create(actorClass);
+
+        if (!handle.IsValid())
+            return nullptr;
+
+        actor = static_cast<AActor*>(persistentLevel->actorRegistry.Resolve(handle));
+    }
+
+    if (params.name != nullptr)
+        actor->SetName(params.name);
+
+    if (!actor->rootComponent)
+        actor->rootComponent = actor->CreateDefaultSubobject<USceneComponent>("DefaultSceneRoot");
+
+    actor->rootComponent->SetWorldTransform(transform);
+    actor->RegisterAllComponents();
+
+    if (!params.deferConstruction)
+        actor->FinishSpawning(transform);
+
+    return actor;
+}
+
 void UWorld::TickWorld(const float dt)
 {
     persistentLevel->TickLevel(dt);
@@ -60,6 +96,7 @@ void UWorld::Destroy(AActor* actor)
         level->componentRegistry.Destroy(component->GetHandle());
 
     actor->OnDestroyed();
+    actor->UnregisterAllComponents();
 
     for (const auto& component : actor->ownedComponents)
         component->OnDestroyed();

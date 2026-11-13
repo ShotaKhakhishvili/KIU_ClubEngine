@@ -8,15 +8,6 @@ namespace CE
 
 IMPLEMENT_CLASS(UPrimitiveComponent)
 
-UPrimitiveComponent::UPrimitiveComponent(AActor* owner, const FTransform& transform)
-    : Super(owner, transform)
-{
-    FPrimitiveSceneProxy primitiveSceneProxy;
-    primitiveSceneProxy.localToWorld = static_cast<FMatrix4x4F>(transform.ToMatrix());
-
-    primitiveSceneProxyHandle = GetOwner()->GetWorld()->GetScene().AddProxy(primitiveSceneProxy);
-}
-
 bool UPrimitiveComponent::IsVisible()const
 {
     return isVisible;
@@ -25,22 +16,39 @@ bool UPrimitiveComponent::IsVisible()const
 void UPrimitiveComponent::SetVisible(bool newVisibility)
 {
     isVisible = newVisibility;
-    GetOwner()->GetWorld()->GetScene().SetVisible(primitiveSceneProxyHandle, isVisible);
+
+    if (IsRegistered())
+        GetOwner()->GetWorld()->GetScene().SetVisible(primitiveSceneProxyHandle, isVisible);
 }
+
 void UPrimitiveComponent::OnTransformUpdated()
 {
-    GetOwner()->GetWorld()->GetScene().UpdateTransform(primitiveSceneProxyHandle, GetWorldTransform());
-}
-void UPrimitiveComponent::OnDestroyed()
-{
-    Super::OnDestroyed();
-
-    GetOwner()->GetWorld()->GetScene().RemoveProxy(primitiveSceneProxyHandle);
+    if (IsRegistered())
+        GetOwner()->GetWorld()->GetScene().UpdateTransform(primitiveSceneProxyHandle, GetWorldTransform());
 }
 
 FPrimitiveSceneProxyHandle UPrimitiveComponent::GetPrimitiveSceneProxy() const
 {
     return primitiveSceneProxyHandle;
+}
+
+void UPrimitiveComponent::OnRegister()
+{
+    Super::OnRegister();
+
+    FPrimitiveSceneProxy primitiveSceneProxy;
+    primitiveSceneProxy.localToWorld = static_cast<FMatrix4x4F>(GetWorldTransform().ToMatrix());
+    primitiveSceneProxy.isVisible = isVisible;
+
+    primitiveSceneProxyHandle = GetOwner()->GetWorld()->GetScene().AddProxy(primitiveSceneProxy);
+}
+
+void UPrimitiveComponent::OnUnregister()
+{
+    GetOwner()->GetWorld()->GetScene().RemoveProxy(primitiveSceneProxyHandle);
+    primitiveSceneProxyHandle = {};
+
+    Super::OnUnregister();
 }
 
 }

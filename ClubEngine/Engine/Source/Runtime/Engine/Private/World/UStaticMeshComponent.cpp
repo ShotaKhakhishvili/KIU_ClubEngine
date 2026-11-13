@@ -8,11 +8,24 @@ namespace CE
 
 IMPLEMENT_CLASS(UStaticMeshComponent)
 
-UStaticMeshComponent::UStaticMeshComponent(AActor* owner, const FTransform& transform, const TObjectHandle<UStaticMesh> staticMesh)
-    : Super(owner, transform), staticMesh(staticMesh)
+void UStaticMeshComponent::SetStaticMesh(const TObjectHandle<UStaticMesh> newStaticMesh)
 {
-    GetOwner()->GetWorld()->GetScene().UpdateStaticMesh(GetPrimitiveSceneProxy(), staticMesh);
+    staticMesh = newStaticMesh;
+
+    if (IsRegistered())
+        GetOwner()->GetWorld()->GetScene().UpdateStaticMesh(GetPrimitiveSceneProxy(), staticMesh);
 }
 
+TObjectHandle<UStaticMesh> UStaticMeshComponent::GetStaticMesh() const
+{
+    return staticMesh;
+}
+
+void UStaticMeshComponent::OnRegister()
+{
+    Super::OnRegister();
+
+    GetOwner()->GetWorld()->GetScene().UpdateStaticMesh(GetPrimitiveSceneProxy(), staticMesh);
+}
 
 }

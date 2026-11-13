@@ -8,10 +8,6 @@ namespace CE
 
 IMPLEMENT_CLASS(UActorComponent)
 
-UActorComponent::UActorComponent(AActor* owner)
-    : owner(owner)
-{
-}
 void UActorComponent::Tick(const float dt)
 {
     (void)dt;
@@ -26,7 +22,38 @@ AActor* UActorComponent::GetOwner() const
 }
 bool UActorComponent::IsPendingDestroy() const
 {
-    return !owner->GetLevel()->IsAlive(GetHandle());
+    return owner == nullptr || !owner->GetLevel()->IsAlive(GetHandle());
+}
+
+void UActorComponent::RegisterComponent()
+{
+    if (registered || owner == nullptr || owner->GetWorld() == nullptr)
+        return;
+
+    registered = true;
+    OnRegister();
+}
+
+void UActorComponent::UnregisterComponent()
+{
+    if (!registered)
+        return;
+
+    OnUnregister();
+    registered = false;
+}
+
+bool UActorComponent::IsRegistered() const
+{
+    return registered;
+}
+
+void UActorComponent::OnRegister()
+{
+}
+
+void UActorComponent::OnUnregister()
+{
 }
 
 }

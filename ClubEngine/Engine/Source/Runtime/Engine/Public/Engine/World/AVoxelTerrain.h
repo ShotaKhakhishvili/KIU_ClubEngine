@@ -13,7 +13,7 @@ class AVoxelTerrain : public AActor
     GENERATED_BODY(AVoxelTerrain, AActor)
     
 public:
-    AVoxelTerrain(uint16 chunkSizeX, uint16 chunkSizeY, uint16 chunkSizeZ);
+    AVoxelTerrain();
 
 private:
     UVoxelGrid* voxelGrid;

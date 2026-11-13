@@ -7,12 +7,6 @@ namespace CE
 
 IMPLEMENT_CLASS(USceneComponent)
 
-USceneComponent::USceneComponent(AActor* owner, const FTransform& newTransform)
-    : Super(owner), worldTransform(newTransform), relativeTransform(newTransform)
-{
-
-}
-
 USceneComponent* USceneComponent::GetParentComponent() const
 {
     return parentComponent;

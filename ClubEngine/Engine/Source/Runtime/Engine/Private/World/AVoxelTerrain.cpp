@@ -7,11 +7,10 @@ namespace CE
 
 IMPLEMENT_CLASS(AVoxelTerrain)
 
-AVoxelTerrain::AVoxelTerrain(uint16 chunkSizeX, uint16 chunkSizeY, uint16 chunkSizeZ)
-    : AActor(FTransform())
+AVoxelTerrain::AVoxelTerrain()
 {
-    voxelGrid = CreateDefaultSubobject<UVoxelGrid>(chunkSizeX, chunkSizeY, chunkSizeZ);
-    voxelGrid->SetParentComponent(GetRootComponent());
+    voxelGrid = CreateDefaultSubobject<UVoxelGrid>("VoxelGrid");
+    rootComponent = voxelGrid;
 }
 
 }

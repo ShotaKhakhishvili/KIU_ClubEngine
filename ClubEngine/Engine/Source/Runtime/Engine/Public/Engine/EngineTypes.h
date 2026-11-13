@@ -52,4 +52,12 @@ enum class EVoxelChunkState
     Ready
 };
 
+enum class EActorState : uint8
+{
+    Constructed,
+    Spawned,
+    Playing,
+    EndedPlay
+};
+
 }

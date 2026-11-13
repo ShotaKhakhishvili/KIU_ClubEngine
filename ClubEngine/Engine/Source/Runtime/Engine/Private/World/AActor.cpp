@@ -6,18 +6,36 @@ namespace CE
 
 IMPLEMENT_CLASS(AActor)
 
-AActor::AActor(const FTransform& transform)
-{
-}
-
 USceneComponent* AActor::GetRootComponent() const
 {
     return rootComponent;
 }
 
+void AActor::FinishSpawning(const FTransform& transform)
+{
+    if (state != EActorState::Constructed || IsPendingDestroy())
+        return;
+
+    state = EActorState::Spawned;
+    rootComponent->SetWorldTransform(transform);
+
+    OnSpawned();
+}
 void AActor::Tick(const float dt)
 {
     (void)dt;
+}
+
+void AActor::RegisterAllComponents()
+{
+    for (UActorComponent* component : ownedComponents)
+        component->RegisterComponent();
+}
+
+void AActor::UnregisterAllComponents()
+{
+    for (UActorComponent* component : ownedComponents)
+        component->UnregisterComponent();
 }
 
 UWorld* AActor::GetWorld() const

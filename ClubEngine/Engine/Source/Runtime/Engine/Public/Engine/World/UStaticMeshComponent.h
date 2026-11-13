@@ -10,7 +10,13 @@ class UStaticMeshComponent : public UPrimitiveComponent
     GENERATED_BODY(UStaticMeshComponent, UPrimitiveComponent)
 
 public:
-    UStaticMeshComponent(AActor* owner, const FTransform& transform, TObjectHandle<UStaticMesh> staticMesh);
+    UStaticMeshComponent() = default;
+
+    void SetStaticMesh(TObjectHandle<UStaticMesh> newStaticMesh);
+    TObjectHandle<UStaticMesh> GetStaticMesh() const;
+
+protected:
+    void OnRegister() override;
 
 private:
     TObjectHandle<UStaticMesh> staticMesh;

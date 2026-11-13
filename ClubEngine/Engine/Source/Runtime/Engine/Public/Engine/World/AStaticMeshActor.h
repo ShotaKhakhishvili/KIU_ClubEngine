@@ -13,9 +13,12 @@ class AStaticMeshActor : public AActor
     GENERATED_BODY(AStaticMeshActor, AActor)
 
 public:
-    AStaticMeshActor(const FTransform& transform, TObjectHandle<UStaticMesh> staticMeshHandle);
+    AStaticMeshActor();
 
     UStaticMeshComponent* GetStaticMeshComponent() const;
+
+private:
+    UStaticMeshComponent* staticMeshComponent;
 };
 
 }
