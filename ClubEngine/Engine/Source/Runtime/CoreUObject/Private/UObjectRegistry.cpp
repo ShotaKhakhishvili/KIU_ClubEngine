@@ -22,6 +22,55 @@ void UObjectRegistry::Destroy(const UObjectHandle handle)
     pendingDestroy.push_back(handle.index);
 }
 
+UObjectHandle UObjectRegistry::Create(const UClass* objectClass)
+{
+    if (!objectClass)
+        return {};
+
+    std::unique_ptr<UObject> object = objectClass->Construct();
+
+    if (!object)
+    {
+        CE_LOG(Error, "Tried To Construct Abstract Class {}.", objectClass->GetName());
+        return {};
+    }
+
+    return Emplace(std::move(object));
+}
+
+UObjectHandle UObjectRegistry::Emplace(std::unique_ptr<UObject> object)
+{
+    uint32_t index;
+
+    if(!freeList.empty())
+    {
+        index = freeList.back();
+        freeList.pop_back();
+    }
+    else
+    {
+        index = static_cast<uint32_t>(slots.size());
+        slots.emplace_back();
+    }
+
+    Slot& slot = slots[index];
+    slot.object = std::move(object);
+    slot.alive = true;
+
+    slot.object->id = ++nextID;
+    slot.object->SetName(nullptr);
+
+    UObjectHandle handle{};
+
+    handle.index = index;
+    handle.generation = slot.generation;
+    handle.registryId = registryId;
+
+    slot.object->selfHandle = handle;
+
+    return handle;
+}
+
 UObjectRegistry::UObjectRegistry()
 {
     this->registryId = registryCounter++;

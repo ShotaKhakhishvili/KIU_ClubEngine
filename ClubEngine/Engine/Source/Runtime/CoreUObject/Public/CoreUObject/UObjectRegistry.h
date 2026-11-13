@@ -24,6 +24,8 @@ public:
     template<typename T, typename... Args>
     TObjectHandle<T> Create(Args&&... args);
 
+    UObjectHandle Create(const UClass* objectClass);
+
     template<typename T>
     T* Resolve(TObjectHandle<T> handle);
 
@@ -43,6 +45,8 @@ private:
         uint32 generation = 0;
         bool alive = false;
     };
+
+    UObjectHandle Emplace(std::unique_ptr<UObject> object);
 
     UObject* ResolveRaw(UObjectHandle handle);
     Slot* GetSlotFromHandle(UObjectHandle handle);

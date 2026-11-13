@@ -8,35 +8,7 @@ TObjectHandle<T> UObjectRegistry::Create(Args&&... args)
 {
     static_assert(std::is_base_of_v<UObject, T>, "T must derive from UObject");
 
-    uint32_t index;
-
-    if(!freeList.empty())
-    {
-        index = freeList.back();
-        freeList.pop_back();
-    }
-    else
-    {
-        index = static_cast<uint32_t>(slots.size());
-        slots.emplace_back();
-    }
-
-    Slot& slot = slots[index];
-    slot.object = std::make_unique<T>(std::forward<Args>(args)...);
-    slot.alive = true;
-
-    slot.object->id = ++nextID;
-    slot.object->SetName(nullptr);
-
-    UObjectHandle handle{};
-
-    handle.index = index;
-    handle.generation = slot.generation;
-    handle.registryId = registryId;
-
-    slot.object->selfHandle = handle;
-
-    return TObjectHandle<T>(handle);
+    return TObjectHandle<T>(Emplace(std::make_unique<T>(std::forward<Args>(args)...)));
 }
 
 template<typename T>
