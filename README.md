@@ -22,14 +22,14 @@ graph TD
     end
 
     subgraph WorldLayer["  World · Engine Module  "]
-        UWorld(["UWorld<br/>SpawnActor · Destroy · DestroyComponent · GetScene"])
+        UWorld(["UWorld<br/>SpawnActor by class · SpawnActorDeferred · Destroy · GetScene"])
         ULevel(["ULevel<br/>Actor & component registries · IsAlive"])
-        AActor(["AActor<br/>Tick · CreateDefaultSubobject"])
+        AActor(["AActor<br/>Tick · FinishSpawning · CreateDefaultSubobject"])
         AStaticMeshActor(["AStaticMeshActor<br/>Static mesh component as root"])
-        UActorComponent(["UActorComponent<br/>Tick · Owner"])
+        UActorComponent(["UActorComponent<br/>Tick · Owner · Register / Unregister"])
         USceneComponent(["USceneComponent<br/>World transform · Attachment"])
-        UPrimitiveComponent(["UPrimitiveComponent<br/>Visibility · Owns its scene proxy"])
-        UStaticMeshComponent(["UStaticMeshComponent<br/>Static mesh"])
+        UPrimitiveComponent(["UPrimitiveComponent<br/>Visibility · Scene proxy while registered"])
+        UStaticMeshComponent(["UStaticMeshComponent<br/>Set / Get static mesh"])
     end
 
     subgraph InputLayer["  Input · Engine Module  "]
@@ -49,7 +49,7 @@ graph TD
         FPrimitiveSceneProxy(["FPrimitiveSceneProxy<br/>Mesh · LocalToWorld · Visible"])
     end
 
-    CoreUObject(["CoreUObject<br/>UObject · Registry · TObjectHandle"])
+    CoreUObject(["CoreUObject<br/>UObject · UClass · TSubclassOf · Registry · TObjectHandle"])
     Platform(["Platform<br/>IWindow · GLFWWindow · Key conversion · Input events · Cursor mode"])
     Asset(["Asset<br/>StaticMesh · Material · Shader · Texture"])
     AssetImport(["AssetImport<br/>OBJ · image loader"])
@@ -188,7 +188,11 @@ Dashed arrows are inheritance or optional links. Gold arrows mark `TObjectHandle
 
 ### UObjects
 
-- Every engine object (`UWorld`, `ULevel`, actors, components, assets) derives from `UObject` and declares `GENERATED_BODY(Class, Super)`.
+- Every engine object (`UWorld`, `ULevel`, actors, components, assets) derives from `UObject`. Each class puts `GENERATED_BODY(Class, Super)` in its header and `IMPLEMENT_CLASS(Class)` once in its `.cpp`, right after `namespace CE {`. A missing `IMPLEMENT_CLASS` shows up as a linker error for `Class::StaticClass()`; putting it in a header gives a "multiple definition" error.
+- **Class objects:** every class has exactly one `UClass` that describes it at runtime: its name, its parent class, and a function that constructs it. `Class::StaticClass()` returns the `UClass` of a type, `object->GetClass()` returns the `UClass` of what an object actually is, and `object->IsA(SomeClass)` / `object->IsA<T>()` checks the class hierarchy. `UClass::IsChildOf` walks up the parent chain. Classes are identified by their `UClass` pointer, not by name.
+- A class whose `UClass` can construct it needs a public default constructor. Abstract classes and classes without one report `IsAbstract()` and can't be created from their `UClass`.
+- **`TSubclassOf<T>`** stores "which class" as a value: `TSubclassOf<APawn> pawnClass = AMyPawn::StaticClass();`. It holds a `UClass*`, and `Get()` (or `*`, `->`, or the implicit conversion to `UClass*`) only returns it if it is `T` or a child of `T`, otherwise `nullptr`. The check happens when you read it, not when you assign it.
+- `UObjectRegistry::Create(UClass*)` creates an object from its class. The templated `Create<T>(args...)` still takes constructor arguments; only assets use those now, and they'll move to default construction with the asset pipeline.
 - UObjects are owned by a `UObjectRegistry` and **cannot be copied or moved**.
 - **`TObjectHandle<T>` is not used everywhere.** It's a generational handle that resolves to `nullptr` once its object is gone, and it's used for resources (static meshes, materials, textures) and anything else that could be unloaded, once unloading is added.
 - Links whose lifetime is guaranteed by the structure are plain raw pointers: component → owner actor, actor → level, level → world, and attachment parent ↔ child. An actor's components are destroyed together with it, so these never dangle.
@@ -207,20 +211,30 @@ Dashed arrows are inheritance or optional links. Gold arrows mark `TObjectHandle
 ### World, Levels, Actors, Components
 
 - `WorldSystem` owns a single `UWorld` and ticks it every frame.
-- `UWorld` owns a persistent `ULevel` and the world's `FScene`. Spawn actors with `world.SpawnActor<T>(transform, args...)` and remove them with `world.Destroy(actor)`. A destroyed actor and its components are freed at the end of the world's tick.
+- `UWorld` owns a persistent `ULevel` and the world's `FScene`. Remove actors with `world.Destroy(actor)`; a destroyed actor and its components are freed at the end of the world's tick.
+- **Spawning:**
+  - `world.SpawnActor<T>(transform)` spawns a known type.
+  - `world.SpawnActor(actorClass, transform)` spawns from a `UClass*` or a `TSubclassOf<T>` (the `TSubclassOf` version returns `T*`).
+  - All of them take an optional `FActorSpawnParameters` (`name`, `deferConstruction`).
+  - `world.SpawnActorDeferred<T>(transform)` returns the actor before it starts. Set per-instance values on it, then call `actor->FinishSpawning(transform)`, which runs `OnSpawned()`. Plain `SpawnActor` does both steps at once.
+  - A spawn goes: construct → default root if needed → place the root at the transform → register all components → `FinishSpawning`.
+- **Actors and components are default-constructible.** Spawning never passes arguments to a constructor. The constructor sets the defaults every instance shares and creates components with `CreateDefaultSubobject<T>("Name")`; values for one specific instance (like the mesh of an `AStaticMeshActor`) are set after spawning, or between `SpawnActorDeferred` and `FinishSpawning`.
+- **Constructors only set defaults.** Nothing that touches the world (scene proxies, shaders, other actors) belongs in a constructor. Components do that in `OnRegister()` / `OnUnregister()`; actors do it in `OnSpawned()`. A component's owner is set right after its constructor, so `GetOwner()` is `nullptr` inside it.
 - Remove a single component with `world.DestroyComponent(component)`. Destroying an actor's root component destroys the whole actor, so a live actor always has a root.
 - When something is destroyed, it's marked dead in its registry first and its `OnDestroyed()` runs after that. A second `Destroy` call from inside `OnDestroyed()` is ignored, and handles to the object already resolve to `nullptr` there, so use raw `this`/owner pointers in teardown code.
 - A destroyed scene component detaches from its parent and its children. Children are not destroyed with it: ownership belongs to the actor, attachment only places components in space.
 - `ULevel` holds two registries, one for actors and one for components. Each level knows its world (`GetWorld()`).
-- `AActor` creates its components in its constructor through `CreateDefaultSubobject<T>()`, and can make one of them the root by assigning it to `rootComponent`. If an actor doesn't set a root component, it gets a default `USceneComponent` when spawned. Override `Tick(dt)` and `OnSpawned()` for behaviour.
+- `AActor` creates its components in its constructor through `CreateDefaultSubobject<T>("Name")`, and can make one of them the root by assigning it to `rootComponent`. If an actor doesn't set a root component, it gets a default `USceneComponent` (`DefaultSceneRoot`) when spawned. Override `Tick(dt)` and `OnSpawned()` for behaviour.
+- Spawning only places the root. Every other scene component has to be attached in the constructor with `SetParentComponent(rootComponent)` (and offset with `SetRelativeTransform`), or it stays at the world origin.
+- **Component registration:** `RegisterComponent()` / `UnregisterComponent()` connect a component to the world and call `OnRegister()` / `OnUnregister()`. Spawning registers all of an actor's components, and destroying an actor or component unregisters them. Registration can be undone and redone; `IsRegistered()` tells the current state.
 - Component hierarchy: `UActorComponent` → `USceneComponent` (transform, attachment) → `UPrimitiveComponent` (visibility, scene proxy) → `UStaticMeshComponent`.
-- `AStaticMeshActor` is a ready-made actor whose root is a `UStaticMeshComponent` (`GetStaticMeshComponent()`).
+- `AStaticMeshActor` is a ready-made actor whose root is a `UStaticMeshComponent` (`GetStaticMeshComponent()`). It has no mesh by default; set one with `GetStaticMeshComponent()->SetStaticMesh(mesh)`.
 
 ### Rendering
 
 - The renderer never touches UObjects or actors directly. It draws an **`FScene`**, which is a `TPool` of **`FPrimitiveSceneProxy`** entries. Each proxy is plain render data: a `TObjectHandle<UStaticMesh>`, a `localToWorld` matrix, and a visibility flag. The renderer resolves the mesh handle when it draws, so a mesh that gets unloaded is simply skipped.
 - `FScene` API: `AddProxy`, `RemoveProxy`, `UpdateTransform`, `UpdateStaticMesh`, `SetVisible`, and `ForEachPrimitive`. Each `UWorld` owns its scene, and you can get it with `GetScene()`.
-- A `UPrimitiveComponent` owns its proxy for its whole life: it adds the proxy when it's created, pushes changes from `SetWorldTransform` and `SetVisible` to it, and removes it in `OnDestroyed`. Hidden proxies are skipped by the renderer.
+- A `UPrimitiveComponent` owns its proxy while it's registered: it adds the proxy in `OnRegister`, pushes changes from transform updates and `SetVisible` to it, and removes it in `OnUnregister`. Changes made before registration are stored and picked up when the proxy is created. Hidden proxies are skipped by the renderer.
 - Every frame, `RenderSystem` calls `Renderer::BeginFrame`, `Render(world.GetScene())`, and `EndFrame`, then swaps the window buffers.
 - If a sub-mesh has a missing or invalid material, or its shader failed to compile, the renderer skips it instead of crashing.
 - The rendering backend sits behind the `IRHI` interface (`RenderCore`). OpenGL (`RHI.OpenGL`) is the only backend right now.
@@ -261,9 +275,10 @@ Input follows an action-based model: gameplay code binds to **actions**, never t
 
 ### Current Limitations
 
-- `USceneComponent` stores a single transform: there are no relative transforms yet, so attached children don't follow their parent.
 - Nothing owns an `FPlayerInput` yet; it moves to the player controller once that exists.
 - There's no camera, pawn/controller, or game mode framework yet. The view is a hardcoded `LookAt`.
+- `OnSpawned()` always runs at the end of spawning. There's no `BeginPlay`/`EndPlay` or "world has begun play" state yet; that comes with the game mode.
+- Every class needs its `IMPLEMENT_CLASS` line written by hand; there's no header tool that generates it.
 - `AVoxelTerrain` / `UVoxelGrid` are work in progress.
 - Asset paths and serialization aren't implemented yet; assets are loaded from paths in code.
 
