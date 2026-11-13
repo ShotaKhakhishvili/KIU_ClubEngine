@@ -6,6 +6,8 @@
 namespace CE
 {
 
+IMPLEMENT_CLASS(UPrimitiveComponent)
+
 UPrimitiveComponent::UPrimitiveComponent(AActor* owner, const FTransform& transform)
     : Super(owner, transform)
 {

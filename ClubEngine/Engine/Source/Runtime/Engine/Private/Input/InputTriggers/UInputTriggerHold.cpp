@@ -3,6 +3,8 @@
 namespace CE
 {
 
+IMPLEMENT_CLASS(UInputTriggerHold)
+
 UInputTriggerHold::UInputTriggerHold(const float holdTime, const bool oneShot)
     : holdTime(holdTime), oneShot(oneShot)
 {

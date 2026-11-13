@@ -3,6 +3,8 @@
 namespace CE
 {
 
+IMPLEMENT_CLASS(UInputModifierNegate)
+
 FInputActionValue UInputModifierNegate::ModifyRaw(const FInputActionValue value, const float dt)
 {
     (void)dt;

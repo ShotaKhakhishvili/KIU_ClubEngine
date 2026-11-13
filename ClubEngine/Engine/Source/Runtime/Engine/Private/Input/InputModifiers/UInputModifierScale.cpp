@@ -3,6 +3,8 @@
 namespace CE
 {
 
+IMPLEMENT_CLASS(UInputModifierScale)
+
 UInputModifierScale::UInputModifierScale(const float uniformScale)
     : scale(uniformScale, uniformScale, uniformScale)
 {

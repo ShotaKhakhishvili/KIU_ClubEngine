@@ -11,6 +11,8 @@
 namespace CE
 {
 
+IMPLEMENT_CLASS(UStaticMesh);
+
 const std::vector<FSubMesh>& UStaticMesh::GetSubMeshes() const { return subMeshes; }
 const std::vector<TObjectHandle<UMaterial>>& UStaticMesh::GetMaterials() const { return materials; }
 

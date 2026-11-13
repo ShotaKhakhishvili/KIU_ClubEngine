@@ -4,6 +4,11 @@
 namespace CE
 {
 
+UClass::UClass(const char* name, UClass* superClass, const FClassConstructor constructor)
+    : name(name), superClass(superClass), constructor(constructor)
+{
+}
+
 const char* UClass::GetName() const noexcept
 {
     return name;

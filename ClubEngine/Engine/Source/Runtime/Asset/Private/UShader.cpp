@@ -12,6 +12,8 @@
 namespace CE
 {
 
+IMPLEMENT_CLASS(UShader)
+
 UShader::UShader(RHI::ShaderDesc  shaderDesc)
 	: shaderDesc(std::move(shaderDesc))
 {

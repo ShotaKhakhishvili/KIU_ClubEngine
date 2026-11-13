@@ -3,6 +3,8 @@
 namespace CE
 {
 
+IMPLEMENT_CLASS(UInputComponent)
+
 FDelegateHandle UInputComponent::BindAction(UInputAction* action, ETriggerEvent triggerEvent,
     const std::function<void(const FInputActionValue&)>& callback)
 {

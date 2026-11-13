@@ -3,6 +3,6 @@
 namespace CE
 {
 
-
+IMPLEMENT_CLASS(UInputModifier)
 
 }

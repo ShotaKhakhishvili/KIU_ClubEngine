@@ -6,6 +6,8 @@
 namespace CE
 {
 
+IMPLEMENT_CLASS(UMaterial)
+
 UMaterial::UMaterial(TObjectHandle<UShader> inShader)
     : shader(inShader)
 {

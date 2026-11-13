@@ -4,6 +4,8 @@
 namespace CE
 {
 
+IMPLEMENT_CLASS(AActor)
+
 AActor::AActor(const FTransform& transform)
 {
 }

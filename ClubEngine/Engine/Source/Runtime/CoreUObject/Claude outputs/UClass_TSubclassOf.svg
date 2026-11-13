@@ -1,0 +1,127 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 1480 1010" preserveAspectRatio="xMidYMid meet" style="background-color:#1f1f1e">
+<defs>
+  <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9" fill="none" stroke="context-stroke" stroke-width="1.6"/></marker>
+  <style>
+    .h{font:600 17px sans-serif;fill:#e8e6df}
+    .t{font:600 15px sans-serif;fill:#e8e6df}
+    .s{font:13px sans-serif;fill:#b9b7ae}
+    .c{font:13.5px monospace;fill:#f0c674}
+    .cw{font:13px monospace;fill:#d6d4cc}
+    .g{font:13px sans-serif;fill:#8fd19e}
+    .r{font:13px sans-serif;fill:#f09595}
+    .code{fill:#2a2a28;stroke:#6b6a64}
+    .cls{fill:#2b2840;stroke:#8f88e0}
+    .obj{fill:#1f3530;stroke:#4fb894}
+  </style>
+</defs>
+
+<text class="h" x="40" y="38">Your code</text>
+<text class="h" x="560" y="38">UClass objects: one per C++ class, live forever</text>
+<text class="h" x="1040" y="38">Objects at runtime</text>
+
+<!-- ============ Your code column ============ -->
+<rect class="code" x="40" y="60" width="400" height="120" rx="6"/>
+<text class="t" x="56" y="84">1. Defining the class</text>
+<text class="c" x="56" y="108">IMPLEMENT_CLASS(AMyPawn)  // AMyPawn.cpp</text>
+<text class="s" x="56" y="132">Generates AMyPawn::StaticClass(), which holds</text>
+<text class="s" x="56" y="150">one static UClass. Created the first time it's</text>
+<text class="s" x="56" y="168">called, never destroyed.</text>
+
+<rect class="code" x="40" y="240" width="400" height="120" rx="6"/>
+<text class="t" x="56" y="264">2. Storing "which class"</text>
+<text class="c" x="56" y="288">TSubclassOf&lt;APawn&gt; defaultPawnClass</text>
+<text class="c" x="56" y="306">    = AMyPawn::StaticClass();</text>
+<text class="s" x="56" y="330">Just stores a pointer to AMyPawn's UClass.</text>
+<text class="s" x="56" y="348">No object exists yet. It's data, like an int.</text>
+
+<rect class="code" x="40" y="420" width="400" height="140" rx="6"/>
+<text class="t" x="56" y="444">3. Reading it safely</text>
+<text class="c" x="56" y="468">UClass* cls = defaultPawnClass.Get();</text>
+<text class="s" x="56" y="492">Get() asks: is the stored class a child of</text>
+<text class="s" x="56" y="510">APawn? It walks the super chain upward.</text>
+<text class="g" x="56" y="534">AMyPawn → APawn → found, returns the UClass</text>
+<text class="r" x="56" y="552">not found → returns nullptr</text>
+
+<rect class="code" x="40" y="620" width="400" height="140" rx="6"/>
+<text class="t" x="56" y="644">4. Spawning from it</text>
+<text class="c" x="56" y="668">world.SpawnActor(defaultPawnClass, t);</text>
+<text class="s" x="56" y="692">The world only has a UClass*. It calls the</text>
+<text class="s" x="56" y="710">UClass's construct function, which is</text>
+<text class="s" x="56" y="728">make_unique&lt;AMyPawn&gt;() compiled in by</text>
+<text class="s" x="56" y="746">IMPLEMENT_CLASS. That's why no args are allowed.</text>
+
+<!-- arrows code -> AMyPawn UClass -->
+<path d="M440 120 L558 652" stroke="#9c9a92" stroke-width="1.3" fill="none" stroke-dasharray="6 4" marker-end="url(#a)"/>
+<path d="M440 300 L558 676" stroke="#f0c674" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+<path d="M440 490 L558 700" stroke="#8fd19e" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+<path d="M440 690 L558 724" stroke="#9c9a92" stroke-width="1.3" fill="none" marker-end="url(#a)"/>
+
+<!-- ============ UClass column ============ -->
+<rect class="cls" x="560" y="60" width="340" height="130" rx="6"/>
+<text class="t" x="576" y="86">UClass  "UObject"</text>
+<text class="cw" x="576" y="114">name:      "UObject"</text>
+<text class="cw" x="576" y="136">super:     nullptr  (top of chain)</text>
+<text class="cw" x="576" y="158">construct: nullptr  (can't spawn)</text>
+
+<rect class="cls" x="560" y="250" width="340" height="130" rx="6"/>
+<text class="t" x="576" y="276">UClass  "AActor"</text>
+<text class="cw" x="576" y="304">name:      "AActor"</text>
+<text class="cw" x="576" y="326">super:     → UObject's UClass</text>
+<text class="cw" x="576" y="348">construct: make_unique&lt;AActor&gt;</text>
+
+<rect class="cls" x="560" y="440" width="340" height="130" rx="6"/>
+<text class="t" x="576" y="466">UClass  "APawn"</text>
+<text class="cw" x="576" y="494">name:      "APawn"</text>
+<text class="cw" x="576" y="516">super:     → AActor's UClass</text>
+<text class="cw" x="576" y="538">construct: make_unique&lt;APawn&gt;</text>
+
+<rect class="cls" x="560" y="630" width="340" height="130" rx="6" stroke-width="2"/>
+<text class="t" x="576" y="656">UClass  "AMyPawn"</text>
+<text class="cw" x="576" y="684">name:      "AMyPawn"</text>
+<text class="cw" x="576" y="706">super:     → APawn's UClass</text>
+<text class="cw" x="576" y="728">construct: make_unique&lt;AMyPawn&gt;</text>
+
+<!-- super arrows -->
+<path d="M610 250 L610 192" stroke="#8f88e0" stroke-width="1.4" fill="none" marker-end="url(#a)"/>
+<text class="s" x="622" y="226">super</text>
+<path d="M610 440 L610 382" stroke="#8f88e0" stroke-width="1.4" fill="none" marker-end="url(#a)"/>
+<text class="s" x="622" y="416">super</text>
+<path d="M610 630 L610 572" stroke="#8fd19e" stroke-width="2.2" fill="none" marker-end="url(#a)"/>
+<text class="g" x="622" y="606">super: Get() walks up here, finds APawn</text>
+
+<!-- ============ runtime objects column ============ -->
+<rect class="obj" x="1040" y="260" width="400" height="90" rx="6"/>
+<text class="t" x="1056" y="286">an AActor object</text>
+<text class="s" x="1056" y="310">lives in a level registry slot</text>
+<text class="cw" x="1056" y="334">GetClass() → AActor's UClass</text>
+<path d="M1040 305 L902 315" stroke="#4fb894" stroke-width="1.4" fill="none" marker-end="url(#a)"/>
+
+<rect class="obj" x="1040" y="600" width="400" height="80" rx="6"/>
+<text class="t" x="1056" y="626">AMyPawn object #1</text>
+<text class="cw" x="1056" y="652">GetClass() → AMyPawn's UClass</text>
+<path d="M1040 640 L902 668" stroke="#4fb894" stroke-width="1.4" fill="none" marker-end="url(#a)"/>
+
+<rect class="obj" x="1040" y="730" width="400" height="80" rx="6"/>
+<text class="t" x="1056" y="756">AMyPawn object #2</text>
+<text class="cw" x="1056" y="782">GetClass() → AMyPawn's UClass</text>
+<path d="M1040 760 L902 712" stroke="#4fb894" stroke-width="1.4" fill="none" marker-end="url(#a)"/>
+<path d="M902 748 L1038 790" stroke="#9c9a92" stroke-width="1.3" fill="none" stroke-dasharray="6 4" marker-end="url(#a)"/>
+<text class="s" x="920" y="800">construct (step 4)</text>
+
+<text class="s" x="1056" y="840">Every AMyPawn shares the same single UClass.</text>
+<text class="s" x="1056" y="858">That's why comparing UClass pointers works.</text>
+
+<!-- ============ failing example ============ -->
+<rect x="40" y="880" width="1400" height="100" rx="6" fill="#3a2424" stroke="#c96a6a"/>
+<text class="t" x="56" y="906">When it says no</text>
+<text class="c" x="56" y="932">TSubclassOf&lt;APawn&gt; wrong = AActor::StaticClass();   wrong.Get();</text>
+<text class="s" x="56" y="958">Get() walks AActor → UObject → nullptr and never meets APawn, so it returns nullptr. SpawnActor then gets nothing, logs an error and returns nullptr.</text>
+<text class="s" x="56" y="976">The pointer is stored either way. The check happens when you read it, same as UE5.</text>
+
+<!-- legend -->
+<rect x="1040" y="80" width="14" height="14" fill="#2a2a28" stroke="#6b6a64"/><text class="s" x="1062" y="92">your code</text>
+<rect x="1040" y="104" width="14" height="14" fill="#2b2840" stroke="#8f88e0"/><text class="s" x="1062" y="116">UClass (class descriptor)</text>
+<rect x="1040" y="128" width="14" height="14" fill="#1f3530" stroke="#4fb894"/><text class="s" x="1062" y="140">actual object (an instance)</text>
+<line x1="1040" y1="160" x2="1068" y2="160" stroke="#9c9a92" stroke-dasharray="6 4"/><text class="s" x="1076" y="164">creates</text>
+<line x1="1040" y1="182" x2="1068" y2="182" stroke="#9c9a92"/><text class="s" x="1076" y="186">points to / uses</text>
+</svg>

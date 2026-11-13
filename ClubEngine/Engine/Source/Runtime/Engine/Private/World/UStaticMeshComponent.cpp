@@ -6,6 +6,8 @@
 namespace CE
 {
 
+IMPLEMENT_CLASS(UStaticMeshComponent)
+
 UStaticMeshComponent::UStaticMeshComponent(AActor* owner, const FTransform& transform, const TObjectHandle<UStaticMesh> staticMesh)
     : Super(owner, transform), staticMesh(staticMesh)
 {

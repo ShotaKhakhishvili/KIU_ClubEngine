@@ -3,6 +3,8 @@
 namespace CE
 {
 
+IMPLEMENT_CLASS(UInputModifierSwizzle)
+
 UInputModifierSwizzle::UInputModifierSwizzle(const EInputAxisSwizzle order)
     : order(order)
 {

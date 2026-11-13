@@ -3,6 +3,8 @@
 namespace CE
 {
 
+IMPLEMENT_CLASS(UInputMapContext)
+
 FActionKeyMapping* UInputMapContext::AddMapping(UInputAction* action, const EKey key)
 {
     if (!action)

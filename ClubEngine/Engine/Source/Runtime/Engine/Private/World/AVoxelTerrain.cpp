@@ -5,6 +5,8 @@
 namespace CE
 {
 
+IMPLEMENT_CLASS(AVoxelTerrain)
+
 AVoxelTerrain::AVoxelTerrain(uint16 chunkSizeX, uint16 chunkSizeY, uint16 chunkSizeZ)
     : AActor(FTransform())
 {

@@ -5,9 +5,6 @@ namespace CE
 
 std::unordered_map<std::string, uint32> UObject::unnamedClassInstanceCounts;
 
-const char* UObject::StaticClassName() noexcept { return "UObject"; }
-const char* UObject::GetClassName() const noexcept { return "UObject"; }
-
 UObjectHandle UObject::GetHandle() const noexcept
 {
     return selfHandle;
@@ -15,18 +12,35 @@ UObjectHandle UObject::GetHandle() const noexcept
 
 void UObject::SetName(const char* inName)
 {
+    const std::string className = GetClass()->GetName();
+
     if (inName == nullptr)
     {
-        const uint32 count = unnamedClassInstanceCounts[GetClassName()]++;
-        objectName = GetClassName() + std::to_string(count);
+        const uint32 count = unnamedClassInstanceCounts[className]++;
+        objectName = className + std::to_string(count);
     }
     else
     {
-        objectName = GetClassName() + std::string(":") + std::string(inName);
+        objectName = className + std::string(":") + std::string(inName);
     }
 }
 
 uint64_t UObject::GetID() const noexcept { return id; }
 const std::string& UObject::GetName() const noexcept { return objectName; }
+
+UClass* UObject::StaticClass() noexcept
+{
+    static UClass classObject = UClass("UObject", nullptr, nullptr);
+    return &classObject;
+}
+
+UClass* UObject::GetClass() const
+{
+    return StaticClass();
+}
+bool UObject::IsA(const UClass* Class) const noexcept
+{
+    return GetClass()->IsChildOf(Class);
+}
 
 }

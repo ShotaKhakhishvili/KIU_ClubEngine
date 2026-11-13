@@ -23,8 +23,13 @@ public:
     uint64 GetID() const noexcept;
     const std::string& GetName() const noexcept;
 
-    static const char* StaticClassName() noexcept;
-    virtual const char* GetClassName() const noexcept;
+    static UClass* StaticClass() noexcept;
+    virtual UClass* GetClass() const;
+
+    bool IsA(const UClass* Class) const noexcept;
+
+    template <typename T>
+    bool IsA() const noexcept;
 
     UObjectHandle GetHandle() const noexcept;
 
@@ -46,3 +51,5 @@ private:
 };
 
 }
+
+#include "UObject.inl"

@@ -5,6 +5,8 @@
 namespace CE
 {
 
+IMPLEMENT_CLASS(UWorld)
+
 void UWorld::TickWorld(const float dt)
 {
     persistentLevel->TickLevel(dt);

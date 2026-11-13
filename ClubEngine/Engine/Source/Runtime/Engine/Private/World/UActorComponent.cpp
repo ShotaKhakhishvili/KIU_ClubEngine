@@ -6,6 +6,8 @@
 namespace CE
 {
 
+IMPLEMENT_CLASS(UActorComponent)
+
 UActorComponent::UActorComponent(AActor* owner)
     : owner(owner)
 {

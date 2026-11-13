@@ -6,6 +6,8 @@
 namespace CE
 {
 
+IMPLEMENT_CLASS(AStaticMeshActor)
+
 AStaticMeshActor::AStaticMeshActor(const FTransform& transform, TObjectHandle<UStaticMesh> staticMeshHandle)
     : Super(transform)
 {

@@ -15,6 +15,8 @@
 namespace CE
 {
 
+IMPLEMENT_CLASS(UTexture)
+
 UTexture::UTexture(std::filesystem::path inSourcePath,
 				   const RHI::TextureDesc& inDesc)
 	: sourcePath(std::move(inSourcePath))

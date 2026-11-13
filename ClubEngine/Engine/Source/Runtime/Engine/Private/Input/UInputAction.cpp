@@ -3,6 +3,8 @@
 namespace CE
 {
 
+IMPLEMENT_CLASS(UInputAction)
+
 UInputAction::UInputAction(const EInputActionValueType valueType)
     : valueType(valueType)
 {

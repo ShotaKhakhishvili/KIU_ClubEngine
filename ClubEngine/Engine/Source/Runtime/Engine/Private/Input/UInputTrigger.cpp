@@ -3,6 +3,8 @@
 namespace CE
 {
 
+IMPLEMENT_CLASS(UInputTrigger)
+
 ETriggerState UInputTrigger::Update(const FInputActionValue& value, const float dt)
 {
     const ETriggerState newState = UpdateState(value, dt);

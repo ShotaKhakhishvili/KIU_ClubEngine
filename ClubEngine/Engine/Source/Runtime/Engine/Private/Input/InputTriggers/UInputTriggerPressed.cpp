@@ -3,6 +3,8 @@
 namespace CE
 {
 
+IMPLEMENT_CLASS(UInputTriggerPressed)
+
 ETriggerState UInputTriggerPressed::UpdateState(const FInputActionValue& value, const float dt)
 {
     (void)dt;

@@ -4,6 +4,8 @@
 namespace CE
 {
 
+IMPLEMENT_CLASS(ULevel)
+
 ULevel::ULevel(UWorld* inWorld)
 {
     world = inWorld;
