@@ -18,11 +18,11 @@ graph TD
         InputSystem(["InputSystem<br/>Window events → FInputState"])
         FpsSystem(["FpsSystem<br/>Frame delta"])
         AssetContext(["AssetContext<br/>Asset ownership"])
-        RenderSystem(["RenderSystem<br/>Renders the world's scene"])
+        RenderSystem(["RenderSystem<br/>Builds view families · owns scene render target · presents"])
     end
 
     subgraph WorldLayer["  World · Engine Module  "]
-        UWorld(["UWorld<br/>SpawnActor by class · SpawnActorDeferred · Destroy · GetScene"])
+        UWorld(["UWorld<br/>SpawnActor by class · SpawnActorDeferred · Destroy · GetScene · View targets"])
         ULevel(["ULevel<br/>Actor & component registries · IsAlive"])
         AActor(["AActor<br/>Tick · FinishSpawning · CreateDefaultSubobject"])
         AStaticMeshActor(["AStaticMeshActor<br/>Static mesh component as root"])
@@ -30,6 +30,8 @@ graph TD
         USceneComponent(["USceneComponent<br/>World transform · Attachment"])
         UPrimitiveComponent(["UPrimitiveComponent<br/>Visibility · Scene proxy while registered"])
         UStaticMeshComponent(["UStaticMeshComponent<br/>Set / Get static mesh"])
+        ACameraActor(["ACameraActor<br/>Camera component as root"])
+        UCameraComponent(["UCameraComponent<br/>FOV · near / far · GetCameraView"])
     end
 
     subgraph InputLayer["  Input · Engine Module  "]
@@ -44,7 +46,10 @@ graph TD
     end
 
     subgraph RendererModule["  Renderer Module  "]
-        Renderer(["Renderer<br/>BeginFrame · Render · EndFrame"])
+        Renderer(["Renderer<br/>Render view family · Present"])
+        FSceneViewFamily(["FSceneViewFamily<br/>One scene · one render target · its views"])
+        FSceneView(["FSceneView<br/>View / projection · origin · pixel rect"])
+        FRenderTarget(["FRenderTarget<br/>Color + depth textures · RHI target · Resize"])
         FScene(["FScene<br/>Pool of primitive proxies"])
         FPrimitiveSceneProxy(["FPrimitiveSceneProxy<br/>Mesh · LocalToWorld · Visible"])
     end
@@ -53,8 +58,8 @@ graph TD
     Platform(["Platform<br/>IWindow · GLFWWindow · Key conversion · Input events · Cursor mode"])
     Asset(["Asset<br/>StaticMesh · Material · Shader · Texture"])
     AssetImport(["AssetImport<br/>OBJ · image loader"])
-    RenderCore(["RenderCore<br/>IRHI interface · Handles"])
-    RHI_OpenGL(["RHI.OpenGL<br/>GLRHI · GL objects"])
+    RenderCore(["RenderCore<br/>IRHI interface · Handles · Render targets & passes"])
+    RHI_OpenGL(["RHI.OpenGL<br/>GLRHI · GL objects · Framebuffers · Blit"])
 
     subgraph CoreFoundation["  Core Foundation  "]
         Core(["Math · Containers · Config · Delegates · Log · FileIO · Types"])
@@ -92,7 +97,7 @@ graph TD
     UPrimitiveComponent -.->|adds · syncs · removes| FPrimitiveSceneProxy
 
     FScene -->|TPool| FPrimitiveSceneProxy
-    Renderer -->|draws| FScene
+    Renderer -->|draws| FSceneViewFamily
     FPrimitiveSceneProxy ==>|TObjectHandle| Asset
 
     ULevel --> CoreUObject
@@ -124,9 +129,19 @@ graph TD
     AStaticMeshActor -->|root| UStaticMeshComponent
     UStaticMeshComponent ==>|TObjectHandle| Asset
 
+    UCameraComponent -.->|extends| USceneComponent
+    ACameraActor -.->|extends| AActor
+    ACameraActor -->|root| UCameraComponent
+    UWorld ==>|view targets| UCameraComponent
+    RenderSystem -->|builds per frame| FSceneViewFamily
+    RenderSystem -->|owns| FRenderTarget
+    FSceneViewFamily -->|views| FSceneView
+    FSceneViewFamily -->|scene| FScene
+    FSceneViewFamily -->|into| FRenderTarget
+
     linkStyle default stroke:#909090,stroke-width:1.8px
-    linkStyle 4,7,18,19,20,21,32,47 stroke:#505050,stroke-width:1.2px,stroke-dasharray:5 3
-    linkStyle 24,49 stroke:#c8a050,stroke-width:2.4px
+    linkStyle 4,7,18,19,20,21,32,47,50,51 stroke:#505050,stroke-width:1.2px,stroke-dasharray:5 3
+    linkStyle 24,49,53 stroke:#c8a050,stroke-width:2.4px
 
     style EngineModule   fill:#1c1b2e,stroke:#4a4880,stroke-width:1.5px,stroke-dasharray:5 3,color:#9890b8
     style WorldLayer     fill:#1f1c12,stroke:#6a5a28,stroke-width:1.5px,stroke-dasharray:5 3,color:#b8a878
@@ -143,9 +158,9 @@ graph TD
     classDef foundation    fill:#202020,stroke:#444444,stroke-width:1px,color:#a8a8a8
 
     class Launch,Application,FpsSystem,WorldSystem orchestration
-    class RenderSystem,WindowSystem,InputSystem,Renderer,FScene,FPrimitiveSceneProxy,Platform,RenderCore,RHI_OpenGL runtime
+    class RenderSystem,WindowSystem,InputSystem,Renderer,FScene,FPrimitiveSceneProxy,FSceneViewFamily,FSceneView,FRenderTarget,Platform,RenderCore,RHI_OpenGL runtime
     class AssetContext,AssetLibrary,CoreUObject,Asset,AssetImport asset
-    class UWorld,ULevel,AActor,AStaticMeshActor,UActorComponent,USceneComponent,UPrimitiveComponent,UStaticMeshComponent world
+    class UWorld,ULevel,AActor,AStaticMeshActor,ACameraActor,UActorComponent,USceneComponent,UPrimitiveComponent,UStaticMeshComponent,UCameraComponent world
     class UInputComponent,UInputMapContext,FActionKeyMapping,UInputAction,UInputTrigger,UInputModifier,FInputState,FPlayerInput input
     class Core,GLFW,glad foundation
 ```
@@ -194,8 +209,8 @@ Dashed arrows are inheritance or optional links. Gold arrows mark `TObjectHandle
 - **`TSubclassOf<T>`** stores "which class" as a value: `TSubclassOf<APawn> pawnClass = AMyPawn::StaticClass();`. It holds a `UClass*`, and `Get()` (or `*`, `->`, or the implicit conversion to `UClass*`) only returns it if it is `T` or a child of `T`, otherwise `nullptr`. The check happens when you read it, not when you assign it.
 - `UObjectRegistry::Create(UClass*)` creates an object from its class. The templated `Create<T>(args...)` still takes constructor arguments; only assets use those now, and they'll move to default construction with the asset pipeline.
 - UObjects are owned by a `UObjectRegistry` and **cannot be copied or moved**.
-- **`TObjectHandle<T>` is not used everywhere.** It's a generational handle that resolves to `nullptr` once its object is gone, and it's used for resources (static meshes, materials, textures) and anything else that could be unloaded, once unloading is added.
-- Links whose lifetime is guaranteed by the structure are plain raw pointers: component → owner actor, actor → level, level → world, and attachment parent ↔ child. An actor's components are destroyed together with it, so these never dangle.
+- **`TObjectHandle<T>` is for any reference that can outlive its target.** It's a generational handle that resolves to `nullptr` once its object is gone. Use it for resources (static meshes, materials, textures), which can be unloaded, and for references to objects owned somewhere else that can be destroyed first, like the camera a view target points at.
+- **Raw pointers are only for links that can't dangle:** either the target is guaranteed to outlive the pointer (component → owner actor, actor → level, level → world, an actor's pointers to its own components, and per-frame render data like a view family's scene and render target), or both sides clean the link up explicitly (attachment parent ↔ child).
 - A handle converts to a handle of any base class (`TObjectHandle<AActor>` → `TObjectHandle<UObject>`).
 - Destroying an object never frees it right away. `Destroy` marks it dead, so its handles resolve to `nullptr` immediately, but the memory stays valid until the registry's `FlushPendingDestroy()`. That makes it safe to destroy objects from anywhere: inside a `ForEach`, a delegate callback, or the object's own code.
 - `UObjectRegistry::IsAlive(handle)` (and `ULevel::IsAlive`, which checks both of a level's registries) tells whether an object is still alive. Actors and components expose this as `IsPendingDestroy()`. The registry is the only source of truth; objects don't keep their own "destroyed" flag.
@@ -229,15 +244,24 @@ Dashed arrows are inheritance or optional links. Gold arrows mark `TObjectHandle
 - **Component registration:** `RegisterComponent()` / `UnregisterComponent()` connect a component to the world and call `OnRegister()` / `OnUnregister()`. Spawning registers all of an actor's components, and destroying an actor or component unregisters them. Registration can be undone and redone; `IsRegistered()` tells the current state.
 - Component hierarchy: `UActorComponent` → `USceneComponent` (transform, attachment) → `UPrimitiveComponent` (visibility, scene proxy) → `UStaticMeshComponent`.
 - `AStaticMeshActor` is a ready-made actor whose root is a `UStaticMeshComponent` (`GetStaticMeshComponent()`). It has no mesh by default; set one with `GetStaticMeshComponent()->SetStaticMesh(mesh)`.
+- An actor class keeps a typed pointer and a getter for each component it creates that other code needs (`GetStaticMeshComponent()`, `GetCameraComponent()`). The root pointer is only for the transform hierarchy, so those getters keep working if the root changes.
+- **Cameras:** `UCameraComponent` is a scene component with a field of view (degrees), a near and a far plane. `GetCameraView()` returns an `FMinimalViewInfo` (position, rotation, FOV, near, far) built from its world transform. `ACameraActor` is a ready-made actor whose root is a camera component (`GetCameraComponent()`).
+- **View targets:** a camera only renders while it's a view target. `world.AddViewTarget(camera, x, y, width, height)` adds it with a rectangle in normalized screen coordinates (0..1, top-left origin; the default is the whole screen), and `RemoveViewTarget(camera)` removes it. Several view targets give split screen. Targets whose camera was destroyed are dropped at the end of the world's tick.
 
 ### Rendering
 
 - The renderer never touches UObjects or actors directly. It draws an **`FScene`**, which is a `TPool` of **`FPrimitiveSceneProxy`** entries. Each proxy is plain render data: a `TObjectHandle<UStaticMesh>`, a `localToWorld` matrix, and a visibility flag. The renderer resolves the mesh handle when it draws, so a mesh that gets unloaded is simply skipped.
 - `FScene` API: `AddProxy`, `RemoveProxy`, `UpdateTransform`, `UpdateStaticMesh`, `SetVisible`, and `ForEachPrimitive`. Each `UWorld` owns its scene, and you can get it with `GetScene()`.
 - A `UPrimitiveComponent` owns its proxy while it's registered: it adds the proxy in `OnRegister`, pushes changes from transform updates and `SetVisible` to it, and removes it in `OnUnregister`. Changes made before registration are stored and picked up when the proxy is created. Hidden proxies are skipped by the renderer.
-- Every frame, `RenderSystem` calls `Renderer::BeginFrame`, `Render(world.GetScene())`, and `EndFrame`, then swaps the window buffers.
+- **Render targets:** the scene isn't drawn to the window directly. `RenderSystem` owns an **`FRenderTarget`**: a color texture, an optional depth texture, and the RHI render target that combines them. It's recreated whenever the window size changes (a minimized window keeps the old one).
+- **Views:** an **`FSceneView`** is one camera's view for one frame: view and projection matrices, the camera position (`viewOrigin`, double precision), and a pixel rectangle in the render target. An **`FSceneViewFamily`** is all the views of one scene drawn into one render target. Families and views are rebuilt every frame and never stored.
+- **One frame:** `RenderSystem` resizes the render target to the window, turns each of the world's view targets into an `FSceneView` (skipping destroyed or unregistered cameras), and builds one view family from the world's scene and the render target. `Renderer::Render(family)` opens a render pass on the target, clears it, and draws the scene once per view, with the viewport and scissor set to that view's rectangle. `Renderer::Present(target, rect)` copies the result to the window, then the window buffers are swapped.
+- A family can skip clearing its target, so several families (for example a second world shown as a minimap) can draw into the same target one after another.
+- **Precision:** world positions and rotations are doubles. They're converted to float matrices when the views are built, at the renderer boundary.
 - If a sub-mesh has a missing or invalid material, or its shader failed to compile, the renderer skips it instead of crashing.
 - The rendering backend sits behind the `IRHI` interface (`RenderCore`). OpenGL (`RHI.OpenGL`) is the only backend right now.
+- **RHI render passes:** `CreateRenderTarget` combines existing textures without owning them. `BeginRenderPass` / `EndRenderPass` bind a render target (an invalid handle means the window) and clear or keep its color and depth (`LoadOp`). `SetViewport` / `SetScissor` only work inside a pass. `BlitToBackbuffer` copies a render target to the window, and `SetBackbufferSize` tells the RHI the window's size in pixels.
+- All rectangles passed to the RHI use a top-left origin. The OpenGL backend flips them to OpenGL's bottom-left origin itself, so nothing above the RHI deals with that.
 
 ### Assets
 
@@ -276,7 +300,8 @@ Input follows an action-based model: gameplay code binds to **actions**, never t
 ### Current Limitations
 
 - Nothing owns an `FPlayerInput` yet; it moves to the player controller once that exists.
-- There's no camera, pawn/controller, or game mode framework yet. The view is a hardcoded `LookAt`.
+- There's no pawn/controller or game mode framework yet.
+- View targets live on `UWorld` for now; they'll move to a camera manager owned by the player controller. Only one world is rendered, as a single view family.
 - `OnSpawned()` always runs at the end of spawning. There's no `BeginPlay`/`EndPlay` or "world has begun play" state yet; that comes with the game mode.
 - Every class needs its `IMPLEMENT_CLASS` line written by hand; there's no header tool that generates it.
 - `AVoxelTerrain` / `UVoxelGrid` are work in progress.
