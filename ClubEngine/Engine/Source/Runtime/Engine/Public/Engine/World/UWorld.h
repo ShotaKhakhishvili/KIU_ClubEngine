@@ -12,6 +12,7 @@
 #include <Engine/World/AActor.h>
 #include <Engine/World/UActorComponent.h>
 #include <Engine/World/FActorSpawnParameters.h>
+#include <Engine/World/FViewTarget.h>
 
 #include <vector>
 #include <type_traits>
@@ -62,6 +63,10 @@ public:
 
     FScene& GetScene();
 
+    void AddViewTarget(UCameraComponent* camera, float x = 0.0f, float y = 0.0f, float width = 1.0f, float height = 1.0f);
+    void RemoveViewTarget(const UCameraComponent* camera);
+    const TArray<FViewTarget>& GetViewTargets() const;
+
 private:
     friend class WorldSystem;
 
@@ -71,6 +76,8 @@ private:
 
     ULevel* persistentLevel = new ULevel(this);
     TArray<ULevel*> streamedLevels;
+
+    TArray<FViewTarget> viewTargets; // This is here temporarily. later well have some sort of camera manager that manages these view targets
 
     FScene scene;
 };

@@ -60,4 +60,13 @@ enum class EActorState : uint8
     EndedPlay
 };
 
+struct FMinimalViewInfo
+{
+    FVector pos;
+    FQuat rot;
+    float fov = 90.0f;
+    float zNear = 0.1f;
+    float zFar = 10000.0f;
+};
+
 }

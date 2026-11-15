@@ -57,6 +57,11 @@ void UWorld::TickWorld(const float dt)
         level->componentRegistry.FlushPendingDestroy();
         level->actorRegistry.FlushPendingDestroy();
     }
+
+    std::erase_if(viewTargets, [this](const FViewTarget& viewTarget)
+    {
+        return ResolveComponent(viewTarget.camera) == nullptr;
+    });
 }
 
 ULevel* UWorld::GetLevelFromRegistryID(uint32 registryId) const
@@ -81,6 +86,7 @@ UWorld::~UWorld()
 
     delete persistentLevel;
 }
+
 void UWorld::Destroy(AActor* actor)
 {
     if(actor == nullptr)
@@ -104,9 +110,39 @@ void UWorld::Destroy(AActor* actor)
     actor->ownedComponents.clear();
     actor->rootComponent = nullptr;
 }
+
 FScene& UWorld::GetScene()
 {
     return scene;
 }    
+
+void UWorld::AddViewTarget(UCameraComponent* camera, const float x, const float y, const float width, const float height)
+{
+    if (camera == nullptr || camera->GetOwner()->GetWorld() != this)
+    {
+        CE_LOG(Warning, "Tried To Add A Null Or Foreign Camera As A View Target.");
+        return;
+    }
+
+    viewTargets.push_back({ TObjectHandle<UCameraComponent>(camera->GetHandle()), x, y, width, height });
+}
+
+void UWorld::RemoveViewTarget(const UCameraComponent* camera)
+{
+    if (camera == nullptr)
+        return;
+
+    const TObjectHandle<UCameraComponent> handle(camera->GetHandle());
+
+    std::erase_if(viewTargets, [&handle](const FViewTarget& viewTarget)
+    {
+        return viewTarget.camera == handle;
+    });
+}
+
+const TArray<FViewTarget>& UWorld::GetViewTargets() const
+{
+    return viewTargets;
+}
 
 }

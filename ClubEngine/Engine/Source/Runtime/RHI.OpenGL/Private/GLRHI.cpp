@@ -3,6 +3,7 @@
 #include "GLConvert.h"
 #include <RHI.OpenGL/GLRHI.h>
 #include <RHI.OpenGL/GLShaderBase.h>
+#include <RHI.OpenGL/GLRenderTarget.h>
 #include <RHI.OpenGL/GLTexture.h>
 #include <RHI.OpenGL/GLVertexArray.h>
 #include <RHI.OpenGL/GLBuffer.h>
@@ -12,6 +13,17 @@
 
 namespace CE::RHI
 {
+
+namespace
+{
+
+// Engine rectangles use a top-left origin; OpenGL window coordinates start bottom-left.
+GLint FlipY(const ViewportDesc& rect, const uint32 targetHeight)
+{
+    return static_cast<GLint>(targetHeight) - static_cast<GLint>(rect.y) - static_cast<GLint>(rect.height);
+}
+
+}
 
 GLRHI::GLRHI() = default;
 GLRHI::~GLRHI() = default;
@@ -27,6 +39,7 @@ void GLRHI::Init()
 void GLRHI::Shutdown()
 {
     shaders.clear();
+    renderTargets.clear();
     textures.clear();
     buffers.clear();
     vertexArrays.clear();
@@ -310,7 +323,7 @@ void GLRHI::SetViewport(const ViewportDesc& desc)
 {
     glViewport(
         static_cast<GLint>(desc.x),
-        static_cast<GLint>(desc.y),
+        FlipY(desc, currentTargetHeight),
         static_cast<GLsizei>(desc.width),
         static_cast<GLsizei>(desc.height)
     );
@@ -503,4 +516,170 @@ void GLRHI::DrawIndexed(const DrawIndexedDesc& desc)
     );
 }
 
+GLTexture* GLRHI::FindTexture(const TextureHandle handle) const
+{
+    if (!handle.IsValid())
+        return nullptr;
+
+    const auto it = textures.find(handle.id);
+    return it != textures.end() ? it->second.get() : nullptr;
 }
+
+RenderTargetHandle GLRHI::CreateRenderTarget(const RenderTargetDesc& desc)
+{
+    const GLTexture* colorTexture = FindTexture(desc.colorAttachment);
+    const GLTexture* depthTexture = FindTexture(desc.depthAttachment);
+
+    if (colorTexture == nullptr)
+    {
+        CE_LOG(Error, "RHI.OpenGL: Render Target Needs A Valid Color Attachment");
+        return {};
+    }
+
+    if (desc.depthAttachment.IsValid() && depthTexture == nullptr)
+    {
+        CE_LOG(Error, "RHI.OpenGL: Render Target Has An Invalid Depth Attachment");
+        return {};
+    }
+
+    if (depthTexture != nullptr &&
+        (depthTexture->GetWidth() != colorTexture->GetWidth() || depthTexture->GetHeight() != colorTexture->GetHeight()))
+    {
+        CE_LOG(Error, "RHI.OpenGL: Render Target Attachments Must Have The Same Size");
+        return {};
+    }
+
+    auto renderTarget = std::make_unique<GLRenderTarget>(*colorTexture, depthTexture);
+
+    if (!renderTarget->IsComplete())
+    {
+        CE_LOG(Error, "RHI.OpenGL: Render Target Is Incomplete");
+        return {};
+    }
+
+    const uint32 id = nextRenderTargetHandle++;
+    renderTargets[id] = std::move(renderTarget);
+
+    return RenderTargetHandle{id};
+}
+
+void GLRHI::DestroyRenderTarget(const RenderTargetHandle renderTarget)
+{
+    if (!renderTarget.IsValid())
+    {
+        CE_LOG(Warning, "RHI.OpenGL: Tried To Destroy An Invalid Render Target");
+        return;
+    }
+
+    renderTargets.erase(renderTarget.id);
+}
+
+void GLRHI::BeginRenderPass(const RenderPassDesc& desc)
+{
+    if (desc.target.IsValid())
+    {
+        const auto it = renderTargets.find(desc.target.id);
+
+        if (it == renderTargets.end())
+        {
+            CE_LOG(Error, "RHI.OpenGL: Tried To Begin A Render Pass On An Unknown Render Target");
+            return;
+        }
+
+        it->second->Bind();
+        currentTargetWidth = it->second->GetWidth();
+        currentTargetHeight = it->second->GetHeight();
+    }
+    else
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        currentTargetWidth = backbufferWidth;
+        currentTargetHeight = backbufferHeight;
+    }
+
+    inRenderPass = true;
+
+    glDisable(GL_SCISSOR_TEST);
+    glViewport(0, 0, static_cast<GLsizei>(currentTargetWidth), static_cast<GLsizei>(currentTargetHeight));
+
+    GLbitfield clearFlags = 0;
+
+    if (desc.colorLoad == LoadOp::Clear)
+    {
+        glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+        glClearColor(desc.clearColor.x, desc.clearColor.y, desc.clearColor.z, desc.clearColor.w);
+        clearFlags |= GL_COLOR_BUFFER_BIT;
+    }
+
+    if (desc.depthLoad == LoadOp::Clear)
+    {
+        glDepthMask(GL_TRUE);
+        glClearDepth(desc.clearDepth);
+        clearFlags |= GL_DEPTH_BUFFER_BIT;
+    }
+
+    if (clearFlags != 0)
+        glClear(clearFlags);
+
+    glEnable(GL_SCISSOR_TEST);
+    glScissor(0, 0, static_cast<GLsizei>(currentTargetWidth), static_cast<GLsizei>(currentTargetHeight));
+}
+
+void GLRHI::EndRenderPass()
+{
+    glDisable(GL_SCISSOR_TEST);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    inRenderPass = false;
+}
+
+void GLRHI::SetScissor(const ViewportDesc& desc)
+{
+    glScissor(
+        static_cast<GLint>(desc.x),
+        FlipY(desc, currentTargetHeight),
+        static_cast<GLsizei>(desc.width),
+        static_cast<GLsizei>(desc.height)
+    );
+}
+
+void GLRHI::SetBackbufferSize(const uint32 width, const uint32 height)
+{
+    backbufferWidth = width;
+    backbufferHeight = height;
+}
+
+void GLRHI::BlitToBackbuffer(const RenderTargetHandle renderTarget, const ViewportDesc& srcRect, const ViewportDesc& dstRect)
+{
+    const auto it = renderTargets.find(renderTarget.id);
+
+    if (!renderTarget.IsValid() || it == renderTargets.end())
+    {
+        CE_LOG(Error, "RHI.OpenGL: Tried To Blit An Unknown Render Target");
+        return;
+    }
+
+    const GLRenderTarget& source = *it->second;
+
+    const GLint srcY = FlipY(srcRect, source.GetHeight());
+    const GLint dstY = FlipY(dstRect, backbufferHeight);
+
+    glDisable(GL_SCISSOR_TEST);     // the scissor clips blits too
+
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, source.GetID()); // Read from
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);              // Write to (id = 0 is the window's backbuffer's id)
+
+    glBlitFramebuffer(
+        static_cast<GLint>(srcRect.x), srcY,
+        static_cast<GLint>(srcRect.x + srcRect.width), srcY + static_cast<GLint>(srcRect.height),
+        static_cast<GLint>(dstRect.x), dstY,
+        static_cast<GLint>(dstRect.x + dstRect.width), dstY + static_cast<GLint>(dstRect.height),
+        GL_COLOR_BUFFER_BIT,
+        GL_LINEAR
+    );
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+}
+

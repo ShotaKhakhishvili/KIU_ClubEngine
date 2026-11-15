@@ -28,6 +28,8 @@ public:
     FVector GetWorldLocation() const;
     void SetWorldRotation(const FRotator& newRotation);
     FRotator GetWorldRotation() const;
+    void SetWorldRotationInQuat(const FQuat& newRotation);
+    FQuat GetWorldRotationInQuat() const;
     void SetWorldScale(const FVector& newScale);
     FVector GetWorldScale() const;
 
@@ -38,6 +40,8 @@ public:
     FVector GetRelativeLocation() const;
     void SetRelativeRotation(const FRotator& newRotation);
     FRotator GetRelativeRotation() const;
+    void SetRelativeRotationInQuat(const FQuat& newRotation);
+    FQuat GetRelativeRotationInQuat() const;
     void SetRelativeScale(const FVector& newScale);
     FVector GetRelativeScale() const;
 

@@ -79,11 +79,14 @@ void USceneComponent::OnDestroyed()
 const FTransform& USceneComponent::GetWorldTransform()      const { return worldTransform;                  }
 FVector USceneComponent::GetWorldLocation()                 const { return worldTransform.Translation;      }
 FRotator USceneComponent::GetWorldRotation()                const { return worldTransform.GetRotator();     }
+FQuat USceneComponent::GetWorldRotationInQuat()             const { return worldTransform.Rotation;         }
+
 FVector USceneComponent::GetWorldScale()                    const { return worldTransform.Scale;            }
 
 const FTransform& USceneComponent::GetRelativeTransform()   const { return relativeTransform;               }
 FVector USceneComponent::GetRelativeLocation()              const { return relativeTransform.Translation;   }
 FRotator USceneComponent::GetRelativeRotation()             const { return relativeTransform.GetRotator();  }
+FQuat USceneComponent::GetRelativeRotationInQuat()          const { return worldTransform.Rotation;         }
 FVector USceneComponent::GetRelativeScale()                 const { return relativeTransform.Scale;         }
 
 void USceneComponent::OnTransformUpdated() {}
@@ -120,6 +123,13 @@ void USceneComponent::SetWorldRotation(const FRotator& newRotation)
     SetWorldTransform(newTransform);
 }
 
+void USceneComponent::SetRelativeRotationInQuat(const FQuat& newRotation)
+{
+    FTransform newTransform = worldTransform;
+    newTransform.Rotation = newRotation;
+    SetWorldTransform(newTransform);
+}
+
 void USceneComponent::SetWorldScale(const FVector& newScale)
 {
     FTransform newTransform = worldTransform;
@@ -142,6 +152,12 @@ void USceneComponent::SetRelativeLocation(const FVector& newLocation)
 void USceneComponent::SetRelativeRotation(const FRotator& newRotation)
 {
     relativeTransform.SetRotation(newRotation);
+    UpdateWorldTransform();
+}
+
+void USceneComponent::SetWorldRotationInQuat(const FQuat& newRotation)
+{
+    relativeTransform.Rotation = newRotation;
     UpdateWorldTransform();
 }
 

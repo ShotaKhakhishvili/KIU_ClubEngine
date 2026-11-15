@@ -51,6 +51,12 @@ bool GLFWWindow::Init(const FWindowConfig& config)
         return false;
     }
 
+    int framebufferWidth = 0;
+    int framebufferHeight = 0;
+    glfwGetFramebufferSize(handle, &framebufferWidth, &framebufferHeight);
+    width = static_cast<uint32>(framebufferWidth);
+    height = static_cast<uint32>(framebufferHeight);
+
     glfwSetWindowUserPointer(handle, this);
 
     glfwSetFramebufferSizeCallback(handle, [](GLFWwindow* win, int W, int H)

@@ -15,6 +15,7 @@ using VertexArrayID = uint32;
 using VertexBufferID = uint32;
 using IndexBufferID = uint32;
 using BufferID = uint32;
+using RenderTargetID = uint32;
 
 enum class ShaderDataType
 {
@@ -253,6 +254,14 @@ struct ViewportDesc
     uint32 y = 0;
     uint32 width = 0;
     uint32 height = 0;
+};
+
+enum class LoadOp
+{
+    Load,
+    Clear,
+    DontCare,
+    Count
 };
 
 }

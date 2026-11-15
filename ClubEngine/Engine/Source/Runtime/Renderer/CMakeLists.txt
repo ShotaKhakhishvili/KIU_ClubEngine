@@ -21,9 +21,9 @@ target_link_libraries(CERenderer
   PUBLIC
     ClubEngine::Core
     ClubEngine::Asset
+        ClubEngine::RenderCore
   PRIVATE
     ClubEngine::RHIOpenGL
-    ClubEngine::RenderCore
 )
 
 target_compile_definitions(CERenderer PRIVATE CERENDERER_BUILD)

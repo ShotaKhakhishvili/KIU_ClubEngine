@@ -49,7 +49,7 @@ const AssetContext& Application::GetAssetContext() const noexcept
 {
     return assetContext;
 }
-    
+
 int Application::Run()
 {
     this->PreInit();
@@ -124,6 +124,7 @@ int Application::Run()
 
 void Application::PostInit()
 {
+
 }
 
 void Application::PreInit()

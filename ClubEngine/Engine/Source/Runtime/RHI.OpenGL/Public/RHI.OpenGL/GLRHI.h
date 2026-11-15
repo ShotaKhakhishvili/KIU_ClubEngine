@@ -12,6 +12,7 @@ class GLShaderBase;
 class GLTexture;
 class GLVertexArray;
 class GLBuffer;
+class GLRenderTarget;
 
 class GLRHI final : public IRHI
 {
@@ -73,12 +74,22 @@ public:
     void SetUniformVec4(const std::string& name, const FVector4F& value) override;
 	void SetUniformMat4(const std::string& name, const FMatrix4x4F& value) override;
     void SetTexture(const std::string& name, TextureHandle texture, uint32_t slot) override;
-    
+
+    RenderTargetHandle CreateRenderTarget(const RenderTargetDesc& desc) override;
+    void DestroyRenderTarget(RenderTargetHandle renderTarget) override;
+    void BeginRenderPass(const RenderPassDesc& desc) override;
+    void EndRenderPass() override;
+    void SetScissor(const ViewportDesc& desc) override;
+    void SetBackbufferSize(uint32 width, uint32 height) override;
+    void BlitToBackbuffer(RenderTargetHandle renderTarget, const ViewportDesc& srcRect, const ViewportDesc& dstRect) override;
+
     void DrawIndexed(const DrawIndexedDesc& desc) override;
 
 private:
+    GLTexture* FindTexture(TextureHandle handle) const;
 
     uint32 nextShaderHandle = 1;
+    uint32 nextRenderTargetHandle = 1;
     uint32 nextTextureHandle = 1;
     uint32 nextBufferHandle = 1;
     uint32 nextVertexArrayHandle = 1;
@@ -86,9 +97,18 @@ private:
     RHI::ShaderHandle currentShader{};
 
     std::unordered_map<uint32, std::unique_ptr<GLShaderBase>> shaders;
+    std::unordered_map<uint32, std::unique_ptr<GLRenderTarget>> renderTargets;
     std::unordered_map<uint32, std::unique_ptr<GLTexture>> textures;
     std::unordered_map<uint32, std::unique_ptr<GLBuffer>> buffers;
     std::unordered_map<uint32, std::unique_ptr<GLVertexArray>> vertexArrays;
+
+    uint32 backbufferWidth = 0;
+    uint32 backbufferHeight = 0;
+
+    uint32 currentTargetWidth = 0;
+    uint32 currentTargetHeight = 0;
+
+    bool inRenderPass = false;
 };
 
 }

@@ -35,11 +35,13 @@ namespace CE::RHI
     class RHITextureTag{};
     class RHIBufferTag{};
     class RHIVertexArrayTag{};
+	class RHIRenderTargetTag{};
 	class RHISyncFenceTag{};
 
     using ShaderHandle              = RHIHandle<RHIShaderTag>;
     using TextureHandle             = RHIHandle<RHITextureTag>;
     using BufferHandle              = RHIHandle<RHIBufferTag>;
     using VertexArrayHandle         = RHIHandle<RHIVertexArrayTag>;
+	using RenderTargetHandle        = RHIHandle<RHIRenderTargetTag>;
 	using SyncFenceHandle           = RHIHandle<RHISyncFenceTag>;
 }

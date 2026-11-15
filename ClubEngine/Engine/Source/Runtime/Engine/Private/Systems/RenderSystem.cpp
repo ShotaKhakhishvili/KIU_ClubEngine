@@ -1,5 +1,10 @@
 #include <Core/ClubCore.h>
+#include <Core/Math/MathFunctions.h>
 
+#include <RenderCore/RHI/IRHI.h>
+
+#include <Engine/World/UWorld.h>
+#include <Engine/World/UCameraComponent.h>
 #include <Engine/Systems/RenderSystem.h>
 #include <Engine/Systems/WindowSystem.h>
 #include <Engine/Systems/WorldSystem.h>
@@ -20,11 +25,16 @@ RenderSystem::RenderSystem(WindowSystem* windowSystem,  WorldSystem* worldSystem
 bool RenderSystem::Init()
 {
     renderer = std::make_unique<Renderer>(ToRHI(backend));
+
+    const IWindow* window = windowSystem->GetWindow();
+    sceneTarget = std::make_unique<FRenderTarget>(window->GetWidth(), window->GetHeight(), true);
+
     return renderer != nullptr;
 }
 
 void RenderSystem::Shutdown()
 {
+    sceneTarget.reset();
     renderer.reset();
 }
 
@@ -37,11 +47,21 @@ int RenderSystem::Update(float dt)
 {
     (void)dt;
 
-    renderer->BeginFrame({0, 0, windowSystem->GetWindow()->GetWidth(), windowSystem->GetWindow()->GetHeight()});
+    const IWindow* window = windowSystem->GetWindow();
+    const uint32 windowWidth = window->GetWidth();
+    const uint32 windowHeight = window->GetHeight();
 
-    renderer->Render(worldSystem->GetWorld().GetScene());
+    if (windowWidth == 0 || windowHeight == 0)
+        return 0;
 
-    renderer->EndFrame();
+    RHI::Get().SetBackbufferSize(windowWidth, windowHeight);
+    sceneTarget->Resize(windowWidth, windowHeight);
+
+    const FSceneViewFamily sceneViewFamily(&worldSystem->GetWorld().GetScene(), sceneTarget.get(),
+        BuildSceneViews(worldSystem->GetWorld()));
+
+    renderer->Render(sceneViewFamily);
+    Renderer::Present(*sceneTarget, { 0, 0, windowWidth, windowHeight });
 
     windowSystem->GetWindow()->SwapBuffers();
 
@@ -51,6 +71,48 @@ int RenderSystem::Update(float dt)
 void RenderSystem::SetBackend(const CE::ERenderBackend backend)
 {
     renderer->SetBackend(ToRHI(backend));
+}
+
+TArray<FSceneView> RenderSystem::BuildSceneViews(const UWorld& world) const
+{
+    TArray<FSceneView> views;
+
+    const float targetWidth = static_cast<float>(sceneTarget->GetWidth());
+    const float targetHeight = static_cast<float>(sceneTarget->GetHeight());
+
+    for (const FViewTarget& viewTarget : world.GetViewTargets())
+    {
+        const UCameraComponent* camera = world.ResolveComponent(viewTarget.camera);
+        if (camera == nullptr || !camera->IsRegistered())
+            continue;
+
+        FSceneView view;
+        view.viewRect = {
+            static_cast<uint32>(viewTarget.x * targetWidth),
+            static_cast<uint32>(viewTarget.y * targetHeight),
+            static_cast<uint32>(viewTarget.width * targetWidth),
+            static_cast<uint32>(viewTarget.height * targetHeight)
+        };
+
+        if (view.viewRect.width == 0 || view.viewRect.height == 0)
+            continue;
+
+        const auto [pos, rot, fov, zNear, zFar] = camera->GetCameraView();
+
+        const float aspect = static_cast<float>(view.viewRect.width) / static_cast<float>(view.viewRect.height);
+
+        const FVectorF eye(pos);
+        const FVectorF forward(rot.GetForward());
+        const FVectorF up(rot.GetUp());
+
+        view.viewOrigin = pos;
+        view.viewMatrix = FMatrix4x4F::LookAt(eye, eye + forward, up);
+        view.projMatrix = FMatrix4x4F::Perspective(ToRadians(fov), aspect, zNear, zFar);
+
+        views.push_back(view);
+    }
+
+    return views;
 }
 
 }

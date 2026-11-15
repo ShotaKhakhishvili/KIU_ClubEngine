@@ -7,6 +7,7 @@
 #include <Core/Math/Matrix4x4.h>
 
 #include <RenderCore/RHI/RHIHandle.h>
+#include <RenderCore/RHI/RHIRenderPassTypes.h>
 
 #include <cstdint>
 #include <string>
@@ -14,7 +15,8 @@
 
 namespace CE::RHI
 {
-    class IRHI
+
+class IRHI
     {
     public:
         virtual ~IRHI() = default;
@@ -104,6 +106,16 @@ namespace CE::RHI
         virtual void SetUniformVec4(const std::string& name, const CE::FVector4F& value) = 0;
 		virtual void SetUniformMat4(const std::string& name, const CE::FMatrix4x4F& value) = 0;
         virtual void SetTexture(const std::string& name, TextureHandle texture, uint32_t slot) = 0;
+
+        // ------------ Render Pass ------------
+
+        virtual RenderTargetHandle CreateRenderTarget(const RenderTargetDesc& desc) = 0;
+        virtual void DestroyRenderTarget(RenderTargetHandle) = 0;
+        virtual void BeginRenderPass(const RenderPassDesc& desc) = 0;
+        virtual void EndRenderPass() = 0;
+        virtual void SetScissor(const ViewportDesc& desc) = 0;
+        virtual void BlitToBackbuffer(RenderTargetHandle renderTarget, const ViewportDesc& srcRect, const ViewportDesc& dstRect) = 0;
+        virtual void SetBackbufferSize(uint32 width, uint32 height) = 0;
 
         // ------------ Draw ------------
 

@@ -7,7 +7,11 @@
 #include <Asset/IAssetResolver.h>
 
 #include <Renderer/Renderer.h>
+
+#include "Renderer/FRenderTarget.h"
+
 #include <Renderer/FFrameData.h>
+#include <Renderer/Scene/FScene.h>
 
 namespace CE
 {
@@ -23,37 +27,14 @@ Renderer::Renderer(const RHI::Backend backend)
         sizeof(FFrameData)
     };
 
-    frameData.view = FMatrix4x4F::LookAt({ 0.0f, -45.0f, 25.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 1.0f });
-    frameData.proj = FMatrix4x4F::Perspective(0.9f, 16.0f / 9.0f, 0.1f, 100.0f);
-
-    frameDataHandle = RHI::Get().CreateBuffer(frameDataDesc, &frameData);
+    frameDataHandle = RHI::Get().CreateBuffer(frameDataDesc, nullptr);
 }
+
 
 Renderer::~Renderer()
 {
     RHI::Get().DestroyBuffer(frameDataHandle);
     RHI::Get().Shutdown();
-}
-
-void Renderer::BeginFrame(const RHI::ViewportDesc& viewportDesc) const
-{
-    RHI::Get().SetViewport(viewportDesc);
-
-    RHI::Get().SetDepthTest(true);
-    RHI::Get().SetDepthWrite(true);
-    RHI::Get().SetCullMode(RHI::CullMode::Back);
-    RHI::Get().SetBlendMode(RHI::BlendMode::Opaque);
-
-    RHI::Get().SetClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-    RHI::Get().Clear(true, true);
-
-    RHI::Get().WriteBuffer(frameDataHandle, &frameData, sizeof(frameData), 0);
-    RHI::Get().BindBufferBase(frameDataHandle, frameDataSlot);
-}
-
-void Renderer::EndFrame()
-{
-    // Empty for now lol
 }
 
 void Renderer::DrawStaticMesh(const UStaticMesh& staticMesh, const FMatrix4x4F& localToWorld) const
@@ -134,17 +115,65 @@ void Renderer::SetBackend(RHI::Backend backend)
     }
 }
 
-void Renderer::Render(const FScene& scene) const
+void Renderer::Render(const FSceneViewFamily& sceneViewFamily) const
 {
-    scene.ForEachPrimitive([this](const FPrimitiveSceneProxy& proxy)
+    if (!sceneViewFamily.GetScene())
     {
-        if (!proxy.isVisible || !proxy.staticMesh.IsValid())
-            return;
+        CE_LOG(Error, "Failed to render with invalid scene");
+        return;
+    }
 
-        if (const UStaticMesh* mesh = GetCurrentAssetResolver()->Resolve(proxy.staticMesh))
-            DrawStaticMesh(*mesh, proxy.localToWorld);
-    });
+    if (!sceneViewFamily.GetRenderTarget()->GetHandle().IsValid())
+    {
+        CE_LOG(Error, "Failed to render with invalid render target");
+        return;
+    }
 
+    FFrameData frameData;
+
+    RHI::RenderPassDesc renderPassDesc{};
+
+    renderPassDesc.target = sceneViewFamily.GetRenderTarget()->GetHandle();
+    renderPassDesc.colorLoad = sceneViewFamily.ShouldClearTarget() ? RHI::LoadOp::Clear : RHI::LoadOp::Load;
+    renderPassDesc.depthLoad = renderPassDesc.colorLoad;
+
+    RHI::Get().BeginRenderPass(renderPassDesc);
+
+    for (const FSceneView& view : sceneViewFamily.GetViews())
+    {
+        RHI::Get().SetViewport(view.viewRect);
+        RHI::Get().SetScissor(view.viewRect);
+
+        frameData.view = view.viewMatrix;
+        frameData.proj = view.projMatrix;
+
+        RHI::Get().BindBufferBase(frameDataHandle, frameDataSlot);
+        RHI::Get().WriteBuffer(frameDataHandle, &frameData, sizeof(frameData), 0);
+
+        sceneViewFamily.GetScene()->ForEachPrimitive([this](const FPrimitiveSceneProxy& proxy)
+        {
+            if (!proxy.isVisible || !proxy.staticMesh.IsValid())
+                return;
+
+            if (const UStaticMesh* mesh = GetCurrentAssetResolver()->Resolve(proxy.staticMesh))
+                DrawStaticMesh(*mesh, proxy.localToWorld);
+        });
+    }
+
+    RHI::Get().EndRenderPass();
+}
+
+void Renderer::Present(const FRenderTarget& renderTarget, const RHI::ViewportDesc& viewDesc)
+{
+    if (!renderTarget.GetHandle().IsValid())
+    {
+        CE_LOG(Warning, "Failed to present with invalid render target");
+        return;
+    }
+
+    const RHI::ViewportDesc source { 0, 0, renderTarget.GetWidth(), renderTarget.GetHeight() };
+
+    RHI::Get().BlitToBackbuffer(renderTarget.GetHandle(), source, viewDesc);
 }
 
 }
