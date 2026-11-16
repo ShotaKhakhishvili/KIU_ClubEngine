@@ -83,6 +83,8 @@ public:
     void SetBackbufferSize(uint32 width, uint32 height) override;
     void BlitToBackbuffer(RenderTargetHandle renderTarget, const ViewportDesc& srcRect, const ViewportDesc& dstRect) override;
 
+    bool ReadTexture (TextureHandle handle, const ViewportDesc& rect, void* dest, uint32 size) override;
+
     void DrawIndexed(const DrawIndexedDesc& desc) override;
 
 private:

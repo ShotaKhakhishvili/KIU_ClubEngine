@@ -117,6 +117,8 @@ class IRHI
         virtual void BlitToBackbuffer(RenderTargetHandle renderTarget, const ViewportDesc& srcRect, const ViewportDesc& dstRect) = 0;
         virtual void SetBackbufferSize(uint32 width, uint32 height) = 0;
 
+        virtual bool ReadTexture (TextureHandle handle, const ViewportDesc& rect, void* dest, uint32 size) = 0;
+
         // ------------ Draw ------------
 
         virtual void DrawIndexed(const DrawIndexedDesc& desc) = 0;

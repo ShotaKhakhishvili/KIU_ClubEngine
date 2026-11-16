@@ -10,6 +10,7 @@
 
 #include <glad/glad.h>
 #include <cassert>
+#include <algorithm>
 
 namespace CE::RHI
 {
@@ -23,6 +24,28 @@ GLint FlipY(const ViewportDesc& rect, const uint32 targetHeight)
     return static_cast<GLint>(targetHeight) - static_cast<GLint>(rect.y) - static_cast<GLint>(rect.height);
 }
 
+uint32 BytesPerPixel(const TextureFormat format, const TexturePixelType type)
+{
+    uint32 components = 0;
+    switch (format)
+    {
+    case TextureFormat::Red:   components = 1; break;
+    case TextureFormat::RG:    components = 2; break;
+    case TextureFormat::RGB:   components = 3; break;
+    case TextureFormat::RGBA:  components = 4; break;
+    case TextureFormat::Depth: components = 1; break;
+    default: assert(false);
+    }
+    return components * (type == TexturePixelType::Float ? 4 : 1);
+}
+
+void FlipRows(uint8* data, const uint32 rowSize, const uint32 rowCount)
+{
+    for (uint32 i = 0; i < rowCount / 2; ++i)
+        std::swap_ranges(data + i * rowSize, data + (i + 1) * rowSize,
+                         data + (rowCount - 1 - i) * rowSize);
+}
+
 }
 
 GLRHI::GLRHI() = default;
@@ -34,6 +57,7 @@ void GLRHI::Init()
     GLint depthBits = 0;
     glEnable(GL_DEPTH_TEST);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    glPixelStorei(GL_PACK_ALIGNMENT, 1);
 }
 
 void GLRHI::Shutdown()
@@ -679,6 +703,36 @@ void GLRHI::BlitToBackbuffer(const RenderTargetHandle renderTarget, const Viewpo
     );
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+bool GLRHI::ReadTexture(TextureHandle handle, const ViewportDesc& rect, void* dest, const uint32 size)
+{
+    const GLTexture* texture = FindTexture(handle);
+    if (!texture)
+    {
+        CE_LOG(Error, "ReadTexture: invalid texture handle [{}]", handle.id);
+        return false;
+    }
+
+    if (texture->GetType() != TextureType::Texture2D)
+        return false;
+
+    if (rect.x + rect.width > texture->GetWidth() || rect.y + rect.height > texture->GetHeight())
+        return false;
+
+    const uint32 rowSize = rect.width * BytesPerPixel(texture->GetReadFormat(), texture->GetPixelType());
+    if (size < rowSize * rect.height)
+        return false;
+
+    const GLint glY = FlipY(rect, texture->GetHeight());
+
+    glGetTextureSubImage(texture->GetID(), 0,
+                         rect.x, glY, 0, rect.width, rect.height, 1,
+                         ToGL(texture->GetReadFormat()), ToGL(texture->GetPixelType()),
+                         static_cast<GLsizei>(size), dest);
+
+    FlipRows(static_cast<uint8*>(dest), rowSize, rect.height);
+    return true;
 }
 
 }
