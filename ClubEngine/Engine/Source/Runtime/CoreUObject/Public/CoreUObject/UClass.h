@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <type_traits>
+#include <string_view>
 
 namespace CE
 {
@@ -26,6 +27,8 @@ public:
 
     bool IsChildOf(const UClass* other) const noexcept;
     bool IsAbstract() const noexcept;
+
+    static UClass* FindClass(std::string_view);
 
 private:
     friend class UObjectRegistry;

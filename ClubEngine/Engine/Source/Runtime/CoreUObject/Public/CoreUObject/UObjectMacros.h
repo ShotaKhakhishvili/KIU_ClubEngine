@@ -15,4 +15,6 @@ private:
 { \
 static ::CE::UClass classObject(#TClass, TClass::Super::StaticClass(), ::CE::GetClassConstructor<TClass>());\
 return &classObject;\
-}
+}\
+namespace{::CE::UClass* const TClass##_StaticClassRegistration = TClass::StaticClass(); }\
+\
