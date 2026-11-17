@@ -10,42 +10,37 @@ void ConfigSystem::LoadFile(const std::filesystem::path& path)
     IniParser::Parse(path, data);
 }
 
-template<>
-std::string ConfigSystem::Get(const std::string& section, const std::string& key, const std::string& defaultValue) const
+void ConfigSystem::AddCommandLine(const TArray<std::string>& commandLine)
 {
-    auto secIt = data.find(section);
-    if (secIt == data.end()) return defaultValue;
+    for (const std::string& arg : commandLine)
+    {
+        // Only "-Section.Key=Value" or "--Section.Key=Value", other args are left for other systems or get ignored
 
-    auto keyIt = secIt->second.find(key);
-    if (keyIt == secIt->second.end()) return defaultValue;
+        if (arg.size() < 2 || arg[0] != '-')
+            continue;
 
-    return keyIt->second;
-}
+        const size_t start = (arg[1] == '-') ? 2 : 1;
+        const std::string body = arg.substr(start);
 
-template<>
-int ConfigSystem::Get(const std::string& section, const std::string& key, const int& defaultValue) const
-{
-    auto str = Get<std::string>(section, key, "");
-    if (str.empty()) return defaultValue;
-    try { return std::stoi(str); }
-    catch (...) { return defaultValue; }
-}
+        const size_t dot = body.find('.');
+        if (dot == std::string::npos)
+            continue;
 
-template<>
-float ConfigSystem::Get(const std::string& section, const std::string& key, const float& defaultValue) const
-{
-    auto str = Get<std::string>(section, key, "");
-    if (str.empty()) return defaultValue;
-    try { return std::stof(str); }
-    catch (...) { return defaultValue; }
-}
+        const size_t eq = body.find('=', dot);
 
-template<>
-bool ConfigSystem::Get(const std::string& section, const std::string& key, const bool& defaultValue) const
-{
-    auto str = Get<std::string>(section, key, "");
-    if (str.empty()) return defaultValue;
-    return str == "true" || str == "1" || str == "True";
+        const std::string section = body.substr(0, dot);
+        const std::string key     = body.substr(dot + 1, eq == std::string::npos ? std::string::npos : eq - dot - 1);
+        const std::string value   = (eq == std::string::npos) ? "true" : body.substr(eq + 1);
+
+        if (section.empty() || key.empty())
+        {
+            CE_LOG(Warning, "Config: ignoring malformed argument '{}'", arg);
+            continue;
+        }
+
+        data[section][key] = value;
+        CE_LOG(Info, "Config: command line override [{}] {}={}", section, key, value);
+    }
 }
 
 }

@@ -29,6 +29,9 @@ public:
 
     void SetBackend(CE::ERenderBackend backend);
 
+    void SetFixedTargetSize(uint32 width, uint32 height);
+    bool ReadSceneColor(TArray<uint8>& outPixels) const;
+
 private:
     TArray<FSceneView> BuildSceneViews(const UWorld& world) const;
 
@@ -38,6 +41,9 @@ private:
     WindowSystem*               windowSystem;
     WorldSystem*                worldSystem;
     ERenderBackend              backend;
+
+    uint32 fixedWidth  = 0;
+    uint32 fixedHeight = 0;
 };
 
 }

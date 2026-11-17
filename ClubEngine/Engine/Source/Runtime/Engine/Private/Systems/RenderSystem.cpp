@@ -55,7 +55,10 @@ int RenderSystem::Update(float dt)
         return 0;
 
     RHI::Get().SetBackbufferSize(windowWidth, windowHeight);
-    sceneTarget->Resize(windowWidth, windowHeight);
+
+    const bool fixedSize = fixedWidth > 0 && fixedHeight > 0;
+    sceneTarget->Resize(fixedSize ? fixedWidth  : windowWidth,
+                        fixedSize ? fixedHeight : windowHeight);
 
     const FSceneViewFamily sceneViewFamily(&worldSystem->GetWorld().GetScene(), sceneTarget.get(),
         BuildSceneViews(worldSystem->GetWorld()));
@@ -71,6 +74,22 @@ int RenderSystem::Update(float dt)
 void RenderSystem::SetBackend(const CE::ERenderBackend backend)
 {
     renderer->SetBackend(ToRHI(backend));
+}
+
+void RenderSystem::SetFixedTargetSize(uint32 width, uint32 height)
+{
+    fixedWidth  = width;
+    fixedHeight = height;
+}
+
+bool RenderSystem::ReadSceneColor(TArray<uint8>& outPixels) const
+{
+    const uint32 w = sceneTarget->GetWidth();
+    const uint32 h = sceneTarget->GetHeight();
+    outPixels.resize(static_cast<size_t>(w) * h * 4);
+
+    return RHI::Get().ReadTexture(sceneTarget->GetColorTexture(), { 0, 0, w, h },
+                              outPixels.data(), static_cast<uint32>(outPixels.size()));
 }
 
 TArray<FSceneView> RenderSystem::BuildSceneViews(const UWorld& world) const

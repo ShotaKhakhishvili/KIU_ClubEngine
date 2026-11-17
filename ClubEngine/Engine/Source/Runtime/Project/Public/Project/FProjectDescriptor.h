@@ -10,47 +10,16 @@ struct FProjectDescriptor
     std::string name;
     std::filesystem::path rootPath;
 
-    std::filesystem::path GetEnginePath() const
-    {
-        return std::filesystem::path(CE_ENGINE_ROOT);
-    }
+    std::filesystem::path GetEnginePath() const;
+    std::filesystem::path GetEngineConfigPath() const;
 
-    std::filesystem::path GetProjectPath() const
-    {
-        return rootPath;
-    }
+    std::filesystem::path GetProjectPath() const;
 
-    std::filesystem::path GetContentPath() const
-    {
-        return rootPath / "Content";
-    }
+    std::filesystem::path GetContentPath() const;
+    std::filesystem::path GetConfigPath() const;
 
-    std::filesystem::path GetConfigPath() const
-    {
-        return rootPath / "Config";
-    }
-
-    std::filesystem::path ResolveContentPath(const std::filesystem::path& relativePath) const
-    {
-        return GetContentPath() / relativePath;
-    }
-
-    std::filesystem::path ResolveAssetPath(const std::filesystem::path& path) const
-    {
-        const std::string text = path.generic_string();
-
-        if (text.rfind("/Game/", 0) == 0)
-        {
-            return GetContentPath() / text.substr(6);
-        }
-
-        if (path.is_absolute())
-        {
-            return path;
-        }
-
-        return GetContentPath() / path;
-    }
+    std::filesystem::path ResolveContentPath(const std::filesystem::path& relativePath) const;
+    std::filesystem::path ResolveAssetPath(const std::filesystem::path& path) const;
 };
 
 }

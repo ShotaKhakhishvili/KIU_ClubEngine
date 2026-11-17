@@ -64,9 +64,12 @@ void FRenderTarget::Resize(const uint32 newWidth, const uint32 newHeight)
 
     Create();
 }
-bool FRenderTarget::HasDepth() const    { return hasDepth;  }
-uint32 FRenderTarget::GetHeight() const { return height;    }
-uint32 FRenderTarget::GetWidth() const  { return width;     }
+
+bool FRenderTarget::HasDepth()                      const { return hasDepth;        }
+uint32 FRenderTarget::GetHeight()                   const { return height;          }
+uint32 FRenderTarget::GetWidth()                    const { return width;           }
+RHI::TextureHandle FRenderTarget::GetColorTexture() const { return colorTexture;    }
+RHI::TextureHandle FRenderTarget::GetDepthTexture() const { return depthTexture;    }
 
 void FRenderTarget::Release()
 {

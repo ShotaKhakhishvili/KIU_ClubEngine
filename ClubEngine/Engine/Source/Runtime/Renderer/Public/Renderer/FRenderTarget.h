@@ -28,6 +28,9 @@ public:
     uint32 GetHeight() const;
     uint32 GetWidth() const;
 
+    RHI::TextureHandle GetColorTexture() const;
+    RHI::TextureHandle GetDepthTexture() const;
+
 private:
     void Release();
     void Create();

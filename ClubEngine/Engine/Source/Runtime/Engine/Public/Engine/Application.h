@@ -2,11 +2,14 @@
 
 #include <Engine/AssetContext.h>
 #include <Engine/ISystem.h>
+#include <Engine/FOfflineRenderSettings.h>
 
 #include <vector>
 
 namespace CE
 {
+
+class RenderSystem;
 
 class Application {
 public:
@@ -35,6 +38,7 @@ public:
     }
 
     int Run();
+
     virtual int Update(float dt) = 0;
 
     AssetContext& GetAssetContext() noexcept;
@@ -46,6 +50,13 @@ protected:
         
     std::vector<std::unique_ptr<ISystem>> systems;
 private:
+    int RunInteractiveLoop();
+    int RunOfflineLoop();
+
+    bool CaptureFrame(const RenderSystem& renderSystem, uint32 frame) const;
+
+    FOfflineRenderSettings offlineRenderSettings;
+
     bool running{false};
         
     AssetContext assetContext{};

@@ -1,4 +1,6 @@
 #pragma once
+#include "Core/CommandLine.h"
+
 #include <Launch/Launch.h>
 
 #include <Project/FProjectDescriptor.h>
@@ -13,7 +15,7 @@ namespace CE
 
 int main(int argc, char** argv)
 {
-    (void)argc; (void)argv;
+    CE::CommandLine::Set(argc, argv);
     
     CE::FProjectDescriptor project;
     project.rootPath = CE_PROJECT_ROOT;

@@ -15,6 +15,7 @@ struct FWindowConfig
     uint32          height      = 720;
     bool            vSync       = true;
     RHI::Backend    backend     = RHI::Backend::OpenGL;
+    bool            visible     = true;
 };
 
 }

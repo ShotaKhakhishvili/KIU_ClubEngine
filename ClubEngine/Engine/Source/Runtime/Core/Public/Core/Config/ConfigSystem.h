@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Core/Containers/TArray.h"
+
 #include <Core/Config/IniTypes.h>
 
 #include <filesystem>
@@ -12,24 +14,15 @@ class ConfigSystem
 {
 public:
     void LoadFile(const std::filesystem::path& path);
+    void AddCommandLine(const TArray<std::string>& commandLine);
 
     template<typename T>
-    T Get(const std::string& section, const std::string& key, const T& defaultValue) const;
+    T Get(const std::string& section, const std::string& key) const;
 
 private:
     IniData data;
 };
 
-template<>
-std::string ConfigSystem::Get(const std::string& section, const std::string& key, const std::string& defaultValue) const;
-
-template<>
-int ConfigSystem::Get(const std::string& section, const std::string& key, const int& defaultValue) const;
-
-template<>
-float ConfigSystem::Get(const std::string& section, const std::string& key, const float& defaultValue) const;
-
-template<>
-bool ConfigSystem::Get(const std::string& section, const std::string& key, const bool& defaultValue) const;
-
 }
+
+#include "ConfigSystem.inl"
