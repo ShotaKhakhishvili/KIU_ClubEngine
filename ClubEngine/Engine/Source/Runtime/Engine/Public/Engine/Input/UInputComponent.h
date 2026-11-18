@@ -3,7 +3,7 @@
 #include <Core/Delegate/TMulticastDelegate.h>
 #include <Core/Containers/TMap.h>
 
-#include <Engine/World/UActorComponent.h>
+#include <Engine/Components/UActorComponent.h>
 #include <Engine/Input/UInputAction.h>
 #include <Engine/Input/Types/ETriggerEvent.h>
 

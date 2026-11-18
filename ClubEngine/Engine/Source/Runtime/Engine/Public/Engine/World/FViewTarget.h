@@ -2,7 +2,7 @@
 
 #include <CoreUObject/TObjectHandle.h>
 
-#include <Engine/World/UCameraComponent.h>
+#include <Engine/Components/UCameraComponent.h>
 
 namespace CE
 {

@@ -4,7 +4,7 @@
 #include <RenderCore/RHI/IRHI.h>
 
 #include <Engine/World/UWorld.h>
-#include <Engine/World/UCameraComponent.h>
+#include <Engine/Components/UCameraComponent.h>
 #include <Engine/Systems/RenderSystem.h>
 #include <Engine/Systems/WindowSystem.h>
 #include <Engine/Systems/WorldSystem.h>

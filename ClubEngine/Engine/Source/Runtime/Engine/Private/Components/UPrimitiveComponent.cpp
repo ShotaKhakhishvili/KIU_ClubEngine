@@ -1,7 +1,7 @@
-#include <Engine/World/UPrimitiveComponent.h>
+#include <Engine/Components/UPrimitiveComponent.h>
 
-#include "Engine/World/AActor.h"
-#include "Engine/World/UWorld.h"
+#include <Engine/Actors/AActor.h>
+#include <Engine/World/UWorld.h>
 
 namespace CE
 {

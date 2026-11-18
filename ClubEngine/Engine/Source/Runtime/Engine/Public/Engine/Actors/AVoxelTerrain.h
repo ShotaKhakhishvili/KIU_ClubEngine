@@ -2,8 +2,8 @@
 
 #include <Core/ClubCore.h>
 
-#include <Engine/World/AActor.h>
-#include <Engine/World/UVoxelGrid.h>
+#include <Engine/Actors/AActor.h>
+#include <Engine/Components/UVoxelGrid.h>
 
 namespace CE
 {

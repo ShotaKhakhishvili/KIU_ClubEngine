@@ -1,6 +1,6 @@
-#include <Engine/World/AVoxelTerrain.h>
+#include <Engine/Actors/AVoxelTerrain.h>
 
-#include "Asset/IAssetResolver.h"
+#include <Asset/IAssetResolver.h>
 
 namespace CE
 {

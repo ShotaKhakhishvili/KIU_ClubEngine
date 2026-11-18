@@ -4,7 +4,7 @@
 
 #include <Renderer/Scene/FScene.h>
 
-#include <Engine/World/USceneComponent.h>
+#include <Engine/Components/USceneComponent.h>
 
 namespace CE
 {

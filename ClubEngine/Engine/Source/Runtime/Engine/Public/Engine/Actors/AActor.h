@@ -5,7 +5,7 @@
 #include <CoreUObject/UObject.h>
 #include <CoreUObject/TObjectHandle.h>
 
-#include <Engine/World/USceneComponent.h>
+#include <Engine/Components/USceneComponent.h>
 #include <Engine/World/FObjectInitializer.h>
 #include <Engine/World/ULevel.h>
 #include <Engine/EngineTypes.h>

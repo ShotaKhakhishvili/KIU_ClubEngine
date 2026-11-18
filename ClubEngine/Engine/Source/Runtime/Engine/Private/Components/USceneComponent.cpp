@@ -1,4 +1,5 @@
-#include <Engine/World/USceneComponent.h>
+#include <Engine/Components/USceneComponent.h>
+
 #include <algorithm>
 #include <ranges>
 

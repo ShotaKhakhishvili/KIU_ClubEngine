@@ -1,7 +1,7 @@
-#include <Engine/World/UActorComponent.h>
+#include <Engine/Components/UActorComponent.h>
 
-#include "Engine/World/AActor.h"
-#include "Engine/World/UWorld.h"
+#include <Engine/Actors/AActor.h>
+#include <Engine/World/UWorld.h>
 
 namespace CE
 {

@@ -2,8 +2,8 @@
 
 #include <Asset/UStaticMesh.h>
 
-#include <Engine/World/AActor.h>
-#include <Engine/World/UStaticMeshComponent.h>
+#include <Engine/Actors/AActor.h>
+#include <Engine/Components/UStaticMeshComponent.h>
 
 namespace CE
 {

@@ -9,8 +9,8 @@
 
 #include <Renderer/Scene/FScene.h>
 
-#include <Engine/World/AActor.h>
-#include <Engine/World/UActorComponent.h>
+#include <Engine/Actors/AActor.h>
+#include <Engine/Components/UActorComponent.h>
 #include <Engine/World/FActorSpawnParameters.h>
 #include <Engine/World/FViewTarget.h>
 

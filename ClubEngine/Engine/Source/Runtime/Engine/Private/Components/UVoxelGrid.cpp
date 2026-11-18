@@ -2,7 +2,7 @@
 
 #include <Project/ActiveProject.h>
 
-#include <Engine/World/UVoxelGrid.h>
+#include <Engine/Components/UVoxelGrid.h>
 #include <Engine/AssetLibrary.h>
 
 #include <fstream>

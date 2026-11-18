@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Engine/World/UPrimitiveComponent.h>
+#include <Engine/Components/UPrimitiveComponent.h>
 
 namespace CE
 {

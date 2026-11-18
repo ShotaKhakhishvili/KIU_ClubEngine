@@ -60,7 +60,7 @@ bool GLBuffer::Read(void* dest, size_t readSize, size_t offset) const
         glBindVertexArray(0);
 
     glBindBuffer(target, ID);
-    glBufferSubData(target, offset, readSize, dest);
+    glGetBufferSubData(target, offset, readSize, dest);
     glBindBuffer(target, 0);
 
     return true;
@@ -108,9 +108,10 @@ GLBuffer::~GLBuffer()
 }
 
 GLBuffer::GLBuffer(GLBuffer&& other) noexcept
-    : ID(other.ID), bufferType(other.bufferType)
+    : ID(other.ID), size(other.size), bufferType(other.bufferType)
 {
     other.ID = 0;
+    other.size = 0;
 }
 
 GLBuffer& GLBuffer::operator=(GLBuffer&& other) noexcept
@@ -120,7 +121,10 @@ GLBuffer& GLBuffer::operator=(GLBuffer&& other) noexcept
         Delete();
         ID = other.ID;
         bufferType = other.bufferType;
+        size = other.size;
+
         other.ID = 0;
+        other.size = 0;
     }
     return *this;
 }

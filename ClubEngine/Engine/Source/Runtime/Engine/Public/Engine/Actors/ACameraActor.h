@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Engine/World/AActor.h>
-#include <Engine/World/UCameraComponent.h>
+#include <Engine/Actors/AActor.h>
+#include <Engine/Components/UCameraComponent.h>
 
 namespace CE
 {

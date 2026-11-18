@@ -5,7 +5,7 @@
 
 #include <CoreUObject/TObjectHandle.h>
 
-#include <Engine/World/UActorComponent.h>
+#include <Engine/Components/UActorComponent.h>
 
 #include <vector>
 

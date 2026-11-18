@@ -1,8 +1,9 @@
 #pragma once
-#include <Engine/World/AActor.h>
+
+#include <Engine/Actors/AActor.h>
 #include <Engine/World/FObjectInitializer.h>
-#include <Engine/World/UActorComponent.h>
-#include <Engine/World/USceneComponent.h>
+#include <Engine/Components/UActorComponent.h>
+#include <Engine/Components/USceneComponent.h>
 #include <Core/Math/Transform.h>
 #include <CoreUObject/TObjectHandle.h>
 #include <Engine/World/FObjectInitializer.h>

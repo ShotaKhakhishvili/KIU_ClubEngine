@@ -4,7 +4,7 @@
 #include <Core/Math/Transform.h>
 
 #include <Engine/AssetContext.h>
-#include <Engine/World/AActor.h>
+#include <Engine/Actors/AActor.h>
 
 #include <CoreUObject/TObjectHandle.h>
 #include <CoreUObject/UObjectHandle.h>

@@ -3,7 +3,7 @@
 #include <CoreUObject/UObject.h>
 #include <CoreUObject/UObjectRegistry.h>
 
-#include <Engine/World/UActorComponent.h>
+#include <Engine/Components/UActorComponent.h>
 
 #include <type_traits>
 
