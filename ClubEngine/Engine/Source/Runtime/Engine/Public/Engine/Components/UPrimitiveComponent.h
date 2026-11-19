@@ -16,9 +16,6 @@ class UPrimitiveComponent : public USceneComponent
 public:
     UPrimitiveComponent() = default;
 
-    bool IsVisible()const;
-    void SetVisible(bool newVisibility);
-
 protected:
     void OnRegister() override;
     void OnUnregister() override;
@@ -26,10 +23,9 @@ protected:
     FPrimitiveSceneProxyHandle GetPrimitiveSceneProxy() const;
 
     void OnTransformUpdated() override;
+    void OnVisibilityChanged() override;
 
 private:
-    bool isVisible = true;
-
     FPrimitiveSceneProxyHandle primitiveSceneProxyHandle;
 };
 

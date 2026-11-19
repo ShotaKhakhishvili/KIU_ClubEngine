@@ -74,6 +74,18 @@ void USceneComponent::OnDestroyed()
     childComponents.clear();
 }
 
+bool USceneComponent::IsVisible()const
+{
+    return isVisible;
+}
+
+void USceneComponent::SetVisible(bool newVisibility)
+{
+    if (isVisible == newVisibility) return;
+
+    isVisible = newVisibility;
+    OnVisibilityChanged();
+}
 
 // --------------------------- Transforms Start ---------------------------
 
@@ -81,16 +93,16 @@ const FTransform& USceneComponent::GetWorldTransform()      const { return world
 FVector USceneComponent::GetWorldLocation()                 const { return worldTransform.Translation;      }
 FRotator USceneComponent::GetWorldRotation()                const { return worldTransform.GetRotator();     }
 FQuat USceneComponent::GetWorldRotationInQuat()             const { return worldTransform.Rotation;         }
-
 FVector USceneComponent::GetWorldScale()                    const { return worldTransform.Scale;            }
 
 const FTransform& USceneComponent::GetRelativeTransform()   const { return relativeTransform;               }
 FVector USceneComponent::GetRelativeLocation()              const { return relativeTransform.Translation;   }
 FRotator USceneComponent::GetRelativeRotation()             const { return relativeTransform.GetRotator();  }
-FQuat USceneComponent::GetRelativeRotationInQuat()          const { return worldTransform.Rotation;         }
+FQuat USceneComponent::GetRelativeRotationInQuat()          const { return relativeTransform.Rotation;      }
 FVector USceneComponent::GetRelativeScale()                 const { return relativeTransform.Scale;         }
 
 void USceneComponent::OnTransformUpdated() {}
+void USceneComponent::OnVisibilityChanged() {}
 
 void USceneComponent::SetWorldTransform(const FTransform& newTransform)
 {
@@ -124,7 +136,7 @@ void USceneComponent::SetWorldRotation(const FRotator& newRotation)
     SetWorldTransform(newTransform);
 }
 
-void USceneComponent::SetRelativeRotationInQuat(const FQuat& newRotation)
+void USceneComponent::SetWorldRotationInQuat(const FQuat& newRotation)
 {
     FTransform newTransform = worldTransform;
     newTransform.Rotation = newRotation;
@@ -156,7 +168,7 @@ void USceneComponent::SetRelativeRotation(const FRotator& newRotation)
     UpdateWorldTransform();
 }
 
-void USceneComponent::SetWorldRotationInQuat(const FQuat& newRotation)
+void USceneComponent::SetRelativeRotationInQuat(const FQuat& newRotation)
 {
     relativeTransform.Rotation = newRotation;
     UpdateWorldTransform();

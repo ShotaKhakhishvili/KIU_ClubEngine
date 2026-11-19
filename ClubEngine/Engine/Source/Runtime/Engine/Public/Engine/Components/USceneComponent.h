@@ -54,11 +54,17 @@ public:
     bool IsAncestorOf(const USceneComponent* other) const;
     TArray<USceneComponent*> GetChildren() const;
 
+    bool IsVisible()const;
+    void SetVisible(bool newVisibility);
+
 protected:
     virtual void OnTransformUpdated();
+    virtual void OnVisibilityChanged();
 
 private:
     void UpdateWorldTransform();
+
+    bool isVisible = true;
 
     FTransform worldTransform;
     FTransform relativeTransform;

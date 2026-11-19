@@ -7,6 +7,7 @@ namespace CE
 {
 
 IMPLEMENT_CLASS(UCameraComponent)
+
 FMinimalViewInfo UCameraComponent::GetCameraView() const
 {
     return FMinimalViewInfo{

@@ -13,7 +13,7 @@ void UStaticMeshComponent::SetStaticMesh(const TObjectHandle<UStaticMesh> newSta
     staticMesh = newStaticMesh;
 
     if (IsRegistered())
-        GetOwner()->GetWorld()->GetScene().UpdateStaticMesh(GetPrimitiveSceneProxy(), staticMesh);
+        GetOwner()->GetWorld()->GetScene().UpdatePrimitiveStaticMesh(GetPrimitiveSceneProxy(), staticMesh);
 }
 
 TObjectHandle<UStaticMesh> UStaticMeshComponent::GetStaticMesh() const
@@ -25,7 +25,7 @@ void UStaticMeshComponent::OnRegister()
 {
     Super::OnRegister();
 
-    GetOwner()->GetWorld()->GetScene().UpdateStaticMesh(GetPrimitiveSceneProxy(), staticMesh);
+    GetOwner()->GetWorld()->GetScene().UpdatePrimitiveStaticMesh(GetPrimitiveSceneProxy(), staticMesh);
 }
 
 }
