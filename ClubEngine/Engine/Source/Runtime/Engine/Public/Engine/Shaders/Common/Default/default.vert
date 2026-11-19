@@ -14,9 +14,6 @@ layout(std140, binding = 0) uniform FrameData
     ivec4 lightCounts;
 } frameData;
 
-layout(std430, binding = 1) readonly buffer DirectionalLights { DirectionalLight directionalLights[]; };
-layout(std430, binding = 2) readonly buffer LocalLights       { LocalLight localLights[]; };
-
 uniform mat4 u_Model;
 
 out vec3 v_Normal;
@@ -32,5 +29,5 @@ void main()
     v_Color = aColor;
     v_TexUV = aTexUV;
 
-    gl_Position = frameData.u_Projection * frameData.u_View * u_Model * vec4(aPos, 1.0);
+    gl_Position = frameData.proj * frameData.view * u_Model * vec4(aPos, 1.0);
 }

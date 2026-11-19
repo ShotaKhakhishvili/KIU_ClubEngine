@@ -74,7 +74,6 @@ void AssetContext::CreateEngineDefaults()
 
     if (material)
     {
-        material->SetVec3("u_LightPos", 5.0f, 10.0f, 20.0f);
         material->SetBool("u_UseTexture", false);
     }
 
