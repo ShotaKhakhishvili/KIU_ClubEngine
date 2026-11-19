@@ -6,11 +6,16 @@ layout(location = 1) in vec3 aNormal;
 layout(location = 2) in vec3 aColor;
 layout(location = 3) in vec2 aTexUV;
 
-layout (std140, binding = 0) uniform FrameData
+layout(std140, binding = 0) uniform FrameData
 {
-    mat4 u_View;
-    mat4 u_Projection;
+    mat4 view;
+    mat4 proj;
+    vec4 viewOrigin;
+    ivec4 lightCounts;
 } frameData;
+
+layout(std430, binding = 1) readonly buffer DirectionalLights { DirectionalLight directionalLights[]; };
+layout(std430, binding = 2) readonly buffer LocalLights       { LocalLight localLights[]; };
 
 uniform mat4 u_Model;
 

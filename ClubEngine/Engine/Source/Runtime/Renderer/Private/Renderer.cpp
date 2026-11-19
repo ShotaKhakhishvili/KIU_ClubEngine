@@ -16,6 +16,100 @@
 namespace CE
 {
 
+void Renderer::EnsureBufferCapacity(RHI::BufferHandle& handle, uint32& capacity, const uint32 required, const uint32 elementSize)
+{
+    if (required <= capacity)
+        return;
+
+    while (capacity < required)
+        capacity *= 2;
+
+    RHI::Get().DestroyBuffer(handle);
+
+    const RHI::BufferDesc desc{
+        RHI::BufferType::ShaderStorage,
+        RHI::BufferUsage::DynamicDraw,
+        capacity * elementSize
+    };
+    handle = RHI::Get().CreateBuffer(desc, nullptr);
+}
+
+void Renderer::UpdateLightSSBOs(const FSceneViewFamily& sceneViewFamily)
+{
+    directionalLights.clear();
+    localLights.clear();
+
+    sceneViewFamily.GetScene()->ForEachLight([&](const FLightSceneProxy& light)
+    {
+        if (!light.isVisible || light.lightParameters.intensity <= 0)
+            return;
+
+        const FVectorF forward = Normalize(light.localToWorld[0].XYZ());
+        const FVector4F direction = FVector4F(forward, 0.0f);
+        const FVector4F color = light.lightParameters.intensity *
+                                FVector4F(light.lightParameters.color, 0.0f);
+
+        if (light.lightType == ELightType::Directional)
+        {
+            const FGPUDirectionalLight directionalLight{
+                .direction = direction,
+                .color = color
+            };
+
+            directionalLights.push_back(directionalLight);
+        }
+        else
+        {
+            const float radius = light.lightParameters.attenuationRadius;
+
+            if (radius <= 0.0f)
+                return;
+
+            FVector4F spotAngles(-2.0f, 1.0f, 0.0f, 0.0f);
+
+            if (light.lightType == ELightType::Spot)
+            {
+                const FLightParameters& params = light.lightParameters;
+
+                const float outerDeg = Clamp(params.outerConeAngle, 1.0f, 89.9f);
+                const float innerDeg = Clamp(params.innerConeAngle, 0.0f, outerDeg - 0.01f);
+
+                const float cosOuter = std::cos(ToRadians(outerDeg));
+                const float cosInner = std::cos(ToRadians(innerDeg));
+
+                spotAngles.x = cosOuter;
+                spotAngles.y = 1.0f / Max(cosInner - cosOuter, KINDA_SMALL_NUMBER<float>);
+            }
+
+            const FGPULocalLight localLight{
+                .positionInvRadius = FVector4F(light.localToWorld[3].XYZ(), 1.0f / radius),
+                .color = color,
+                .direction = direction,
+                .spotAngles = spotAngles
+            };
+
+            localLights.push_back(localLight);
+        }
+    });
+
+    EnsureBufferCapacity(directionalLightSSBOHandle, directionalLightCountOnBuffer,
+        static_cast<uint32>(directionalLights.size()),
+        static_cast<uint32>(sizeof(FGPUDirectionalLight)));
+    EnsureBufferCapacity(localLightSSBOHandle, localLightCountOnBuffer,
+    static_cast<uint32>(localLights.size()),
+    static_cast<uint32>(sizeof(FGPULocalLight)));
+
+    RHI::Get().BindBufferBase(directionalLightSSBOHandle, directionalLightSlot);
+    if (!directionalLights.empty())
+        RHI::Get().WriteBuffer(directionalLightSSBOHandle, directionalLights.data(),
+            static_cast<uint32>(directionalLights.size() * sizeof(FGPUDirectionalLight)), 0);
+
+    RHI::Get().BindBufferBase(localLightSSBOHandle, localLightSlot);
+    if (!localLights.empty())
+        RHI::Get().WriteBuffer(localLightSSBOHandle, localLights.data(),
+            static_cast<uint32>(localLights.size() * sizeof(FGPULocalLight)), 0);
+}
+
 Renderer::Renderer(const RHI::Backend backend)
 {
     SetBackend(backend);
@@ -26,14 +120,29 @@ Renderer::Renderer(const RHI::Backend backend)
         RHI::BufferUsage::DynamicDraw,
         sizeof(FFrameData)
     };
-
     frameDataHandle = RHI::Get().CreateBuffer(frameDataDesc, nullptr);
+
+    const RHI::BufferDesc directionalLightSSBODesc{
+        RHI::BufferType::ShaderStorage,
+        RHI::BufferUsage::DynamicDraw,
+         static_cast<uint32>(sizeof(FGPUDirectionalLight)) * directionalLightCountOnBuffer,
+    };
+    directionalLightSSBOHandle = RHI::Get().CreateBuffer(directionalLightSSBODesc, nullptr);
+
+    const RHI::BufferDesc localLightSSBODesc{
+        RHI::BufferType::ShaderStorage,
+        RHI::BufferUsage::DynamicDraw,
+        static_cast<uint32>(sizeof(FGPULocalLight)) * localLightCountOnBuffer
+    };
+    localLightSSBOHandle = RHI::Get().CreateBuffer(localLightSSBODesc, nullptr);
 }
 
 
 Renderer::~Renderer()
 {
     RHI::Get().DestroyBuffer(frameDataHandle);
+    RHI::Get().DestroyBuffer(directionalLightSSBOHandle);
+    RHI::Get().DestroyBuffer(localLightSSBOHandle);
     RHI::Get().Shutdown();
 }
 
@@ -115,7 +224,7 @@ void Renderer::SetBackend(RHI::Backend backend)
     }
 }
 
-void Renderer::Render(const FSceneViewFamily& sceneViewFamily) const
+void Renderer::Render(const FSceneViewFamily& sceneViewFamily)
 {
     if (!sceneViewFamily.GetScene())
     {
@@ -128,6 +237,8 @@ void Renderer::Render(const FSceneViewFamily& sceneViewFamily) const
         CE_LOG(Error, "Failed to render with invalid render target");
         return;
     }
+
+    UpdateLightSSBOs(sceneViewFamily);
 
     FFrameData frameData;
 
@@ -146,6 +257,17 @@ void Renderer::Render(const FSceneViewFamily& sceneViewFamily) const
 
         frameData.view = view.viewMatrix;
         frameData.proj = view.projMatrix;
+
+        frameData.viewOrigin = FVector4F{
+            static_cast<float>(view.viewOrigin.x),
+            static_cast<float>(view.viewOrigin.y),
+            static_cast<float>(view.viewOrigin.z), 0.0f
+        };
+
+        frameData.lightCounts = FVector4I{
+            static_cast<int>(directionalLights.size()),
+            static_cast<int>(localLights.size()), 0, 0
+        };
 
         RHI::Get().BindBufferBase(frameDataHandle, frameDataSlot);
         RHI::Get().WriteBuffer(frameDataHandle, &frameData, sizeof(frameData), 0);
