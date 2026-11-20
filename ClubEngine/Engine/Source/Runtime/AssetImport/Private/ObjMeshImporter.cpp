@@ -60,7 +60,7 @@ namespace CE
 
         FMeshImportSection currentSection;
         currentSection.name = "Default";
-        currentSection.materialName = "Default";
+        currentSection.materialIndex = -1;
         currentSection.indexStart = 0;
 
         auto FinishCurrentSection = [&]()
@@ -127,7 +127,7 @@ namespace CE
                 }
             }
 
-            vertex.color = FVectorF{1.0f, 1.0f, 1.0f};
+            vertex.color = FVector4F{1.0f, 1.0f, 1.0f, 1.0f};
 
             return vertex;
         };
@@ -179,7 +179,7 @@ namespace CE
                     currentSection.name = "Unnamed";
                 }
 
-                currentSection.materialName = "Default";
+                currentSection.materialIndex = -1;
                 currentSection.indexStart = static_cast<uint32_t>(result.indices.size());
             }
             else if (type == "usemtl")
@@ -188,12 +188,6 @@ namespace CE
 
                 currentSection = {};
                 currentSection.name = "Section";
-                ss >> currentSection.materialName;
-
-                if (currentSection.materialName.empty())
-                {
-                    currentSection.materialName = "Default";
-                }
 
                 currentSection.indexStart = static_cast<uint32_t>(result.indices.size());
             }

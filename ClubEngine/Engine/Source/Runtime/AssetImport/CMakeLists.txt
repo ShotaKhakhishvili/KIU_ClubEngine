@@ -21,6 +21,7 @@ target_link_libraries(CEAssetImport
   PRIVATE
     ClubEngine::Core
     ThirdParty::stb
+    ThirdParty::cgltf
 )
 
 target_compile_definitions(CEAssetImport PRIVATE CEASSETIMPORT_BUILD)

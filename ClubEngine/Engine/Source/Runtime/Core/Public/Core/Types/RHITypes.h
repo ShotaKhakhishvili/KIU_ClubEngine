@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Core/Types/CoreTypes.h>
+#include <Core/Math/Vector.h>
 
 #include <string>
 #include <vector>
@@ -171,6 +172,21 @@ struct BufferDesc
     uint32 size = 0;
 };
 
+enum class TextureWrap
+{
+    Repeat,
+    ClampToEdge,
+    MirroredRepeat,
+    Count
+};
+
+enum class TextureFilter
+{
+    Nearest,
+    Linear,
+    Count
+};
+
 struct TextureDesc
 {
     TextureDimension dimension = TextureDimension::Texture2D;
@@ -182,7 +198,13 @@ struct TextureDesc
     TextureFormat readFormat = TextureFormat::RGBA;
     TexturePixelType pixelType = TexturePixelType::UnsignedByte;
 
+    TextureWrap wrapU = TextureWrap::Repeat;
+    TextureWrap wrapV = TextureWrap::Repeat;
+    TextureFilter minFilter = TextureFilter::Nearest;
+    TextureFilter magFilter = TextureFilter::Nearest;
+
     bool generateMipmaps = true;
+    bool sRGB = false;
 };
 
 struct ShaderSource
@@ -262,6 +284,29 @@ enum class LoadOp
     Clear,
     DontCare,
     Count
+};
+
+struct RenderStateDesc
+{
+    BlendMode blendMode = BlendMode::Opaque;
+    CullMode cullMode = CullMode::Back;
+    bool depthWrite = true;
+    bool depthTest = true;
+};
+
+struct FMaterialSettings
+{
+    FVector4F baseColor{1.0f, 1.0f, 1.0f, 1.0f};
+    float metallic = 1.0f;
+    float roughness = 1.0f;
+    FVectorF emissive{0.0f, 0.0f, 0.0f};
+
+    float normalScale = 1.0f;
+    float occlusionStrength = 1.0f;
+    float alphaCutoff = 0.5f;
+    bool unlit = false;
+
+    RenderStateDesc renderState;
 };
 
 }

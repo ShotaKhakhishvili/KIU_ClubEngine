@@ -45,4 +45,13 @@ target_include_directories(ThirdParty_nlohmann INTERFACE
   ${CMAKE_CURRENT_SOURCE_DIR}/nlohmann
 )
 
+# ---------------- VGLTF (header-only) ----------------
+add_library(ThirdParty_cgltf INTERFACE)
+add_library(ThirdParty::cgltf ALIAS ThirdParty_cgltf)
+
+target_include_directories(ThirdParty_cgltf SYSTEM INTERFACE
+        ${CMAKE_CURRENT_SOURCE_DIR}/cgltf
+)
+
+
 set_target_properties(ThirdParty_glad PROPERTIES POSITION_INDEPENDENT_CODE ON)
