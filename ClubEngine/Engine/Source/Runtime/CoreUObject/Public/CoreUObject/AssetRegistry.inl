@@ -35,4 +35,18 @@ T* Resolve(TObjectHandle<T> handle)
     return GetAssetRegistry().Resolve(handle);
 }
 
+template<typename T>
+TObjectHandle<T> AssetRegistry::FindByPath(const std::filesystem::path& path) const
+{
+    const UObjectHandle handle = FindHandleByPath(path);
+
+    if (!handle.IsValid())
+        return {};
+
+    if (dynamic_cast<T*>(registry.Resolve(handle)) == nullptr)
+        return {};
+
+    return TObjectHandle<T>(handle);
+}
+
 }

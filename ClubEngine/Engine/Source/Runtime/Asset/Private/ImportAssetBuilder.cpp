@@ -261,6 +261,11 @@ TObjectHandle<UStaticMesh> ImportStaticMesh(const std::filesystem::path& path)
         return {};
     }
 
+    AssetRegistry& assets = GetAssetRegistry();
+
+    if (const TObjectHandle<UStaticMesh> cached = assets.FindByPath<UStaticMesh>(path); cached.IsValid())
+        return cached;
+
     GltfImporter importer;
     const std::optional<FSceneImportResult> result = importer.Import(path);
 
@@ -274,7 +279,12 @@ TObjectHandle<UStaticMesh> ImportStaticMesh(const std::filesystem::path& path)
         return {};
 
     ImportAssetBuilder builder;
-    return builder.BuildStaticMesh(*result);
+    const TObjectHandle<UStaticMesh> mesh = builder.BuildStaticMesh(*result);
+
+    if (mesh.IsValid())
+        assets.RegisterPath(path, mesh.GetRaw());
+
+    return mesh;
 }
 
 }

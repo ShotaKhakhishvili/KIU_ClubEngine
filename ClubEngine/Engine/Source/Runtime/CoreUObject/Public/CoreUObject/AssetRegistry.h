@@ -1,9 +1,13 @@
 #pragma once
 
+#include <Core/Containers/TMap.h>
+
 #include <CoreUObject/UObjectRegistry.h>
 #include <CoreUObject/UObjectHandle.h>
 #include <CoreUObject/TObjectHandle.h>
 
+#include <filesystem>
+#include <string>
 namespace CE
 {
 
@@ -32,7 +36,17 @@ public:
 
     uint32 GetRegistryId() const;
 
+    void RegisterPath(const std::filesystem::path& path, UObjectHandle handle);
+
+    template<typename T>
+    TObjectHandle<T> FindByPath(const std::filesystem::path& path) const;
+
 private:
+    UObjectHandle FindHandleByPath(const std::filesystem::path& path) const;
+    static std::string NormalizePath(const std::filesystem::path& path);
+
+    mutable std::unordered_map<std::string, UObjectHandle> pathToHandle;
+
     mutable UObjectRegistry registry;
 };
 
