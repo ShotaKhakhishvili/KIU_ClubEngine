@@ -13,6 +13,17 @@ bool FScene::RemovePrimitive(const FPrimitiveSceneProxyHandle& proxyToRemove)
     return primitiveProxyPool.Remove(proxyToRemove);
 }
 
+bool FScene::UpdatePrimitiveOverrideMaterials(const FPrimitiveSceneProxyHandle handle, const TArray<TObjectHandle<UMaterial>>& overrideMaterials)
+{
+    FPrimitiveSceneProxy* proxy = primitiveProxyPool.Resolve(handle);
+
+    if(proxy == nullptr)
+        return false;
+
+    proxy->overrideMaterials = overrideMaterials;
+    return true;
+}
+
 FLightSceneProxyHandle FScene::AddLight(const FLightSceneProxy& newProxy)
 {
     return lightProxyPool.Add(newProxy);

@@ -14,7 +14,7 @@ using FLightSceneProxyHandle = TPoolHandle<FLightSceneProxy>;
 class FScene
 {
 public:
-
+    bool UpdatePrimitiveOverrideMaterials   (FPrimitiveSceneProxyHandle handle, const TArray<TObjectHandle<UMaterial>>& overrideMaterials);
 
     FLightSceneProxyHandle AddLight         (const FLightSceneProxy& newProxy);
     bool RemoveLight                        (const FLightSceneProxyHandle& proxyToRemove);

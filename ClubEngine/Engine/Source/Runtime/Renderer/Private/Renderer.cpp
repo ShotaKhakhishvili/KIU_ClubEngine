@@ -147,7 +147,7 @@ Renderer::~Renderer()
     RHI::Get().Shutdown();
 }
 
-void Renderer::DrawStaticMesh(const UStaticMesh& staticMesh, const FMatrix4x4F& localToWorld) const
+void Renderer::DrawStaticMesh(const UStaticMesh& staticMesh, const TArray<TObjectHandle<UMaterial>>& overrideMaterials, const FMatrix4x4F& localToWorld) const
 {
     if(!staticMesh.GetVertexArray().IsValid())
     {
@@ -162,14 +162,20 @@ void Renderer::DrawStaticMesh(const UStaticMesh& staticMesh, const FMatrix4x4F& 
 
     for(const auto& subMesh : subMeshes)
     {
+        const uint32 slot = subMesh.materialIndex;
 
-        if(subMesh.materialIndex >= materials.size())
+        if(slot >= materials.size())
         {
             CE_LOG(Warning, "Tried To Draw Sub Mesh With Invalid Material index");
             continue;
         }
 
-        const auto materialHandle = materials[subMesh.materialIndex];
+        TObjectHandle<UMaterial> materialHandle;
+
+        if(slot < overrideMaterials.size() && overrideMaterials[slot].IsValid())
+            materialHandle = overrideMaterials[slot];
+        else if(slot < materials.size())
+            materialHandle = materials[slot];
 
         if(!materialHandle.IsValid())
         {
@@ -274,7 +280,7 @@ void Renderer::Render(const FSceneViewFamily& sceneViewFamily)
                 return;
 
             if (const UStaticMesh* mesh = Resolve(proxy.staticMesh))
-                DrawStaticMesh(*mesh, proxy.localToWorld);
+                DrawStaticMesh(*mesh, proxy.overrideMaterials, proxy.localToWorld);
         });
     }
 

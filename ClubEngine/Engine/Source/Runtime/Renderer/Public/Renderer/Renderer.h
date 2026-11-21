@@ -23,7 +23,7 @@ public:
 
     void SetBackend(RHI::Backend backend);
 
-    void DrawStaticMesh(const UStaticMesh& staticMesh, const FMatrix4x4F& localToWorld) const;
+    void DrawStaticMesh(const UStaticMesh& staticMesh, const TArray<TObjectHandle<UMaterial>>& overrideMaterials, const FMatrix4x4F& localToWorld) const;
 
 private:
     static void EnsureBufferCapacity(RHI::BufferHandle& handle, uint32& capacity, uint32 required, uint32 elementSize);
