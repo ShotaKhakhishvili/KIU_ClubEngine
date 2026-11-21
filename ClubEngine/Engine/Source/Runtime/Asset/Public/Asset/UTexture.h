@@ -11,6 +11,10 @@
 #include <string>
 #include <cstdint>
 
+namespace CE_STB
+{
+struct FImageData;
+}
 namespace CE
 {
 
@@ -19,12 +23,12 @@ class UTexture final : public UObject
     GENERATED_BODY(UTexture, UObject)
 
 public:
-    UTexture(std::filesystem::path inSourcePath,
-             const RHI::TextureDesc& inDesc);
+    UTexture() = default;
     ~UTexture() override;
 
-    bool Load();
-    void Unload();
+    bool BuildFromSourceFile(const std::filesystem::path& path, const RHI::TextureDesc& newDesc);
+    bool BuildFromData(const TArray<uint8>& encodedBytes, const RHI::TextureDesc& newDesc);
+
     bool IsReady() const noexcept;
 
     void Bind(uint32_t slot) const;
@@ -33,7 +37,9 @@ public:
     uint32_t GetHeight() const noexcept;
 
 private:
-    std::filesystem::path sourcePath;
+    bool UploadImage(const CE_STB::FImageData& image, const RHI::TextureDesc& newDesc);
+    void Release();
+
     RHI::TextureDesc desc;
     RHI::TextureHandle handle;    
 };

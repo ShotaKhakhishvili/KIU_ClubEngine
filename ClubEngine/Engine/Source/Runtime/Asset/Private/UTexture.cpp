@@ -17,74 +17,87 @@ namespace CE
 
 IMPLEMENT_CLASS(UTexture)
 
-UTexture::UTexture(std::filesystem::path inSourcePath,
-				   const RHI::TextureDesc& inDesc)
-	: sourcePath(std::move(inSourcePath))
-	, desc(inDesc)
-{
-}
-
 UTexture::~UTexture()
 {
-	Unload();
+	Release();
 }
 
-bool UTexture::Load()
+bool UTexture::BuildFromSourceFile(const std::filesystem::path& path, const RHI::TextureDesc& newDesc)
 {
-	Unload();
+    CE_STB::FImageData image = CE_STB::LoadImage(path);
 
-	CE_STB::FImageData image = CE_STB::LoadImage(sourcePath);
-
-    if (!image.Pixels)
+    if (image.Pixels == nullptr)
     {
-        CE_LOG(Error, "Failed To Load Texture: [{}]", this->GetName());
+        CE_LOG(Error, "Failed To Load Texture File: [{}]", path.string());
         return false;
     }
 
-	desc.width = static_cast<uint32>(image.Width);
-	desc.height = static_cast<uint32>(image.Height);
-	desc.pixelType = RHI::TexturePixelType::UnsignedByte;
+    const bool uploaded = UploadImage(image, newDesc);
 
-	switch (image.Channels)
-	{
-		case 1:
-			desc.format = RHI::TextureInternalFormat::R8;
-			desc.readFormat = RHI::TextureFormat::Red;
-			break;
-		case 2:
-			desc.format = RHI::TextureInternalFormat::RG8;
-			desc.readFormat = RHI::TextureFormat::RG;
-			break;
-		case 3:
-			desc.format = RHI::TextureInternalFormat::RGB8;
-			desc.readFormat = RHI::TextureFormat::RGB;
-			break;
-		case 4:
-			desc.format = RHI::TextureInternalFormat::RGBA8;
-			desc.readFormat = RHI::TextureFormat::RGBA;
-			break;
-		default:
-			CE_LOG(Warning, "Failed To Load Texture: [{}]", this->GetName());
-			CE_STB::FreeImageData(image);
-			return false;
-	}
-
-
-	handle = RHI::Get().CreateTexture(desc, image.Pixels);
-
-	if(!handle.IsValid())
-	{
-		CE_LOG(Error, "Failed To Load Texture: [{}]", this->GetName());
-		CE_STB::FreeImageData(image);
-		return false;
-	}
-
-	CE_STB::FreeImageData(image);
-
-	return true;
+    CE_STB::FreeImageData(image);
+    return uploaded;
 }
 
-void UTexture::Unload()
+bool UTexture::BuildFromData(const TArray<uint8>& encodedBytes, const RHI::TextureDesc& newDesc)
+{
+    CE_STB::FImageData image = CE_STB::LoadImageFromMemory(encodedBytes.data(), encodedBytes.size());
+
+    if (image.Pixels == nullptr)
+    {
+        CE_LOG(Error, "Failed To Decode Texture Data: [{}]", this->GetName());
+        return false;
+    }
+
+    const bool uploaded = UploadImage(image, newDesc);
+
+    CE_STB::FreeImageData(image);
+    return uploaded;
+}
+
+bool UTexture::UploadImage(const CE_STB::FImageData& image, const RHI::TextureDesc& newDesc)
+{
+    Release();
+
+    desc = newDesc;
+    desc.width = image.Width;
+    desc.height = image.Height;
+    desc.pixelType = RHI::TexturePixelType::UnsignedByte;
+
+    switch (image.Channels)
+    {
+        case 1:
+            desc.format = RHI::TextureInternalFormat::R8;
+            desc.readFormat = RHI::TextureFormat::Red;
+            break;
+        case 2:
+            desc.format = RHI::TextureInternalFormat::RG8;
+            desc.readFormat = RHI::TextureFormat::RG;
+            break;
+        case 3:
+            desc.format = RHI::TextureInternalFormat::RGB8;
+            desc.readFormat = RHI::TextureFormat::RGB;
+            break;
+        case 4:
+            desc.format = RHI::TextureInternalFormat::RGBA8;
+            desc.readFormat = RHI::TextureFormat::RGBA;
+            break;
+        default:
+            CE_LOG(Error, "Unsupported Texture Channel Count {}: [{}]", image.Channels, this->GetName());
+            return false;
+    }
+
+    handle = RHI::Get().CreateTexture(desc, image.Pixels);
+
+    if (!handle.IsValid())
+    {
+        CE_LOG(Error, "Failed To Create Texture: [{}]", this->GetName());
+        return false;
+    }
+
+    return true;
+}
+
+void UTexture::Release()
 {
 	if(!handle.IsValid())
 		return;
@@ -98,7 +111,7 @@ bool UTexture::IsReady() const noexcept
 	return handle.IsValid();
 }
 
-void UTexture::Bind(uint32_t slot) const
+void UTexture::Bind(const uint32_t slot) const
 {
 	if(!handle.IsValid())
 		return;

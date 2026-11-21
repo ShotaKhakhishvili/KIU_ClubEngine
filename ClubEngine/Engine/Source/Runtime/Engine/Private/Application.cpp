@@ -1,16 +1,19 @@
 #include <Core/Config/ConfigSystem.h>
+#include <Core/FileIO.h>
+#include <Core/CommandLine.h>
+
+#include <CoreUObject/AssetRegistry.h>
+
+#include <AssetImport/Image.h>
+#include <Asset/UShader.h>
+#include <Asset/UMaterial.h>
+#include <Asset/UStaticMesh.h>
+#include <Asset/ImportAssetBuilder.h>
 
 #include <Platform/FWindowConfig.h>
-
 #include <Project/ActiveProject.h>
 
 #include <Engine/Application.h>
-
-#include <AssetImport/Image.h>
-#include <Core/CommandLine.h>
-
-#include <Engine/AssetContext.h>
-
 #include <Engine/Systems/InputSystem.h>
 #include <Engine/Systems/RenderSystem.h>
 #include <Engine/Systems/WindowSystem.h>
@@ -118,14 +121,58 @@ bool Application::CaptureFrame(const RenderSystem& renderSystem, const uint32 fr
 
 Application::~Application() = default;
 
-AssetContext& Application::GetAssetContext() noexcept
+void Application::CreateAssetDefaults()
 {
-    return assetContext;
+    using std::filesystem::path;
+
+    AssetRegistry& assets = GetAssetRegistry();
+    const path enginePath = GetActiveProject().GetEnginePath();
+
+    const path vertPath = enginePath / "Engine/Source/Runtime/Engine/Public/Engine/Shaders/Common/Default/default.vert";
+    const path fragPath = enginePath / "Engine/Source/Runtime/Engine/Public/Engine/Shaders/Common/Default/default.frag";
+
+    RHI::ShaderDesc shaderDesc;
+    shaderDesc.stages = {
+        { RHI::ShaderStage::Vertex,   FileIO::ReadFileWithIncludes(vertPath) },
+        { RHI::ShaderStage::Fragment, FileIO::ReadFileWithIncludes(fragPath) }
+    };
+
+    const TObjectHandle<UShader> shaderHandle = assets.Create<UShader>(shaderDesc);
+
+    if (UShader* shader = assets.Resolve(shaderHandle))
+    {
+        shader->SetName("DefaultShader");
+
+        if (!shader->IsReady())
+            shader->Load();
+    }
+
+    const TObjectHandle<UMaterial> materialHandle = assets.Create<UMaterial>();
+
+    if (UMaterial* material = assets.Resolve(materialHandle))
+    {
+        material->SetName("DefaultMaterial");
+        material->SetShader(shaderHandle);
+    }
+
+    UMaterial::SetDefault(materialHandle);
+
+    const path meshPath = enginePath / "Engine/Source/Runtime/Engine/Public/Engine/Geometry/TestModel.glb";
+
+    const TObjectHandle<UStaticMesh> meshHandle = ImportStaticMesh(meshPath);
+
+    if (UStaticMesh* mesh = assets.Resolve(meshHandle))
+        mesh->SetName("DebugStaticMesh");
+    else
+        CE_LOG(Warning, "Debug mesh import failed: {}", meshPath.string());
+
+    UStaticMesh::SetDefault(meshHandle);
 }
 
-const AssetContext& Application::GetAssetContext() const noexcept
+void Application::ReleaseAssetDefaults()
 {
-    return assetContext;
+    UStaticMesh::SetDefault({});
+    UMaterial::SetDefault({});
 }
 
 int Application::Run()
@@ -158,11 +205,13 @@ int Application::Run()
         return 1;
     }
 
-    assetContext.CreateEngineDefaults();
+    CreateAssetDefaults();
 
     this->PostInit();
 
     const int exitCode = offlineRenderSettings.enabled ? RunOfflineLoop() : RunInteractiveLoop();
+
+    ReleaseAssetDefaults();
 
     for (const auto & system : std::ranges::reverse_view(systems))
         system->Shutdown();
@@ -204,7 +253,7 @@ int Application::RunInteractiveLoop()
             break;
         }
 
-        assetContext.registry.FlushPendingDestroy();
+        GetAssetRegistry().FlushPendingDestroy();
     }
 
     return exitCode;
@@ -254,7 +303,7 @@ int Application::RunOfflineLoop()
             break;
         }
 
-        assetContext.registry.FlushPendingDestroy();
+        GetAssetRegistry().FlushPendingDestroy();
     }
 
     return exitCode;

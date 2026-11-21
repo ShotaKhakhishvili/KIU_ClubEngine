@@ -1,9 +1,12 @@
 #include <Core/Types/CoreTypes.h>
+#include <Core/FileIO.h>
+
+#include <CoreUObject/AssetRegistry.h>
 
 #include <Project/ActiveProject.h>
 
 #include <Engine/Components/UVoxelGrid.h>
-#include <Engine/AssetLibrary.h>
+#include <sstream>
 
 #include <fstream>
 
@@ -36,7 +39,7 @@ void UVoxelGrid::CompileChunkGenShader()
     
     const std::string shaderCode = oss.str();
 
-    shader = NewObject<UShader>(RHI::ShaderDesc{ std::vector<RHI::ShaderSource>{RHI::ShaderSource{RHI::ShaderStage::Compute, oss.str()} } });
+    shader = shader = NewAsset<UShader>(RHI::ShaderDesc{ std::vector<RHI::ShaderSource>{RHI::ShaderSource{RHI::ShaderStage::Compute, shaderCode} } });
 
     std::ofstream file(intermediateDir / "Shaders/ChunkGen.comp");
     file << shaderCode;

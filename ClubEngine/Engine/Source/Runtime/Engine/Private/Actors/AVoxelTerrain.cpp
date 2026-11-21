@@ -1,7 +1,5 @@
 #include <Engine/Actors/AVoxelTerrain.h>
 
-#include <Asset/IAssetResolver.h>
-
 namespace CE
 {
 

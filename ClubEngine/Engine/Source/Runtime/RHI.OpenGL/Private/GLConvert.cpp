@@ -5,7 +5,7 @@
 namespace CE::RHI
 {
 
-GLenum ToGL(ShaderDataType v) noexcept
+GLenum ToGL(const ShaderDataType v) noexcept
 {
     switch (v)
     {
@@ -19,7 +19,7 @@ GLenum ToGL(ShaderDataType v) noexcept
     return GL_FLOAT;
 }
 
-GLenum ToGL(BufferUsage v) noexcept
+GLenum ToGL(const BufferUsage v) noexcept
 {
     switch (v)
     {
@@ -33,7 +33,7 @@ GLenum ToGL(BufferUsage v) noexcept
     return GL_STATIC_DRAW;
 }
 
-GLenum ToGL(TextureType v) noexcept
+GLenum ToGL(const TextureType v) noexcept
 {
     switch (v)
     {
@@ -46,7 +46,7 @@ GLenum ToGL(TextureType v) noexcept
     return GL_TEXTURE_2D;
 }
 
-GLenum ToGL(TextureSlot v) noexcept
+GLenum ToGL(const TextureSlot v) noexcept
 {
     switch (v)
     {
@@ -73,7 +73,7 @@ GLenum ToGL(TextureSlot v) noexcept
     return GL_TEXTURE0;
 }
 
-GLenum ToGL(TextureInternalFormat v) noexcept
+GLenum ToGL(const TextureInternalFormat v) noexcept
 {
     switch (v)
     {
@@ -89,7 +89,7 @@ GLenum ToGL(TextureInternalFormat v) noexcept
     return GL_RGBA8;
 }
 
-GLenum ToGL(TextureFormat v) noexcept
+GLenum ToGL(const TextureFormat v) noexcept
 {
     switch (v)
     {
@@ -118,7 +118,7 @@ GLenum ToGL(TexturePixelType v) noexcept
     return GL_UNSIGNED_BYTE;
 }
 
-GLenum ToGL(RHI::BufferType type) noexcept
+GLenum ToGL(const RHI::BufferType type) noexcept
 {
     switch (type)
     {
@@ -131,7 +131,7 @@ GLenum ToGL(RHI::BufferType type) noexcept
     return GL_ARRAY_BUFFER;
 }
 
-GLenum ToGL(RHI::PrimitiveType primitive) noexcept
+GLenum ToGL(const RHI::PrimitiveType primitive) noexcept
 {
     switch (primitive)
     {
@@ -143,7 +143,7 @@ GLenum ToGL(RHI::PrimitiveType primitive) noexcept
     return GL_TRIANGLES;
 }
 
-GLenum ToGL(RHI::IndexType type) noexcept
+GLenum ToGL(const RHI::IndexType type) noexcept
 {
     switch (type)
     {
@@ -154,7 +154,7 @@ GLenum ToGL(RHI::IndexType type) noexcept
     return GL_UNSIGNED_INT;
 }
 
-GLuint ToGL(ShaderStage v) noexcept
+GLuint ToGL(const ShaderStage v) noexcept
 {
     switch (v)
     {
@@ -164,6 +164,57 @@ GLuint ToGL(ShaderStage v) noexcept
     }
     assert(false && "Unhandled ShaderStage");
 	return GL_VERTEX_SHADER;
+}
+
+GLenum ToGL(const TextureWrap v) noexcept
+{
+    switch (v)
+    {
+        case TextureWrap::Repeat:         return GL_REPEAT;
+        case TextureWrap::ClampToEdge:    return GL_CLAMP_TO_EDGE;
+        case TextureWrap::MirroredRepeat: return GL_MIRRORED_REPEAT;
+        case TextureWrap::Count:          break;
+    }
+
+    assert(false && "Unhandled TextureWrap");
+    return GL_REPEAT;
+}
+
+GLenum ToGLMagFilter(const TextureFilter v) noexcept
+{
+    switch (v)
+    {
+        case TextureFilter::Nearest: return GL_NEAREST;
+        case TextureFilter::Linear:  return GL_LINEAR;
+        case TextureFilter::Count:   break;
+    }
+
+    assert(false && "Unhandled TextureFilter");
+    return GL_LINEAR;
+}
+
+GLenum ToGLMinFilter(const TextureFilter v, const  bool mipmaps) noexcept
+{
+    switch (v)
+    {
+        case TextureFilter::Nearest: return mipmaps ? GL_NEAREST_MIPMAP_LINEAR : GL_NEAREST;
+        case TextureFilter::Linear:  return mipmaps ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR;
+        case TextureFilter::Count:   break;
+    }
+
+    assert(false && "Unhandled TextureFilter");
+    return GL_LINEAR;
+}
+
+GLenum ToGLInternalFormat(const TextureInternalFormat format, const bool sRGB) noexcept
+{
+    if (sRGB && format == TextureInternalFormat::RGB8)
+        return GL_SRGB8;
+
+    if (sRGB && format == TextureInternalFormat::RGBA8)
+        return GL_SRGB8_ALPHA8;
+
+    return ToGL(format);
 }
 
 }

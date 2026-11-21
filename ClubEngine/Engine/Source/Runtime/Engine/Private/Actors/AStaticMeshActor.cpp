@@ -1,6 +1,5 @@
 #include <Engine/Actors/AStaticMeshActor.h>
 
-#include <Asset/IAssetResolver.h>
 #include <Engine/World/UWorld.h>
 
 namespace CE

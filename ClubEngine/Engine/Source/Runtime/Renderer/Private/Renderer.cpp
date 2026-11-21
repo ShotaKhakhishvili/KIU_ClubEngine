@@ -1,15 +1,16 @@
 #include <Core/ClubCore.h>
 
+#include <CoreUObject/AssetRegistry.h>
+
 #include <RenderCore/RHI/IRHI.h>
 
 #include <RHI.OpenGL/GLRHI.h>
 
-#include <Asset/IAssetResolver.h>
+#include <Asset/UMaterial.h>
+#include <Asset/UStaticMesh.h>
 
 #include <Renderer/Renderer.h>
-
 #include "Renderer/FRenderTarget.h"
-
 #include <Renderer/FFrameData.h>
 #include <Renderer/Scene/FScene.h>
 
@@ -148,23 +149,19 @@ Renderer::~Renderer()
 
 void Renderer::DrawStaticMesh(const UStaticMesh& staticMesh, const FMatrix4x4F& localToWorld) const
 {
-    const auto resolver = GetCurrentAssetResolver();
-    if(!resolver)
+    if(!staticMesh.GetVertexArray().IsValid())
     {
-        CE_LOG(Error, "Tried To Draw Without An Asset Resolver");
+        CE_LOG(Warning, "Tried To Draw Sub Mesh With Invalid Vertex Array");
         return;
     }
 
     const auto& subMeshes = staticMesh.GetSubMeshes();
     const auto& materials = staticMesh.GetMaterials();
 
+    RHI::Get().BindVertexArray(staticMesh.GetVertexArray());
+
     for(const auto& subMesh : subMeshes)
     {
-        if(!subMesh.vertexArray.IsValid())
-        {
-            CE_LOG(Warning, "Tried To Draw Sub Mesh With Invalid Vertex Array");
-            continue;
-        }
 
         if(subMesh.materialIndex >= materials.size())
         {
@@ -180,7 +177,7 @@ void Renderer::DrawStaticMesh(const UStaticMesh& staticMesh, const FMatrix4x4F& 
             continue;
         }
 
-        UMaterial* material = resolver->Resolve(materialHandle);
+        UMaterial* material = Resolve(materialHandle);
 
         if(!material)
         {
@@ -196,14 +193,13 @@ void Renderer::DrawStaticMesh(const UStaticMesh& staticMesh, const FMatrix4x4F& 
 
         RHI::Get().SetUniformMat4("u_Model", localToWorld);
 
-        const FMaterialRenderState& renderState = material->GetRenderState();
+        const RHI::FRenderStateDesc& renderState = material->GetRenderState();
 
         RHI::Get().SetCullMode(renderState.cullMode);
         RHI::Get().SetBlendMode(renderState.blendMode);
         RHI::Get().SetDepthTest(renderState.depthTest);
         RHI::Get().SetDepthWrite(renderState.depthWrite);
 
-        RHI::Get().BindVertexArray(subMesh.vertexArray);
         RHI::Get().DrawIndexed(subMesh.drawDesc);
     }
 }
@@ -211,7 +207,7 @@ void Renderer::DrawStaticMesh(const UStaticMesh& staticMesh, const FMatrix4x4F& 
 void Renderer::SetBackend(RHI::Backend backend)
 {
     this->backend = backend;
-    
+
     switch(backend)
     {
         case RHI::Backend::OpenGL:
@@ -277,7 +273,7 @@ void Renderer::Render(const FSceneViewFamily& sceneViewFamily)
             if (!proxy.isVisible || !proxy.staticMesh.IsValid())
                 return;
 
-            if (const UStaticMesh* mesh = GetCurrentAssetResolver()->Resolve(proxy.staticMesh))
+            if (const UStaticMesh* mesh = Resolve(proxy.staticMesh))
                 DrawStaticMesh(*mesh, proxy.localToWorld);
         });
     }

@@ -1,5 +1,6 @@
 #pragma once
-#include "Core/Log.h"
+
+#include <Core/Log.h>
 
 #include <charconv>
 #include <type_traits>

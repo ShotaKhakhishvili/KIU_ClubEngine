@@ -13,6 +13,9 @@ namespace CE_STB
     };
 
     FImageData LoadImage(const std::filesystem::path& path, bool flipVertically = true);
+    FImageData LoadImageFromMemory(const unsigned char* data, size_t size, bool flipVertically = true);
+
     bool SavePNG(const std::filesystem::path& path, const unsigned char* pixels, int width, int height, int channels);
+
     void FreeImageData(FImageData& image);
 }

@@ -12,7 +12,6 @@ namespace CE
 
 struct FSubMesh
 {
-    RHI::VertexArrayHandle vertexArray;
     RHI::DrawIndexedDesc drawDesc;
 
     uint32 materialIndex = 0;

@@ -151,15 +151,7 @@ TextureHandle GLRHI::CreateTexture(const TextureDesc& desc, const void* data)
 {
     assert(desc.dimension == RHI::TextureDimension::Texture2D);
 
-    auto texture = std::make_unique<GLTexture>(
-                    desc.width,
-                    desc.height,
-                    desc.format,
-                    desc.readFormat,
-                    desc.pixelType,
-                    desc.generateMipmaps,
-                    data
-    );
+    auto texture = std::make_unique<GLTexture>(desc, data);
 
     const uint32_t id = nextTextureHandle++;
 
@@ -172,15 +164,7 @@ TextureHandle GLRHI::CreateCubemap(const RHI::TextureDesc& desc, const void* con
 {
     assert(desc.dimension == RHI::TextureDimension::TextureCube);
 
-    auto texture = std::make_unique<GLTexture>(
-                    desc.width,
-                    desc.height,
-                    desc.format,
-                    desc.readFormat,
-                    desc.pixelType,
-                    desc.generateMipmaps,
-                    faceData
-    );
+    auto texture = std::make_unique<GLTexture>(desc, faceData);
 
     const uint32_t id = nextTextureHandle++;
 

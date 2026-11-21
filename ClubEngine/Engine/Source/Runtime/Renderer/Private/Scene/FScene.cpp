@@ -1,7 +1,5 @@
 #include <Renderer/Scene/FScene.h>
 
-#include "Asset/IAssetResolver.h"
-
 namespace CE
 {
 

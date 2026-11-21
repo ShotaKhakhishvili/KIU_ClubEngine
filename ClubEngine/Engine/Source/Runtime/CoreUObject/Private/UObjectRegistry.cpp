@@ -148,5 +148,15 @@ void UObjectRegistry::FlushPendingDestroy()
 
     pendingDestroy.clear();
 }
+void UObjectRegistry::DestroyRegistry()
+{
+    for (auto& slot : slots)
+        slot.object.reset();
+
+    freeList.clear();
+    pendingDestroy.clear();
+    slots.clear();
+    nextID = 0;
+}
 
 }

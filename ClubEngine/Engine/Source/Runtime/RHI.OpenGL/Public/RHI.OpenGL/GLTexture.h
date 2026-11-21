@@ -11,24 +11,8 @@ namespace CE::RHI
 class GLTexture
 {
 public:
-    GLTexture(
-        const uint32_t width, 
-        const uint32_t height, 
-        TextureInternalFormat internalFormat,
-        TextureFormat readFormat,
-        TexturePixelType pixelType,
-        bool generateMipmaps,
-        const void* data
-    );
-    GLTexture(
-        const uint32_t width,
-        const uint32_t height,
-        TextureInternalFormat internalFormat,
-        TextureFormat readFormat,
-        TexturePixelType pixelType,
-        bool generateMipmaps,
-        const void* const* data
-    );
+    GLTexture(const TextureDesc& desc, const void* data);
+    GLTexture(const TextureDesc& desc, const void* const* faceData);
         
     ~GLTexture();
 
@@ -53,7 +37,7 @@ public:
 private:
     TextureID ID{0};
 
-    TextureType type{TextureType::Texture2D};
+    TextureType type;
     
     TextureInternalFormat internalFormat{TextureInternalFormat::RGBA8};
     TextureFormat readFormat{TextureFormat::RGBA};

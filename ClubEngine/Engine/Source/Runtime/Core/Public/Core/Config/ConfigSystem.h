@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/Containers/TArray.h"
+#include <Core/Containers/TArray.h>
 
 #include <Core/Config/IniTypes.h>
 

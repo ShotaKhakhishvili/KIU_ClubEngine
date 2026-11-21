@@ -18,5 +18,10 @@ GLuint ToGL(ShaderStage v) noexcept;
 GLenum ToGL(BufferType type) noexcept;
 GLenum ToGL(PrimitiveType primitive )noexcept;
 GLenum ToGL(IndexType type) noexcept;
+GLenum ToGL(TextureWrap v) noexcept;
+
+GLenum ToGLMagFilter(TextureFilter v) noexcept;
+GLenum ToGLMinFilter(TextureFilter v, bool mipmaps) noexcept;
+GLenum ToGLInternalFormat(TextureInternalFormat format, bool sRGB) noexcept;
 
 }

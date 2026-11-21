@@ -1,8 +1,8 @@
 #pragma once
 
-#include "MathConstants.h"
-#include "MathFunctions.h"
-#include "Vector.h"
-#include "Matrix4x4.h"
-#include "Quat.h"
-#include "Transform.h"
+#include <Core/Math/MathConstants.h>
+#include <Core/Math/MathFunctions.h>
+#include <Core/Math/Vector.h>
+#include <Core/Math/Matrix4x4.h>
+#include <Core/Math/Quat.h>
+#include <Core/Math/Transform.h>

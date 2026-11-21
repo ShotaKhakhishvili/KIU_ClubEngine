@@ -9,37 +9,30 @@
 namespace CE::RHI
 {
 
-GLTexture::GLTexture(
-        const uint32_t width, 
-        const uint32_t height, 
-        TextureInternalFormat internalFormat,
-        TextureFormat readFormat,
-        TexturePixelType pixelType,
-        bool generateMipmaps,
-        const void* data
-    )
-    :   type(TextureType::Texture2D), 
-        internalFormat(internalFormat), 
-        readFormat(readFormat), 
-        pixelType(pixelType),
-        width(width),
-        height(height),
-        generateMipmaps(generateMipmaps)
+GLTexture::GLTexture(const TextureDesc& desc, const void* data)
+    :   type(TextureType::Texture2D),
+        internalFormat(desc.format),
+        readFormat(desc.readFormat),
+        pixelType(desc.pixelType),
+        width(desc.width),
+        height(desc.height),
+        generateMipmaps(desc.generateMipmaps)
 {
-    assert(type == TextureType::Texture2D);
-
     glGenTextures(1, &ID);
     glBindTexture(GL_TEXTURE_2D, ID);
 
-    glTexParameteri(ToGL(type), GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(ToGL(type), GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(ToGL(type), GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(ToGL(type), GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, ToGLMinFilter(desc.minFilter, desc.generateMipmaps));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, ToGLMagFilter(desc.magFilter));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, ToGL(desc.wrapU));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, ToGL(desc.wrapV));
+
+    // Decoded images are tightly packed, RGB rows with odd widths break the default 4-byte alignment
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
     glTexImage2D(
-        ToGL(type),
+        GL_TEXTURE_2D,
         0,
-        ToGL(internalFormat),
+        ToGLInternalFormat(internalFormat, desc.sRGB),
         static_cast<GLsizei>(width),
         static_cast<GLsizei>(height),
         0,
@@ -54,48 +47,43 @@ GLTexture::GLTexture(
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-GLTexture::GLTexture(
-        const uint32_t width,
-        const uint32_t height,
-        TextureInternalFormat internalFormat,
-        TextureFormat readFormat,
-        TexturePixelType pixelType,
-        bool generateMipmaps,
-        const void* const* data
-    )
+GLTexture::GLTexture(const TextureDesc& desc, const void* const* faceData)
     :   type(TextureType::TextureCubeMap),
-        internalFormat(internalFormat),
-        readFormat(readFormat),
-        pixelType(pixelType),
-        width(width),
-        height(height),
-        generateMipmaps(generateMipmaps)
+        internalFormat(desc.format),
+        readFormat(desc.readFormat),
+        pixelType(desc.pixelType),
+        width(desc.width),
+        height(desc.height),
+        generateMipmaps(desc.generateMipmaps)
 {
-    assert(type == TextureType::TextureCubeMap);
-    assert(data != nullptr);
+    assert(faceData != nullptr);
 
     glGenTextures(1, &ID);
     glBindTexture(GL_TEXTURE_CUBE_MAP, ID);
 
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
     for (size_t i = 0; i < 6; ++i)
     {
-        assert(data[i] != nullptr);
+        assert(faceData[i] != nullptr);
 
         glTexImage2D(
             GL_TEXTURE_CUBE_MAP_POSITIVE_X + static_cast<GLenum>(i),
             0,
-            ToGL(internalFormat),
+            ToGLInternalFormat(internalFormat, desc.sRGB),
             static_cast<GLsizei>(width),
             static_cast<GLsizei>(height),
             0,
             ToGL(readFormat),
             ToGL(pixelType),
-            data[i]
+            faceData[i]
         );
     }
 
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, ToGLMinFilter(desc.minFilter, desc.generateMipmaps));
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, ToGLMagFilter(desc.magFilter));
+
+    // Cubemaps always clamp, repeating would show seams between the faces
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);

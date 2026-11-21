@@ -37,6 +37,7 @@ public:
     bool IsAlive(UObjectHandle handle) const;
 
     void FlushPendingDestroy();
+    void DestroyRegistry();
 
 private:
     struct Slot

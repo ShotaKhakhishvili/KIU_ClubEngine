@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Log.h"
-#include "FileIO.h" 
-#include "Math/MathCore.h"
-#include "Types/CoreTypes.h"
-#include "Containers/CoreContainers.h"
+#include <Core/Log.h>
+#include <Core/FileIO.h>
+#include <Core/Math/MathCore.h>
+#include <Core/Types/CoreTypes.h>
+#include <Core/Containers/CoreContainers.h>

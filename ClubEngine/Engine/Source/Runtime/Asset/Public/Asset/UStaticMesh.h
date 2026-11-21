@@ -20,15 +20,27 @@ class UStaticMesh : public UObject
 
 public:
     explicit UStaticMesh() = default;
+    ~UStaticMesh() override;
+
+    void Build(const FMeshImportResult& importResult);
+
+    void SetMaterial(uint32 slot, TObjectHandle<UMaterial> material);
+    const std::vector<TObjectHandle<UMaterial>>& GetMaterials() const;
+    TObjectHandle<UMaterial> GetMaterial(uint32 slot) const;
 
     const std::vector<FSubMesh>& GetSubMeshes() const;
-    const std::vector<TObjectHandle<UMaterial>>& GetMaterials() const;
+    RHI::VertexArrayHandle GetVertexArray() const;
 
-    void AddSubMesh(const FSubMesh& subMesh);
-    void AddSubMeshWithImportResult(const FMeshImportResult* meshRes, uint32 materialIndex = 0);
-    void AddMaterial(TObjectHandle<UMaterial> material);
+    static void SetDefault(TObjectHandle<UStaticMesh> mesh);
+    static TObjectHandle<UStaticMesh> GetDefault();
 
 private:
+    void Release();
+
+    RHI::BufferHandle VBO;
+    RHI::BufferHandle IBO;
+    RHI::VertexArrayHandle VAO;
+
     std::vector<FSubMesh> subMeshes;
     std::vector<TObjectHandle<UMaterial>> materials;
 };

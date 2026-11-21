@@ -1,6 +1,7 @@
 #pragma once
 
-#include <Engine/AssetContext.h>
+#include <CoreUObject/AssetRegistry.h>
+
 #include <Engine/ISystem.h>
 #include <Engine/FOfflineRenderSettings.h>
 
@@ -41,25 +42,24 @@ public:
 
     virtual int Update(float dt) = 0;
 
-    AssetContext& GetAssetContext() noexcept;
-    const AssetContext& GetAssetContext() const noexcept;
-
 protected:
     virtual void PreInit();
 	virtual void PostInit();
         
     std::vector<std::unique_ptr<ISystem>> systems;
+
 private:
     int RunInteractiveLoop();
     int RunOfflineLoop();
+
+    void CreateAssetDefaults();
+    void ReleaseAssetDefaults();
 
     bool CaptureFrame(const RenderSystem& renderSystem, uint32 frame) const;
 
     FOfflineRenderSettings offlineRenderSettings;
 
     bool running{false};
-        
-    AssetContext assetContext{};
 };
 
 }

@@ -286,7 +286,7 @@ enum class LoadOp
     Count
 };
 
-struct RenderStateDesc
+struct FRenderStateDesc
 {
     BlendMode blendMode = BlendMode::Opaque;
     CullMode cullMode = CullMode::Back;
@@ -294,10 +294,20 @@ struct RenderStateDesc
     bool depthTest = true;
 };
 
+enum class EMaterialTextureSlot : uint8
+{
+    BaseColor,
+    MetallicRoughness,
+    Normal,
+    Occlusion,
+    Emissive,
+    Count
+};
+
 struct FMaterialSettings
 {
     FVector4F baseColor{1.0f, 1.0f, 1.0f, 1.0f};
-    float metallic = 1.0f;
+    float metallic = 0.0f;
     float roughness = 1.0f;
     FVectorF emissive{0.0f, 0.0f, 0.0f};
 
@@ -306,7 +316,7 @@ struct FMaterialSettings
     float alphaCutoff = 0.5f;
     bool unlit = false;
 
-    RenderStateDesc renderState;
+    FRenderStateDesc renderState;
 };
 
 }
