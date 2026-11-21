@@ -4,6 +4,18 @@ ClubEngine is a small C++ game/engine framework. The engine source lives in this
 
 The engine requires **C++20** and **CMake 3.20** or newer. Third-party libraries (GLFW, glad, GLM, stb, cgltf, nlohmann/json) are bundled, so you don't need to download anything separately.
 
+## Table of Contents
+
+- [Architecture](#architecture)
+- [Engine Overview](#engine-overview)
+  - [Conventions](#conventions) · [Core](#core) · [UObjects](#uobjects) · [Application and Systems](#application-and-systems) · [World, Levels, Actors, Components](#world-levels-actors-components) · [Rendering](#rendering) · [Assets](#assets) · [Input](#input) · [Current Limitations](#current-limitations)
+- [Offline Rendering](#offline-rendering)
+- [Getting Started](#getting-started)
+  - [Windows Setup](#windows-setup)
+  - [Linux Setup](#linux-setup)
+- [Engine Association](#engine-association)
+- [Folder Layout](#folder-layout)
+
 ## Architecture
 
 ```mermaid
@@ -341,34 +353,9 @@ Any config value can also be set from the command line as `-Section.Key=Value`, 
 MyGame.exe -OfflineRender.Enabled=true -OfflineRender.EndFrame=119 -OfflineRender.OutputDir=Saved/Renders/Shot01
 ```
 
-## Getting Started
+# Getting Started
 
----
-
-## Table of Contents
-
-- [Engine Overview](#engine-overview)
-- [Offline Rendering](#offline-rendering)
-- [Windows Setup](#windows-setup)
-  - [1. Install dependencies](#1-install-dependencies-windows)
-  - [2. First-time tool setup](#2-first-time-tool-setup-windows)
-  - [3. Build the engine](#3-build-the-engine-windows)
-  - [4. Create a project](#4-create-a-project-windows)
-  - [5. Build and run your project](#5-build-and-run-your-project-windows)
-  - [6. Register an existing project](#6-register-an-existing-project-windows)
-  - [7. Reset the environment](#7-reset-the-environment-windows)
-- [Linux Setup](#linux-setup)
-  - [1. Install dependencies](#1-install-dependencies-linux)
-  - [2. First-time tool setup](#2-first-time-tool-setup-linux)
-  - [3. Build the engine](#3-build-the-engine-linux)
-  - [4. Create a project](#4-create-a-project-linux)
-  - [5. Build and run your project](#5-build-and-run-your-project-linux)
-  - [6. Register an existing project](#6-register-an-existing-project-linux)
-  - [7. Reset the environment](#7-reset-the-environment-linux)
-- [Engine Association](#engine-association)
-- [Folder Layout](#folder-layout)
-
----
+Setup is split by platform: follow [Windows Setup](#windows-setup) or [Linux Setup](#linux-setup), then [Engine Association](#engine-association) explains how projects pick an engine build.
 
 ---
 
