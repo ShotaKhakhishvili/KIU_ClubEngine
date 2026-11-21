@@ -2,7 +2,7 @@
 
 ClubEngine is a small C++ game/engine framework. The engine source lives in this repository, while game projects can live anywhere on disk. Projects connect to the engine through the `CLUBENGINE_ROOT` environment variable, a `.clubproject` file, and the ClubEngine tool scripts.
 
-The engine requires **C++20** and **CMake 3.20** or newer. Third-party libraries (GLFW, glad, GLM, stb, nlohmann/json) are bundled, so you don't need to download anything separately.
+The engine requires **C++20** and **CMake 3.20** or newer. Third-party libraries (GLFW, glad, GLM, stb, cgltf, nlohmann/json) are bundled, so you don't need to download anything separately.
 
 ## Architecture
 
@@ -11,13 +11,11 @@ graph TD
     Launch(["Launch<br/>EntryPoint · LaunchRun"])
 
     subgraph EngineModule["  Engine Module  "]
-        Application(["Application<br/>Run · AddSystem · GetSystem"])
-        AssetLibrary(["AssetLibrary<br/>NewObject helper"])
+        Application(["Application<br/>Run · AddSystem · GetSystem · Asset defaults · Offline render"])
         WorldSystem(["WorldSystem<br/>World tick"])
         WindowSystem(["WindowSystem<br/>Window lifecycle"])
         InputSystem(["InputSystem<br/>Window events → FInputState"])
         FpsSystem(["FpsSystem<br/>Frame delta"])
-        AssetContext(["AssetContext<br/>Asset ownership"])
         RenderSystem(["RenderSystem<br/>Builds view families · owns scene render target · presents"])
     end
 
@@ -29,9 +27,11 @@ graph TD
         UActorComponent(["UActorComponent<br/>Tick · Owner · Register / Unregister"])
         USceneComponent(["USceneComponent<br/>World transform · Attachment"])
         UPrimitiveComponent(["UPrimitiveComponent<br/>Visibility · Scene proxy while registered"])
-        UStaticMeshComponent(["UStaticMeshComponent<br/>Set / Get static mesh"])
+        UStaticMeshComponent(["UStaticMeshComponent<br/>Static mesh · Material overrides"])
         ACameraActor(["ACameraActor<br/>Camera component as root"])
         UCameraComponent(["UCameraComponent<br/>FOV · near / far · GetCameraView"])
+        ALight(["ALight<br/>ADirectionalLight · APointLight · ASpotLight"])
+        ULightComponent(["ULightComponent<br/>Color · Intensity · Radius · Cone angles · Light proxy"])
     end
 
     subgraph InputLayer["  Input · Engine Module  "]
@@ -46,18 +46,20 @@ graph TD
     end
 
     subgraph RendererModule["  Renderer Module  "]
-        Renderer(["Renderer<br/>Render view family · Present"])
+        Renderer(["Renderer<br/>Render view family · Light buffers · Present"])
         FSceneViewFamily(["FSceneViewFamily<br/>One scene · one render target · its views"])
         FSceneView(["FSceneView<br/>View / projection · origin · pixel rect"])
         FRenderTarget(["FRenderTarget<br/>Color + depth textures · RHI target · Resize"])
-        FScene(["FScene<br/>Pool of primitive proxies"])
-        FPrimitiveSceneProxy(["FPrimitiveSceneProxy<br/>Mesh · LocalToWorld · Visible"])
+        FScene(["FScene<br/>Pools of primitive and light proxies"])
+        FPrimitiveSceneProxy(["FPrimitiveSceneProxy<br/>Mesh · Override materials · LocalToWorld · Visible"])
+        FLightSceneProxy(["FLightSceneProxy<br/>Light type · Parameters · LocalToWorld · Visible"])
     end
 
     CoreUObject(["CoreUObject<br/>UObject · UClass · TSubclassOf · Registry · TObjectHandle"])
+    AssetRegistry(["AssetRegistry<br/>Global asset owner · Path lookup"])
     Platform(["Platform<br/>IWindow · GLFWWindow · Key conversion · Input events · Cursor mode"])
-    Asset(["Asset<br/>StaticMesh · Material · Shader · Texture"])
-    AssetImport(["AssetImport<br/>OBJ · image loader"])
+    Asset(["Asset<br/>StaticMesh · Material · Shader · Texture · ImportAssetBuilder"])
+    AssetImport(["AssetImport<br/>glTF importer · image loader"])
     RenderCore(["RenderCore<br/>IRHI interface · Handles · Render targets & passes"])
     RHI_OpenGL(["RHI.OpenGL<br/>GLRHI · GL objects · Framebuffers · Blit"])
 
@@ -69,22 +71,20 @@ graph TD
         direction LR
         GLFW(["GLFW"])
         glad(["glad"])
+        cgltf(["cgltf"])
     end
 
     Launch --> Application
-    Launch -->|sets asset context| AssetLibrary
     Application --> WorldSystem
     Application --> WindowSystem
     Application -.->|optional| FpsSystem
-    Application --> AssetContext
+    Application -->|creates defaults · clears on shutdown| AssetRegistry
     Application --> RenderSystem
-    AssetLibrary -.- AssetContext
-
+    Application --> InputSystem
     WindowSystem --> Platform
     RenderSystem --> Renderer
     RenderSystem -->|reads scene| WorldSystem
     WorldSystem --> UWorld
-
     UWorld -->|persistent level| ULevel
     UWorld -->|owns| FScene
     ULevel --> AActor
@@ -95,19 +95,21 @@ graph TD
     UPrimitiveComponent -.->|extends| USceneComponent
     UStaticMeshComponent -.->|extends| UPrimitiveComponent
     UPrimitiveComponent -.->|adds · syncs · removes| FPrimitiveSceneProxy
-
+    ULightComponent -.->|extends| USceneComponent
+    ULightComponent -.->|adds · syncs · removes| FLightSceneProxy
     FScene -->|TPool| FPrimitiveSceneProxy
+    FScene -->|TPool| FLightSceneProxy
     Renderer -->|draws| FSceneViewFamily
     FPrimitiveSceneProxy ==>|TObjectHandle| Asset
-
     ULevel --> CoreUObject
-    AssetContext --> CoreUObject
+    AssetRegistry -->|owns| Asset
+    AssetRegistry --> CoreUObject
     Asset --> CoreUObject
-    AssetImport -->|imports into| Asset
+    Asset -->|builds assets from| AssetImport
+    AssetImport --> cgltf
     Renderer --> RenderCore
     Renderer -->|creates backend| RHI_OpenGL
     RHI_OpenGL -->|implements| RenderCore
-
     UInputComponent -.->|extends| UActorComponent
     UInputComponent -->|binds| UInputAction
     UInputMapContext -->|owns| FActionKeyMapping
@@ -117,18 +119,16 @@ graph TD
     UInputAction -->|owns| UInputTrigger
     UInputAction -->|owns| UInputModifier
     UInputAction --> CoreUObject
-
-    Application --> InputSystem
     InputSystem -->|consumes window events| WindowSystem
     InputSystem -->|builds| FInputState
     FPlayerInput -->|reads| FInputState
     FPlayerInput -->|active contexts| UInputMapContext
     FPlayerInput -->|dispatches events| UInputComponent
-
     AStaticMeshActor -.->|extends| AActor
     AStaticMeshActor -->|root| UStaticMeshComponent
     UStaticMeshComponent ==>|TObjectHandle| Asset
-
+    ALight -.->|extends| AActor
+    ALight -->|root| ULightComponent
     UCameraComponent -.->|extends| USceneComponent
     ACameraActor -.->|extends| AActor
     ACameraActor -->|root| UCameraComponent
@@ -140,8 +140,8 @@ graph TD
     FSceneViewFamily -->|into| FRenderTarget
 
     linkStyle default stroke:#909090,stroke-width:1.8px
-    linkStyle 4,7,18,19,20,21,32,47,50,51 stroke:#505050,stroke-width:1.2px,stroke-dasharray:5 3
-    linkStyle 24,49,53 stroke:#c8a050,stroke-width:2.4px
+    linkStyle 3,17,18,19,20,21,22,36,50,53,55,56 stroke:#505050,stroke-width:1.2px,stroke-dasharray:5 3
+    linkStyle 26,52,58 stroke:#c8a050,stroke-width:2.4px
 
     style EngineModule   fill:#1c1b2e,stroke:#4a4880,stroke-width:1.5px,stroke-dasharray:5 3,color:#9890b8
     style WorldLayer     fill:#1f1c12,stroke:#6a5a28,stroke-width:1.5px,stroke-dasharray:5 3,color:#b8a878
@@ -158,11 +158,11 @@ graph TD
     classDef foundation    fill:#202020,stroke:#444444,stroke-width:1px,color:#a8a8a8
 
     class Launch,Application,FpsSystem,WorldSystem orchestration
-    class RenderSystem,WindowSystem,InputSystem,Renderer,FScene,FPrimitiveSceneProxy,FSceneViewFamily,FSceneView,FRenderTarget,Platform,RenderCore,RHI_OpenGL runtime
-    class AssetContext,AssetLibrary,CoreUObject,Asset,AssetImport asset
-    class UWorld,ULevel,AActor,AStaticMeshActor,ACameraActor,UActorComponent,USceneComponent,UPrimitiveComponent,UStaticMeshComponent,UCameraComponent world
+    class RenderSystem,WindowSystem,InputSystem,Renderer,FScene,FPrimitiveSceneProxy,FLightSceneProxy,FSceneViewFamily,FSceneView,FRenderTarget,Platform,RenderCore,RHI_OpenGL runtime
+    class AssetRegistry,CoreUObject,Asset,AssetImport asset
+    class UWorld,ULevel,AActor,AStaticMeshActor,ACameraActor,ALight,UActorComponent,USceneComponent,UPrimitiveComponent,UStaticMeshComponent,UCameraComponent,ULightComponent world
     class UInputComponent,UInputMapContext,FActionKeyMapping,UInputAction,UInputTrigger,UInputModifier,FInputState,FPlayerInput input
-    class Core,GLFW,glad foundation
+    class Core,GLFW,glad,cgltf foundation
 ```
 
 Dashed arrows are inheritance or optional links. Gold arrows mark `TObjectHandle` references; every other arrow is ownership or a raw pointer (see [UObjects](#uobjects)).
@@ -184,7 +184,7 @@ Dashed arrows are inheritance or optional links. Gold arrows mark `TObjectHandle
   | `I` | Interfaces | `ISystem`, `IWindow`, `IRHI` |
 
   Engine services, systems, and backend classes (`Application`, `Renderer`, `RenderSystem`, `GLRHI`, …) and the `CE::RHI` descriptor types don't take a prefix.
-- **Coordinate system:** X forward, Y right, Z up, left-handed. Rotators are pitch around Y, yaw around Z, and roll around X. The OBJ importer converts Y-up meshes to engine axes by default (`FObjImportSettings::convertAxes`).
+- **Coordinate system:** X forward, Y right, Z up, left-handed. Rotators are pitch around Y, yaw around Z, and roll around X. The glTF importer converts glTF's Y-up axes to engine axes by default (`FGltfImportSettings::convertAxes`).
 - Classes with more than a few template or inline functions are split into a `.h` declaration and a `.inl` implementation that's included at the bottom of the header.
 
 ### Core
@@ -207,7 +207,7 @@ Dashed arrows are inheritance or optional links. Gold arrows mark `TObjectHandle
 - **Class objects:** every class has exactly one `UClass` that describes it at runtime: its name, its parent class, and a function that constructs it. `Class::StaticClass()` returns the `UClass` of a type, `object->GetClass()` returns the `UClass` of what an object actually is, and `object->IsA(SomeClass)` / `object->IsA<T>()` checks the class hierarchy. `UClass::IsChildOf` walks up the parent chain. Classes are identified by their `UClass` pointer, not by name.
 - A class whose `UClass` can construct it needs a public default constructor. Abstract classes and classes without one report `IsAbstract()` and can't be created from their `UClass`.
 - **`TSubclassOf<T>`** stores "which class" as a value: `TSubclassOf<APawn> pawnClass = AMyPawn::StaticClass();`. It holds a `UClass*`, and `Get()` (or `*`, `->`, or the implicit conversion to `UClass*`) only returns it if it is `T` or a child of `T`, otherwise `nullptr`. The check happens when you read it, not when you assign it.
-- `UObjectRegistry::Create(UClass*)` creates an object from its class. The templated `Create<T>(args...)` still takes constructor arguments; only assets use those now, and they'll move to default construction with the asset pipeline.
+- `UObjectRegistry::Create(UClass*)` creates an object from its class. The templated `Create<T>(args...)` still takes constructor arguments; only `UShader` uses them now.
 - UObjects are owned by a `UObjectRegistry` and **cannot be copied or moved**.
 - **`TObjectHandle<T>` is for any reference that can outlive its target.** It's a generational handle that resolves to `nullptr` once its object is gone. Use it for resources (static meshes, materials, textures), which can be unloaded, and for references to objects owned somewhere else that can be destroyed first, like the camera a view target points at.
 - **Raw pointers are only for links that can't dangle:** either the target is guaranteed to outlive the pointer (component → owner actor, actor → level, level → world, an actor's pointers to its own components, and per-frame render data like a view family's scene and render target), or both sides clean the link up explicitly (attachment parent ↔ child).
@@ -222,6 +222,8 @@ Dashed arrows are inheritance or optional links. Gold arrows mark `TObjectHandle
 - A game derives from `CE::Application`, implements `Update(float dt)`, and optionally overrides `PreInit()` and `PostInit()`. `CreateApplication()` is defined by the game and called from `EntryPoint.h`.
 - Engine functionality is split into `ISystem`s, which you add with `AddSystem<T>(args...)` and look up with `GetSystem<T>()`. By default the application adds `WindowSystem`, `InputSystem`, `WorldSystem`, and `RenderSystem` in that order.
 - Systems initialize in the order they were added and shut down in reverse. If one fails to initialize, the ones already initialized are shut down cleanly. If any system's `Update` returns a non-zero code, the application stops.
+- After the systems initialize and before `PostInit()`, the application creates the **asset defaults**: the default shader, the default material (`UMaterial::GetDefault()`), and the default static mesh (`UStaticMesh::GetDefault()`, the built-in cube). On shutdown it resets the defaults and clears the asset registry before any system shuts down, so every GPU resource is released while the RHI is still alive.
+- **Offline rendering:** with `[OfflineRender] Enabled=true` the application renders a fixed number of frames to PNG files instead of opening an interactive window. See [Offline Rendering](#offline-rendering).
 
 ### World, Levels, Actors, Components
 
@@ -244,31 +246,40 @@ Dashed arrows are inheritance or optional links. Gold arrows mark `TObjectHandle
 - **Component registration:** `RegisterComponent()` / `UnregisterComponent()` connect a component to the world and call `OnRegister()` / `OnUnregister()`. Spawning registers all of an actor's components, and destroying an actor or component unregisters them. Registration can be undone and redone; `IsRegistered()` tells the current state.
 - Component hierarchy: `UActorComponent` → `USceneComponent` (transform, attachment) → `UPrimitiveComponent` (visibility, scene proxy) → `UStaticMeshComponent`.
 - `AStaticMeshActor` is a ready-made actor whose root is a `UStaticMeshComponent` (`GetStaticMeshComponent()`). It has no mesh by default; set one with `GetStaticMeshComponent()->SetStaticMesh(mesh)`.
+- **Material overrides:** `UStaticMeshComponent::SetMaterial(slot, material)` overrides one material slot for that component only; the mesh asset and every other component using it are unaffected. `GetMaterial(slot)` returns the override if one is set, otherwise the mesh's own material, and `ClearOverrideMaterials()` removes them all. Overrides can be changed at any time, also while the game is running.
 - An actor class keeps a typed pointer and a getter for each component it creates that other code needs (`GetStaticMeshComponent()`, `GetCameraComponent()`). The root pointer is only for the transform hierarchy, so those getters keep working if the root changes.
 - **Cameras:** `UCameraComponent` is a scene component with a field of view (degrees), a near and a far plane. `GetCameraView()` returns an `FMinimalViewInfo` (position, rotation, FOV, near, far) built from its world transform. `ACameraActor` is a ready-made actor whose root is a camera component (`GetCameraComponent()`).
+- **Lights:** `ULightComponent` is a scene component with a color and an intensity, and it keeps a light proxy in the scene while it's registered, the same way primitives do. `UDirectionalLightComponent` lights the whole scene from the direction it faces. `UPointLightComponent` (through `ULocalLightComponent`) adds an attenuation radius, and `USpotLightComponent` extends it with inner and outer cone angles in degrees, pointing along the component's forward vector. Moving, rotating, hiding or changing a light updates its proxy right away. `ADirectionalLight`, `APointLight` and `ASpotLight` are ready-made actors with the matching component as root (`GetDirectionalLightComponent()`, `GetPointLightComponent()`, `GetSpotLightComponent()`).
 - **View targets:** a camera only renders while it's a view target. `world.AddViewTarget(camera, x, y, width, height)` adds it with a rectangle in normalized screen coordinates (0..1, top-left origin; the default is the whole screen), and `RemoveViewTarget(camera)` removes it. Several view targets give split screen. Targets whose camera was destroyed are dropped at the end of the world's tick.
 
 ### Rendering
 
-- The renderer never touches UObjects or actors directly. It draws an **`FScene`**, which is a `TPool` of **`FPrimitiveSceneProxy`** entries. Each proxy is plain render data: a `TObjectHandle<UStaticMesh>`, a `localToWorld` matrix, and a visibility flag. The renderer resolves the mesh handle when it draws, so a mesh that gets unloaded is simply skipped.
-- `FScene` API: `AddProxy`, `RemoveProxy`, `UpdateTransform`, `UpdateStaticMesh`, `SetVisible`, and `ForEachPrimitive`. Each `UWorld` owns its scene, and you can get it with `GetScene()`.
+- The renderer never touches UObjects or actors directly. It draws an **`FScene`**, which holds two `TPool`s: **`FPrimitiveSceneProxy`** entries and **`FLightSceneProxy`** entries. A primitive proxy is plain render data: a `TObjectHandle<UStaticMesh>`, the component's override materials, a `localToWorld` matrix, and a visibility flag. A light proxy holds the light type, its `FLightParameters` (color, intensity, attenuation radius, cone angles), a `localToWorld` matrix, and a visibility flag. The renderer resolves asset handles when it draws, so a mesh or material that gets unloaded is simply skipped.
+- `FScene` API: `AddPrimitive`, `RemovePrimitive`, `UpdatePrimitiveTransform`, `UpdatePrimitiveStaticMesh`, `UpdatePrimitiveOverrideMaterials`, `UpdatePrimitiveVisibility` and `ForEachPrimitive` for primitives; `AddLight`, `RemoveLight`, `UpdateLightTransform`, the `UpdateLight…` parameter setters, `UpdateLightVisibility` and `ForEachLight` for lights. Each `UWorld` owns its scene, and you can get it with `GetScene()`.
+- **Materials per sub-mesh:** for each sub-mesh the renderer uses the primitive's override material for that slot if there is one, otherwise the mesh's own material.
+- **Lighting:** every frame the renderer packs the visible lights into two GPU buffers (directional lights and local point/spot lights, which grow as needed) and the light counts into the frame data, and the shaders read all of them. There are no shadows yet.
 - A `UPrimitiveComponent` owns its proxy while it's registered: it adds the proxy in `OnRegister`, pushes changes from transform updates and `SetVisible` to it, and removes it in `OnUnregister`. Changes made before registration are stored and picked up when the proxy is created. Hidden proxies are skipped by the renderer.
 - **Render targets:** the scene isn't drawn to the window directly. `RenderSystem` owns an **`FRenderTarget`**: a color texture, an optional depth texture, and the RHI render target that combines them. It's recreated whenever the window size changes (a minimized window keeps the old one).
 - **Views:** an **`FSceneView`** is one camera's view for one frame: view and projection matrices, the camera position (`viewOrigin`, double precision), and a pixel rectangle in the render target. An **`FSceneViewFamily`** is all the views of one scene drawn into one render target. Families and views are rebuilt every frame and never stored.
 - **One frame:** `RenderSystem` resizes the render target to the window, turns each of the world's view targets into an `FSceneView` (skipping destroyed or unregistered cameras), and builds one view family from the world's scene and the render target. `Renderer::Render(family)` opens a render pass on the target, clears it, and draws the scene once per view, with the viewport and scissor set to that view's rectangle. `Renderer::Present(target, rect)` copies the result to the window, then the window buffers are swapped.
 - A family can skip clearing its target, so several families (for example a second world shown as a minimap) can draw into the same target one after another.
 - **Precision:** world positions and rotations are doubles. They're converted to float matrices when the views are built, at the renderer boundary.
-- If a sub-mesh has a missing or invalid material, or its shader failed to compile, the renderer skips it instead of crashing.
+- If a sub-mesh has no material (neither an override nor its own), or its shader failed to compile, the renderer skips it instead of crashing.
 - The rendering backend sits behind the `IRHI` interface (`RenderCore`). OpenGL (`RHI.OpenGL`) is the only backend right now.
 - **RHI render passes:** `CreateRenderTarget` combines existing textures without owning them. `BeginRenderPass` / `EndRenderPass` bind a render target (an invalid handle means the window) and clear or keep its color and depth (`LoadOp`). `SetViewport` / `SetScissor` only work inside a pass. `BlitToBackbuffer` copies a render target to the window, and `SetBackbufferSize` tells the RHI the window's size in pixels.
 - All rectangles passed to the RHI use a top-left origin. The OpenGL backend flips them to OpenGL's bottom-left origin itself, so nothing above the RHI deals with that.
 
 ### Assets
 
-- `UStaticMesh` is a list of `FSubMesh`es (a vertex array, a draw descriptor, and a material index) plus the `UMaterial` handles they use.
-- `UMaterial` binds a `UShader` with its uniform values, textures, and render state (blend, cull, depth). `UTexture` loads 1, 2, 3 and 4 channel images and sizes the texture from the image itself.
-- Create assets with `NewObject<T>(args...)`. It creates them in the application's `AssetContext`, which owns them.
-- `AssetImport` contains the OBJ mesh importer and the stb-based image loader.
+- **Asset registry:** every asset is owned by one global **`AssetRegistry`** (`CoreUObject`), reached through `GetAssetRegistry()`. Create assets with `NewAsset<T>(args...)`, resolve handles with `Resolve(handle)`, and destroy them with `DestroyAsset(handle)`. World objects (actors and components) are not in it; they live in their level's registries.
+- **Path lookup:** `RegisterPath(path, handle)` names an asset by its file path, and `FindByPath<T>(path)` finds it again (returning an invalid handle if it's missing, destroyed, or of another type). Paths are normalized first, so different spellings of the same file match.
+- `UStaticMesh` is a list of `FSubMesh`es (a vertex array, a draw descriptor, and a material index) plus one material slot per sub-mesh.
+- `UMaterial` binds a `UShader` with its settings, uniform values, textures, and render state (blend, cull, depth). Its `RHI::FMaterialSettings` are the glTF metallic-roughness values: `baseColor`, `metallic`, `roughness`, `emissive`, `normalScale`, `occlusionStrength`, `alphaCutoff` and `unlit`. Each texture slot (base color, metallic-roughness, normal, occlusion, emissive) is optional. `Bind()` tells the shader which slots have a texture (`u_Has…Texture`); without one, the plain value is used on its own, so a material with no textures is a plain color.
+- `UTexture` loads 1, 2, 3 and 4 channel images, from a file or from encoded bytes in memory, and sizes the texture from the image itself.
+- **Defaults:** `UMaterial::GetDefault()` and `UStaticMesh::GetDefault()` return the engine's default material and mesh. Imported materials take their shader from the default material, and sub-meshes without a material fall back to it.
+- **Importing meshes:** `ImportStaticMesh(path)` (`<Asset/ImportAssetBuilder.h>`) imports a `.gltf` or `.glb` file and returns a `TObjectHandle<UStaticMesh>`. It flattens the file's whole node hierarchy into one static mesh with one sub-mesh per material section, and creates its textures and materials as assets too. Importing a path that's already been imported returns the existing mesh instead of loading it again.
+- Importing is split in two: `AssetImport` reads files into plain import data (`GltfImporter` produces an `FSceneImportResult`; the stb image loader reads PNG/JPG), and `ImportAssetBuilder` in `Asset` turns that data into registered assets. Importing only creates assets, never actors.
+- **Built-in shapes:** `Engine/Source/Runtime/Engine/Public/Engine/Geometry/` holds `Cube`, `Sphere`, `Cylinder`, `Cone` and `Plane` as `.glb` files: 1 unit across, centered on the origin, upright along Z, with normals, tangents and UVs and no materials (so they render with the default material or an override).
 
 ### Input
 
@@ -305,7 +316,30 @@ Input follows an action-based model: gameplay code binds to **actions**, never t
 - `OnSpawned()` always runs at the end of spawning. There's no `BeginPlay`/`EndPlay` or "world has begun play" state yet; that comes with the game mode.
 - Every class needs its `IMPLEMENT_CLASS` line written by hand; there's no header tool that generates it.
 - `AVoxelTerrain` / `UVoxelGrid` are work in progress.
-- Asset paths and serialization aren't implemented yet; assets are loaded from paths in code.
+- Assets can be found by path once they're imported, but there's no asset serialization or custom asset format yet; assets are imported from source files at runtime.
+- The glTF importer turns a whole file into one static mesh. Node hierarchies aren't kept as separate meshes, and skinned meshes and animations aren't imported.
+- There's no ambient light, sky, or shadows yet.
+
+## Offline Rendering
+
+Offline rendering runs the game for a fixed number of frames and saves each frame as a PNG, without an interactive window. It's configured in the `[OfflineRender]` section of the render config (`Engine/Config/BaseRender.ini`, overridden by the project's `Config/DefaultRender.ini`):
+
+| Key | Default | Meaning |
+|---|---|---|
+| `Enabled` | `false` | Turns offline rendering on |
+| `FPS` | `30` | Frame rate; every frame advances the game by exactly `1 / FPS` seconds |
+| `StartFrame` / `EndFrame` | `0` / `0` | Frames `0..EndFrame` are simulated; frames from `StartFrame` on are saved |
+| `Width` / `Height` | `1920` / `1080` | Output size, independent of the window |
+| `OutputDir` | `Saved/Renders` | Output folder, relative to the project unless absolute |
+| `ForceOpaqueAlpha` | `true` | Writes alpha as fully opaque |
+
+Frames are saved as `frame_0000.png`, `frame_0001.png`, …. While it's enabled the window is hidden and VSync is off.
+
+Any config value can also be set from the command line as `-Section.Key=Value`, so a render can be started without editing files:
+
+```
+MyGame.exe -OfflineRender.Enabled=true -OfflineRender.EndFrame=119 -OfflineRender.OutputDir=Saved/Renders/Shot01
+```
 
 ## Getting Started
 
@@ -314,6 +348,7 @@ Input follows an action-based model: gameplay code binds to **actions**, never t
 ## Table of Contents
 
 - [Engine Overview](#engine-overview)
+- [Offline Rendering](#offline-rendering)
 - [Windows Setup](#windows-setup)
   - [1. Install dependencies](#1-install-dependencies-windows)
   - [2. First-time tool setup](#2-first-time-tool-setup-windows)
@@ -751,9 +786,9 @@ ClubEngine/
   CMakeLists.txt          — Root build file (defines engine version)
   Engine/
     Source/Runtime/       — Engine source modules
-    ThirdParty/           — Bundled libraries (GLFW, glad, GLM, stb, nlohmann/json)
+    ThirdParty/           — Bundled libraries (GLFW, glad, GLM, stb, cgltf, nlohmann/json)
     Config/               — Base engine config files
-    Programs/             — Standalone tools (e.g. AssetImporter)
+    Programs/             — Standalone tools (e.g. AssetImporter, a glTF import checker)
   Templates/
     Project/              — Template used by club-new-project
   Tools/
