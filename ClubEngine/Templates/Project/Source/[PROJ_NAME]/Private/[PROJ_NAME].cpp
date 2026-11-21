@@ -4,7 +4,6 @@
 
 int [PROJ_NAME]App::Update(float dt)
 {
-    (void)GetAssetContext();
     (void)dt;
 
     return 0;

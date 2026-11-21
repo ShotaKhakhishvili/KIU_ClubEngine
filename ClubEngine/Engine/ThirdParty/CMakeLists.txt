@@ -5,6 +5,12 @@ set(GLFW_BUILD_DOCS     OFF CACHE BOOL "" FORCE)
 set(GLFW_INSTALL        OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 
+# Linux: build the X11 backend only. Wayland needs extra dev tools (wayland-scanner, protocols),
+# and X11 also runs on Wayland desktops through XWayland. Pass -DGLFW_BUILD_WAYLAND=ON to build it anyway.
+if(NOT DEFINED GLFW_BUILD_WAYLAND)
+    set(GLFW_BUILD_WAYLAND OFF CACHE BOOL "Build GLFW's Wayland backend")
+endif()
+
 add_subdirectory(GLFW)
 add_library(ThirdParty::glfw ALIAS glfw)
 
